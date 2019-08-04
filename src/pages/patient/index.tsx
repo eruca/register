@@ -1,8 +1,10 @@
 import Taro, { useState, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
-import dayjs from 'dayjs';
-
+import { useDispatch, useSelector } from '@tarojs/redux';
 import { AtForm, AtInput, AtButton, AtSwitch, AtMessage, AtCalendar, AtModal } from 'taro-ui';
+
+import { add } from '../../actions/patient';
+import { zeroValue } from '../../reducers/patient';
 import {
     useStringField,
     test_100_299,
@@ -12,46 +14,80 @@ import {
     null_func,
     testNumber_16_139,
 } from './config';
+import './index.scss';
+
+const dispatch = useDispatch();
 
 export default function Patient() {
-    const [name, setName, validateName] = useStringField('', '名字不能为空');
-    const [hospId, setHospID, validateHospId] = useStringField('', '病案号不能为空');
+    const { data, index } = useSelector((state: any) => state.patient);
+
+    let defaultValue = zeroValue();
+    if (index >= 0) {
+        defaultValue = data[index];
+    }
+
+    const [name, setName, validateName] = useStringField(defaultValue.name, '名字不能为空');
+    const [hospId, setHospID, validateHospId] = useStringField(
+        defaultValue.hospId,
+        '病案号不能为空'
+    );
     const [isMale, setIsMale] = useState(true);
-    const [age, setAge, validateAge] = useStringField('', '年龄需在16-139之间', testNumber_16_139);
-    const [bed, setBed, validateBed] = useStringField('', '床号在1-100之间', test_1_99);
+    const [age, setAge, validateAge] = useStringField(
+        defaultValue.age === 0 ? '' : defaultValue.age.toString(),
+        '年龄需在16-139之间',
+        testNumber_16_139
+    );
+    const [bed, setBed, validateBed] = useStringField(
+        defaultValue.bed === 0 ? '' : defaultValue.bed.toString(),
+        '床号在1-100之间',
+        test_1_99
+    );
     const [height, setHeigt, validateHeight] = useStringField(
-        '',
+        defaultValue.height === 0 ? '' : defaultValue.height.toString(),
         '身高在100-299之间',
         test_100_299
     );
 
-    const [admittime, setAdmittime] = useState(dayjs().format('YYYY-MM-DD'));
+    const [admittime, setAdmittime] = useState(defaultValue.admittime);
     const [isOpen, setIsOpen] = useState(false);
     const setOpen = useCallback(() => setIsOpen(true), [setIsOpen]);
 
-    const [weight, setWeight, validateWeight] = useStringField('', '体重在20-299', test_20_299);
+    const [enrolltime, setEnrolltime] = useState(defaultValue.enrolltime);
 
-    const [pickerIndex, setPickerIndex] = useState(0);
-    const [needVesopressor, setNeedVesopressor] = useState(false);
-    const [needVentilation, setNeedVentilation] = useState(false);
+    const [weight, setWeight, validateWeight] = useStringField(
+        defaultValue.weight === 0 ? '' : defaultValue.weight.toFixed(2),
+        '体重在20-299',
+        test_20_299
+    );
+
+    const [pickerIndex, setPickerIndex] = useState(defaultValue.diagnoseIndex);
+    const [needVesopressor, setNeedVesopressor] = useState(defaultValue.needVesopressor);
+    const [needVentilation, setNeedVentilation] = useState(defaultValue.needVentilation);
     const [apache2, setApache2, validateApache2] = useStringField(
-        '',
+        defaultValue.apache2 === 0 ? '' : defaultValue.apache2.toString(),
         'ApacheII分值在0~71分',
         (v: string) => {
             const num = parseInt(v, 10);
             return !Number.isNaN(num) && num >= 0 && num <= 71;
         }
     );
-    const [agi, setAgi, validateAGI] = useStringField('', 'AGI评分0-4', (v: string) => {
-        const num = parseInt(v, 10);
-        return !Number.isNaN(num) && num >= 0 && num <= 4;
-    });
-    const [nrs2002, setNrs2002, validateNRS2002] = useStringField('', 'NRS2002评分不能为空');
+    const [agi, setAgi, validateAGI] = useStringField(
+        defaultValue.agi === 0 ? '' : defaultValue.agi.toString(),
+        'AGI评分0-4',
+        (v: string) => {
+            const num = parseInt(v, 10);
+            return !Number.isNaN(num) && num >= 0 && num <= 4;
+        }
+    );
+    const [nrs2002, setNrs2002, validateNRS2002] = useStringField(
+        defaultValue.nrs2002 === 0 ? '' : defaultValue.nrs2002.toString(),
+        'NRS2002评分不能为空'
+    );
 
     const onSubmit = () => {
         if (
-            validateName() &&
             validateHospId() &&
+            validateName() &&
             validateAge() &&
             validateBed() &&
             validateHeight() &&
@@ -60,7 +96,25 @@ export default function Patient() {
             validateAGI() &&
             validateNRS2002()
         ) {
-            console.log('submit');
+            dispatch(
+                add({
+                    hospId,
+                    name,
+                    age: parseInt(age, 10),
+                    isMale,
+                    bed: parseInt(bed, 10),
+                    admittime,
+                    enrolltime,
+                    height: parseInt(height, 10),
+                    weight: parseInt(weight, 10),
+                    diagnoseIndex: pickerIndex,
+                    needVesopressor,
+                    needVentilation,
+                    apache2: parseInt(apache2, 10),
+                    agi: parseInt(agi, 10),
+                    nrs2002: parseInt(nrs2002, 10),
+                })
+            );
         }
     };
 
@@ -69,6 +123,13 @@ export default function Patient() {
             <AtMessage />
             <AtForm onSubmit={onSubmit} onReset={() => {}}>
                 <AtInput
+                    name="hospId"
+                    title="病案号:"
+                    type="text"
+                    value={hospId}
+                    onChange={(v: string) => setHospID(v)}
+                />
+                <AtInput
                     name="name"
                     title="姓名:"
                     type="text"
@@ -76,15 +137,8 @@ export default function Patient() {
                     autoFocus={true}
                     onChange={(v: string) => setName(v)}
                 />
-                <AtInput
-                    name="hospId"
-                    title="病案号:"
-                    type="text"
-                    value={hospId}
-                    onChange={(v: string) => setHospID(v)}
-                />
                 <AtSwitch
-                    title={`性别: ${isMale ? '男' : '女'}`}
+                    title={`性别(${isMale ? '男' : '女'}): `}
                     checked={isMale}
                     onChange={v => setIsMale(v)}
                 />
@@ -112,6 +166,19 @@ export default function Patient() {
                     onFocus={setOpen}
                     onChange={setOpen}
                 />
+                <Picker
+                    mode="date"
+                    value={enrolltime}
+                    onChange={e => setEnrolltime(e.detail.value)}
+                >
+                    <AtInput
+                        name="enrolltime"
+                        title="入组时间:"
+                        type="text"
+                        value={enrolltime}
+                        onChange={null_func}
+                    />
+                </Picker>
                 <AtInput
                     name="height"
                     title="身高(cm):"
@@ -185,7 +252,14 @@ export default function Patient() {
                     onChange={(v: string) => setNrs2002(v)}
                 />
                 <AtButton type="primary" formType="submit">
-                    提交
+                    {index >= 0 ? '修改' : '提交'}
+                </AtButton>
+                <AtButton
+                    type="primary"
+                    className="margin-top-1px"
+                    onClick={() => Taro.navigateTo({ url: '/pages/form/index' })}
+                >
+                    进入项目
                 </AtButton>
             </AtForm>
         </View>

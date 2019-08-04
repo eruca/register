@@ -29,7 +29,8 @@ class App extends Component {
             'pages/index/index',
             'pages/patient/index',
             'pages/result/index',
-            'pages/form/index',
+            'pages/grid/index',
+            'pages/list/index',
         ],
 
         tabBar: {
@@ -41,17 +42,17 @@ class App extends Component {
                     selectedIconPath: './assets/home_selected.png',
                 },
                 {
-                    pagePath: 'pages/patient/index',
-                    text: '患者',
+                    pagePath: 'pages/list/index',
+                    text: '所有患者',
                     iconPath: './assets/user.png',
                     selectedIconPath: './assets/user_selected.png',
                 },
-                {
-                    pagePath: 'pages/form/index',
-                    text: '登记',
-                    iconPath: './assets/form.png',
-                    selectedIconPath: './assets/form_selected.png',
-                },
+                // {
+                //     pagePath: 'pages/form/index',
+                //     text: '登记',
+                //     iconPath: './assets/form.png',
+                //     selectedIconPath: './assets/form_selected.png',
+                // },
                 {
                     pagePath: 'pages/result/index',
                     text: '结局',
