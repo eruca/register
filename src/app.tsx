@@ -31,6 +31,7 @@ class App extends Component {
             'pages/result/index',
             'pages/grid/index',
             'pages/list/index',
+            'pages/form/index',
         ],
 
         tabBar: {

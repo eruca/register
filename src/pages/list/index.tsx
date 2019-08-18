@@ -3,7 +3,7 @@ import { View, Text } from '@tarojs/components';
 import { AtList, AtListItem, AtSearchBar, AtFab } from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 
-import { IItem } from '../../reducers/patient';
+import { IPatient } from '../../reducers/patient';
 import { indexOfPatientSelect } from '../../actions/patient';
 
 import './index.scss';
@@ -18,13 +18,13 @@ function newPatient() {
 }
 
 export default function List() {
-    const state: Array<IItem> = useSelector((state: any) => state.patient.data);
+    const state: Array<IPatient> = useSelector((state: any) => state.patients.data);
     const [hospId, setHospId] = useState('');
     const filtered = useMemo(() => {
         if (hospId === '') {
             return state;
         }
-        return state.filter((item: IItem) => item.hospId.startsWith(hospId));
+        return state.filter((item: IPatient) => item.hospId.startsWith(hospId));
     }, [state, hospId]);
 
     const onChange = useCallback((v: string) => setHospId(v), [setHospId]);

@@ -1,6 +1,3 @@
-import Taro, { Dispatch, useState } from '@tarojs/taro';
-// import {} from 'taro-ui'
-
 const reNumber = /^(?:[1-9]\d|1[1-3]\d)$/;
 export function testNumber_16_139(v: string): boolean {
     return reNumber.test(v);
@@ -21,23 +18,6 @@ export function test_20_299(v: string): boolean {
     return weightNum.test(v);
 }
 
-// export function wrap(fn: Dispatch<any>, fn2: (v: string) => boolean, message: string) {
-//     return function(v: string) {
-//         if (v === '') {
-//             return
-//         }
-//         if (!fn2(v)) {
-//             Taro.atMessage({
-//                 message: `输入错误:${message}`,
-//                 type: 'error',
-//             })
-//             fn('')
-//         } else {
-//             fn(v)
-//         }
-//     }
-// }
-
 export const selector = [
     '呼吸系统病变',
     '心血管系统病变',
@@ -53,26 +33,3 @@ export const selector = [
     '心脏骤停',
     '其他',
 ];
-
-export const null_func = () => {};
-
-export const defaultValidator: (v: any) => boolean = (v: any) => v !== '';
-
-export function useStringField(
-    initialValue: any,
-    message: string,
-    valid: (v: any) => boolean = defaultValidator
-): [any, Dispatch<any>, () => boolean] {
-    const [field, setField] = useState(initialValue);
-    const validator = (): boolean => {
-        if (!valid(field)) {
-            Taro.atMessage({
-                message,
-                type: 'error',
-            });
-            return false;
-        }
-        return true;
-    };
-    return [field, setField, validator];
-}

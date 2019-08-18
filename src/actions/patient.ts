@@ -1,8 +1,8 @@
-import { IItem } from '../reducers/patient';
+import { IPatient } from '../reducers/patient';
 import { PATIENT_ADD, PATIENT_INDEX } from '../constants/patient';
 import { IAction } from './base';
 
-export function add(item: IItem): IAction {
+export function add(item: IPatient): IAction {
     return {
         type: PATIENT_ADD,
         payload: { item },

@@ -1,30 +1,23 @@
-import Taro, { useState, useCallback } from '@tarojs/taro';
+import Taro, { useState } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { useDispatch, useSelector } from '@tarojs/redux';
-import { AtForm, AtInput, AtButton, AtSwitch, AtMessage, AtCalendar, AtModal } from 'taro-ui';
+import { AtForm, AtInput, AtButton, AtSwitch, AtMessage } from 'taro-ui';
 
 import { add } from '../../actions/patient';
 import { zeroValue } from '../../reducers/patient';
-import {
-    useStringField,
-    test_100_299,
-    test_1_99,
-    test_20_299,
-    selector,
-    null_func,
-    testNumber_16_139,
-} from './config';
+import { useStringField } from '../../utils';
+import { test_100_299, test_1_99, test_20_299, selector, testNumber_16_139 } from './config';
+import FormField from '../../components/FormField';
 import './index.scss';
+import uuid from '../../utils/uuid';
+import { IReducers } from '../../reducers';
 
 const dispatch = useDispatch();
 
 export default function Patient() {
-    const { data, index } = useSelector((state: any) => state.patient);
+    const { index, data } = useSelector((state: IReducers) => state.patients);
 
-    let defaultValue = zeroValue();
-    if (index >= 0) {
-        defaultValue = data[index];
-    }
+    const defaultValue = index === undefined ? zeroValue() : data[index];
 
     const [name, setName, validateName] = useStringField(defaultValue.name, '名字不能为空');
     const [hospId, setHospID, validateHospId] = useStringField(
@@ -49,9 +42,6 @@ export default function Patient() {
     );
 
     const [admittime, setAdmittime] = useState(defaultValue.admittime);
-    const [isOpen, setIsOpen] = useState(false);
-    const setOpen = useCallback(() => setIsOpen(true), [setIsOpen]);
-
     const [enrolltime, setEnrolltime] = useState(defaultValue.enrolltime);
 
     const [weight, setWeight, validateWeight] = useStringField(
@@ -98,6 +88,7 @@ export default function Patient() {
         ) {
             dispatch(
                 add({
+                    rowid: uuid(),
                     hospId,
                     name,
                     age: parseInt(age, 10),
@@ -158,31 +149,20 @@ export default function Patient() {
                     value={bed}
                     onChange={(v: string) => setBed(v)}
                 />
-                <AtInput
-                    name="admittime"
-                    title="入院时间"
-                    type="text"
-                    value={admittime}
-                    onFocus={setOpen}
-                    onChange={setOpen}
-                />
+                <Picker mode="date" value={admittime} onChange={e => setAdmittime(e.detail.value)}>
+                    <FormField name="入院时间" value={admittime} />
+                </Picker>
                 <Picker
                     mode="date"
                     value={enrolltime}
                     onChange={e => setEnrolltime(e.detail.value)}
                 >
-                    <AtInput
-                        name="enrolltime"
-                        title="入组时间:"
-                        type="text"
-                        value={enrolltime}
-                        onChange={null_func}
-                    />
+                    <FormField name="入组时间" value={enrolltime} />
                 </Picker>
                 <AtInput
                     name="height"
                     title="身高(cm):"
-                    type="text"
+                    type="number"
                     placeholder="100-250"
                     value={height}
                     onChange={(v: string) => setHeigt(v)}
@@ -190,32 +170,18 @@ export default function Patient() {
                 <AtInput
                     name="weight"
                     title="体重(Kg):"
-                    type="text"
+                    type="digit"
                     placeholder="30-300"
                     value={weight}
                     onChange={(v: string) => setWeight(v)}
                 />
-                <AtModal isOpened={isOpen} onClose={() => setIsOpen(false)}>
-                    <AtCalendar
-                        onDayClick={(item: { value: string }) => {
-                            setAdmittime(item.value);
-                            setIsOpen(false);
-                        }}
-                    />
-                </AtModal>
                 <Picker
                     mode="selector"
                     range={selector}
                     value={pickerIndex}
                     onChange={e => setPickerIndex(e.detail.value)}
                 >
-                    <AtInput
-                        name="disease"
-                        title="主要诊断:"
-                        type="text"
-                        value={selector[pickerIndex]}
-                        onChange={null_func}
-                    />
+                    <FormField name="主要诊断" value={selector[pickerIndex]} />
                 </Picker>
                 <AtSwitch
                     title="需要升压药"
@@ -252,12 +218,12 @@ export default function Patient() {
                     onChange={(v: string) => setNrs2002(v)}
                 />
                 <AtButton type="primary" formType="submit">
-                    {index >= 0 ? '修改' : '提交'}
+                    {index === undefined ? '提交' : '修改'}
                 </AtButton>
                 <AtButton
                     type="primary"
                     className="margin-top-1px"
-                    onClick={() => Taro.navigateTo({ url: '/pages/form/index' })}
+                    onClick={() => Taro.navigateTo({ url: '/pages/grid/index' })}
                 >
                     进入项目
                 </AtButton>
