@@ -16,6 +16,8 @@ import './app.scss';
 
 const store = configStore();
 
+Taro.cloud.init();
+
 class App extends Component {
     /**
      * 指定config的类型声明为: Taro.Config

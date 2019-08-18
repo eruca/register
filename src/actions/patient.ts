@@ -9,7 +9,8 @@ export function add(item: IPatient): IAction {
     };
 }
 
-export function indexOfPatientSelect(index?: number): IAction {
+// index: 实际上时_id
+export function indexOfPatientSelect(index: string): IAction {
     return {
         type: PATIENT_INDEX,
         payload: { index },

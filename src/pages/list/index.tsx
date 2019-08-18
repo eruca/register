@@ -1,31 +1,44 @@
-import Taro, { useState, useMemo, useCallback } from '@tarojs/taro';
+import Taro, { useState, useMemo, useCallback, useEffect } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components';
 import { AtList, AtListItem, AtSearchBar, AtFab } from 'taro-ui';
-import { useSelector, useDispatch } from '@tarojs/redux';
+import { useDispatch } from '@tarojs/redux';
 
 import { IPatient } from '../../reducers/patient';
 import { indexOfPatientSelect } from '../../actions/patient';
+import { fuzzysearch } from '../../utils';
+import db from '../../utils/db';
 
 import './index.scss';
 
 const dispatch = useDispatch();
 
 function newPatient() {
-    dispatch(indexOfPatientSelect());
+    dispatch(indexOfPatientSelect(''));
     Taro.navigateTo({
         url: '/pages/patient/index',
     });
 }
 
 export default function List() {
-    const state: Array<IPatient> = useSelector((state: any) => state.patients.data);
+    const [patients, setPatients] = useState<Array<IPatient>>([]);
+    const [cnt, setCount] = useState(0);
+
+    useEffect(() => {
+        db.collection('patients')
+            .get()
+            .then(res => setPatients(res.data as Array<IPatient>));
+    }, [cnt, setPatients]);
+
+    console.log('patients ->', patients);
+
     const [hospId, setHospId] = useState('');
     const filtered = useMemo(() => {
         if (hospId === '') {
-            return state;
+            return patients;
         }
-        return state.filter((item: IPatient) => item.hospId.startsWith(hospId));
-    }, [state, hospId]);
+        // item.hospId.startsWith(hospId)
+        return patients.filter((item: IPatient) => fuzzysearch(hospId, item.hospId + item.name));
+    }, [patients, hospId]);
 
     const onChange = useCallback((v: string) => setHospId(v), [setHospId]);
     return (
@@ -36,10 +49,12 @@ export default function List() {
                 </AtFab>
             </View>
             <AtSearchBar
-                actionName="搜索"
+                showActionButton
+                actionName="更新"
                 value={hospId}
                 placeholder="输入病案号"
                 onChange={onChange}
+                onActionClick={() => setCount(cnt + 1)}
             />
             {filtered.length === 0 ? (
                 <View>没有数据</View>
@@ -50,7 +65,7 @@ export default function List() {
                             key={i}
                             title={`${item.hospId} - ${item.name}`}
                             onClick={() => {
-                                dispatch(indexOfPatientSelect(i));
+                                dispatch(indexOfPatientSelect(item._id || ''));
                                 Taro.navigateTo({
                                     url: `/pages/patient/index`,
                                 });
