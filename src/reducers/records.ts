@@ -1,9 +1,7 @@
 import dayjs from 'dayjs';
 
-import { RECORD_ADD, RECORD_INDEX } from '../constants/record';
+import { RECORD_INDEX } from '../constants/record';
 import { IAction } from '../actions/base';
-
-import uuid from '../utils/uuid';
 
 export interface IRecord {
     rowid: string;
@@ -29,7 +27,7 @@ export interface IRecord {
 
 export function zeroRecord(): IRecord {
     return {
-        rowid: uuid(),
+        rowid: '',
         patientid: 'ppp',
         recordtime: dayjs().format('YYYY-MM-DD'),
         nasalFeedTubeType: 0,
@@ -52,68 +50,18 @@ export function zeroRecord(): IRecord {
 }
 
 export interface IRecordState {
-    data: Array<IRecord>;
-    index?: number;
+    index: string;
 }
 
 const INIT_STATE: IRecordState = {
-    data: [
-        {
-            rowid: uuid(),
-            patientid: '1',
-            recordtime: '2019-07-22',
-            nasalFeedTubeType: 0,
-            enteralCalories: 500,
-            parenteralCalories: 500,
-            prealbumin: 300,
-            totalProtein: 60,
-            albumin: 34,
-            serumTransferrin: 3.3,
-            lymphocyteCount: 300,
-            hemoglobin: 120,
-            fastingGlucose: 9.3,
-            gastricRetention: 0,
-            injectionOfAlbumin: 0,
-            misinhalation: false,
-            diarrhea: false,
-            gastrointestinalHemorrhage: false,
-            agiScore: 0,
-        },
-        {
-            rowid: uuid(),
-            patientid: '0',
-            recordtime: '2019-07-25',
-            nasalFeedTubeType: 0,
-            enteralCalories: 500,
-            parenteralCalories: 500,
-            prealbumin: 300,
-            totalProtein: 60,
-            albumin: 34,
-            serumTransferrin: 3.3,
-            lymphocyteCount: 300,
-            hemoglobin: 120,
-            fastingGlucose: 9.3,
-            gastricRetention: 0,
-            injectionOfAlbumin: 0,
-            misinhalation: false,
-            diarrhea: false,
-            gastrointestinalHemorrhage: false,
-            agiScore: 0,
-        },
-    ],
+    index: '',
 };
 
 export default function records(state = INIT_STATE, action: IAction): IRecordState {
     switch (action.type) {
-        case RECORD_ADD:
-            return {
-                data: [...state.data, action.payload.item],
-                index: state.index,
-            };
         case RECORD_INDEX:
             console.log('PATIENT_INDEX: action', action);
             return {
-                data: [...state.data],
                 index: action.payload.index,
             };
         default:

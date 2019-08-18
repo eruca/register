@@ -4,10 +4,9 @@ import { useSelector } from '@tarojs/redux';
 import { View, Picker } from '@tarojs/components';
 import { AtForm, AtInput, AtSwitch, AtButton, AtMessage } from 'taro-ui';
 
-import { zeroRecord } from '../../reducers/records';
+import { zeroRecord, IRecord } from '../../reducers/records';
 import { useStringField } from '../../utils';
 import FormField from '../../components/FormField';
-// import { IState } from '../../reducers/patient';
 import { IReducers } from '../../reducers';
 import {
     test_0_4999,
@@ -18,26 +17,35 @@ import {
     test_0_1999,
 } from '../../utils/regexp';
 import { nasalFeedTubeTypes, AGIs } from './config';
+import db from '../../utils/db';
 
 export default function Form() {
-    const { data, index, patientid } = useSelector((state: IReducers) => {
-        const {
-            patients: { data, index },
-            records: { data: records_data, index: records_index },
-        } = state;
-        if (index === undefined) {
-            console.log('index 不能为 undefine in Form now');
-            return {};
-        }
-        const patientid = data[index].rowid;
-        return { data: records_data, index: records_index, patientid };
+    const { record_index } = useSelector((state: IReducers) => {
+        return { record_index: state.records.index };
     });
+    if (record_index === '') {
+        return <View>没有数据</View>;
+    }
 
-    console.log('data', data, 'index', index);
+    let record: IRecord = zeroRecord();
+    const future = db
+        .collection('records')
+        .where({ _id: record_index })
+        // .doc(record_index)
+        .get();
+    if (future === undefined) {
+        console.log('没有数据');
+        return <View>没有数据</View>;
+    } else {
+        future.then(res => {
+            const data = res.data as Array<IRecord>;
+            if (data.length === 1) {
+                record = data[0];
+            }
+        });
+    }
 
-    const zero_record = zeroRecord();
-    const defaultRecord =
-        index !== undefined && data && data.length > 0 ? data[index] : zero_record;
+    const defaultRecord = record.rowid === '' ? zeroRecord() : record;
 
     console.log('defaultRecord', defaultRecord);
     const [recordtime, setRecordTime] = useState(defaultRecord.recordtime);

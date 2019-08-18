@@ -7,29 +7,47 @@ import { AtGrid, AtDivider, AtButton } from 'taro-ui';
 import './index.scss';
 import { indexOfPatientRecord } from '../../actions/records';
 import { IReducers } from '../../reducers';
+import db from '../../utils/db';
+import { IPatient, zeroPatient } from '../../reducers/patient';
+import { IRecord } from '../../reducers/records';
 
 const dispatch = useDispatch();
 
 export default function Grid() {
-    const { records, patientid, patient_enrolltime } = useSelector((state: IReducers) => {
-        const { data, index } = state.patients;
-        if (index === undefined) {
-            console.log('index 是undefined');
-            return { records: state.records };
-        }
-
+    const { patient_id } = useSelector((state: IReducers) => {
         return {
-            records: state.records,
-            patientid: data[index].rowid,
-            patient_enrolltime: data[index].enrolltime,
+            patient_id: state.patients.index,
         };
     });
+    console.log('patient_id', typeof patient_id, patient_id === '');
+    if (patient_id === '') {
+        return <View>没有数据</View>;
+    }
 
-    const patient_records = records.data.filter(record => record.patientid === patientid);
+    let patient: IPatient = zeroPatient();
+    const future = db.collection('patients').get();
+    if (future === undefined) {
+        console.log('patient === undefined');
+        return <View>没有该数据</View>;
+    } else {
+        future.then(res => {
+            const data = res.data as Array<IPatient>;
+            if (data.length === 1) {
+                patient = data[0];
+            }
+        });
+    }
+
+    let records: Array<IRecord> = [];
+    db.collection('records')
+        .where({ patientid: patient_id })
+        .get()
+        .then(res => (records = res.data as Array<IRecord>));
+
     const gridValue =
-        patient_records.length > 0
-            ? patient_records.map(({ recordtime }) => ({
-                  value: `第${dayjs(recordtime).diff(dayjs(patient_enrolltime), 'day')}天`,
+        records.length > 0
+            ? records.map(({ recordtime }) => ({
+                  value: `第${dayjs(recordtime).diff(dayjs(patient.enrolltime), 'day')}天`,
               }))
             : [];
 
@@ -43,7 +61,7 @@ export default function Grid() {
 
     return (
         <View>
-            <View style="margin-bottom:5px">入组时间: {patient_enrolltime}</View>
+            <View style="margin-bottom:5px">入组时间: {patient.enrolltime}</View>
             <AtButton
                 type="primary"
                 onClick={() =>
@@ -54,7 +72,7 @@ export default function Grid() {
             >
                 进行记录
                 <Text style="font-size:0.6em;color:#7e6148">
-                    第{dayjs().diff(dayjs(patient_enrolltime), 'day')}天
+                    第{dayjs().diff(dayjs(patient.enrolltime), 'day')}天
                 </Text>
             </AtButton>
             <AtDivider content={`${gridValue.length > 0 ? '记录内容' : '没有内容'}`} />
