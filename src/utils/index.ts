@@ -22,3 +22,25 @@ export function useStringField(
     };
     return [field, setField, validator];
 }
+
+// needle是探针，haystack是全局
+export function fuzzysearch(needle: string, haystack: string): boolean {
+    const hlen = haystack.length;
+    const nlen = needle.length;
+    if (nlen > hlen) {
+        return false;
+    }
+    if (nlen === hlen) {
+        return needle === haystack;
+    }
+    outer: for (let i = 0, j = 0; i < nlen; i++) {
+        const nch = needle.charCodeAt(i);
+        while (j < hlen) {
+            if (haystack.charCodeAt(j++) === nch) {
+                continue outer;
+            }
+        }
+        return false;
+    }
+    return true;
+}
