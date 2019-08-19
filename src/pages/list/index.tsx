@@ -1,6 +1,6 @@
 import Taro, { useState, useMemo, useCallback, useEffect } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components';
-import { AtList, AtListItem, AtSearchBar, AtFab } from 'taro-ui';
+import { AtList, AtListItem, AtSearchBar, AtFab, AtActivityIndicator } from 'taro-ui';
 import { useDispatch } from '@tarojs/redux';
 
 import { IPatient } from '../../reducers/patient';
@@ -57,7 +57,11 @@ export default function List() {
                 onActionClick={() => setCount(cnt + 1)}
             />
             {filtered.length === 0 ? (
-                <View>没有数据</View>
+                <View className="at-row">
+                    <View className="at-col at-col__offset-5">
+                        <AtActivityIndicator content="加载中..." color="#13CE66" />
+                    </View>
+                </View>
             ) : (
                 <AtList>
                     {filtered.map((item, i) => (
