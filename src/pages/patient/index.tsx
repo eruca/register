@@ -222,13 +222,15 @@ export default function Patient() {
                 <AtButton type="primary" formType="submit">
                     {index === '' ? '提交' : '修改'}
                 </AtButton>
-                <AtButton
-                    type="primary"
-                    className="margin-top-1px"
-                    onClick={() => Taro.navigateTo({ url: '/pages/grid/index' })}
-                >
-                    进入项目
-                </AtButton>
+                {index !== '' && (
+                    <AtButton
+                        type="primary"
+                        className="margin-top-1px"
+                        onClick={() => Taro.navigateTo({ url: '/pages/grid/index' })}
+                    >
+                        进入项目
+                    </AtButton>
+                )}
             </AtForm>
         </View>
     );

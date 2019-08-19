@@ -19,7 +19,7 @@ export default function Grid() {
             patient_id: state.patients.index,
         };
     });
-    console.log('patient_id', typeof patient_id, patient_id === '');
+    console.log('patient_id', patient_id);
     if (patient_id === '') {
         return <View>没有数据</View>;
     }
