@@ -44,11 +44,6 @@ export default function List() {
     const onChange = useCallback((v: string) => setHospId(v), [setHospId]);
     return (
         <View>
-            <View className="fab-button-left">
-                <AtFab size="small" onClick={newPatient}>
-                    <Text className="at-fab__icon at-icon at-icon-add" />
-                </AtFab>
-            </View>
             <AtSearchBar
                 showActionButton
                 actionName="更新"
@@ -77,6 +72,11 @@ export default function List() {
                     ))}
                 </AtList>
             )}
+            <View className="fab-button-left">
+                <AtFab size="small" onClick={newPatient}>
+                    <Text className="at-fab__icon at-icon at-icon-add" />
+                </AtFab>
+            </View>
         </View>
     );
 }
