@@ -4,6 +4,10 @@ import { useSelector } from '@tarojs/redux';
 import { AtForm, AtInput, AtButton, AtSwitch, AtMessage } from 'taro-ui';
 
 import { zeroPatient, IPatient } from '../../reducers/patient';
+import FormField from '../../components/FormField';
+import Loading from '../../components/Loading';
+import { patientsCollection } from '../../utils/db';
+import { IReducers } from '../../reducers';
 import {
     selector,
     LocalPatient,
@@ -12,10 +16,7 @@ import {
     convertToPatient,
     convertToPatientWithoutId,
 } from './config';
-import FormField from '../../components/FormField';
 import './index.scss';
-import db from '../../utils/db';
-import { IReducers } from '../../reducers';
 
 export default function Patient() {
     const { patient_id } = useSelector((state: IReducers) => state.patients);
@@ -23,16 +24,13 @@ export default function Patient() {
 
     useEffect(() => {
         if (patient_id !== '') {
-            const promise = db
-                .collection('patients')
-                .doc(patient_id)
-                .get();
+            const promise = patientsCollection.doc(patient_id).get();
             if (promise) {
                 promise.then(res => setPatient(convertToLocal(res.data as IPatient)));
             }
         }
     }, [patient_id, setPatient]);
-    console.log('patient =>', patient);
+    console.log('patient =>', patient, 'patient_id', patient_id);
 
     const onSubmit = () => {
         const message = validate(patient);
@@ -42,7 +40,7 @@ export default function Patient() {
         }
 
         if (patient_id === '') {
-            db.collection('patients').add({
+            patientsCollection.add({
                 data: convertToPatient(patient),
                 success: function() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
@@ -50,19 +48,21 @@ export default function Patient() {
                 fail: console.error,
             });
         } else {
-            db.collection('patients')
-                .doc(patient_id)
-                .set({
-                    data: convertToPatientWithoutId(patient),
-                    success: function() {
-                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                    },
-                    fail: console.error,
-                });
+            patientsCollection.doc(patient_id).set({
+                data: convertToPatientWithoutId(patient),
+                success: function() {
+                    Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                },
+                fail: console.error,
+            });
         }
     };
 
-    return (
+    // 如果是已经有patient_id, 但是这个时候网络断了，那么就会出现这种情况
+
+    return patient_id !== '' && !patient._id ? (
+        <Loading />
+    ) : (
         <View>
             <AtMessage />
             <AtForm onSubmit={onSubmit}>

@@ -1,8 +1,9 @@
 import Taro, { useState, useMemo, useCallback, useEffect } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components';
-import { AtList, AtListItem, AtSearchBar, AtFab, AtActivityIndicator } from 'taro-ui';
+import { AtList, AtListItem, AtSearchBar, AtFab } from 'taro-ui';
 import { useDispatch } from '@tarojs/redux';
 
+import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
 import { deselect, select } from '../../actions/patient';
 import { fuzzysearch } from '../../utils';
@@ -57,11 +58,7 @@ export default function List() {
                 onActionClick={() => setCount(cnt + 1)}
             />
             {filtered.length === 0 ? (
-                <View className="at-row">
-                    <View className="at-col at-col__offset-5">
-                        <AtActivityIndicator content="加载中..." color="#13CE66" />
-                    </View>
-                </View>
+                <Loading />
             ) : (
                 <AtList>
                     {filtered.map((item, i) => (
