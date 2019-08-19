@@ -16,7 +16,7 @@ const dispatch = useDispatch();
 export default function Grid() {
     const { patient_id } = useSelector((state: IReducers) => {
         return {
-            patient_id: state.patients.index,
+            patient_id: state.patients.patient_id,
         };
     });
     console.log('patient_id', patient_id);

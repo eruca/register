@@ -4,7 +4,7 @@ import { AtList, AtListItem, AtSearchBar, AtFab } from 'taro-ui';
 import { useDispatch } from '@tarojs/redux';
 
 import { IPatient } from '../../reducers/patient';
-import { indexOfPatientSelect } from '../../actions/patient';
+import { deselect, select } from '../../actions/patient';
 import { fuzzysearch } from '../../utils';
 import db from '../../utils/db';
 
@@ -13,7 +13,7 @@ import './index.scss';
 const dispatch = useDispatch();
 
 function newPatient() {
-    dispatch(indexOfPatientSelect(''));
+    dispatch(deselect());
     Taro.navigateTo({
         url: '/pages/patient/index',
     });
@@ -65,7 +65,7 @@ export default function List() {
                             key={i}
                             title={`${item.hospId} - ${item.name}`}
                             onClick={() => {
-                                dispatch(indexOfPatientSelect(item._id || ''));
+                                dispatch(select(item._id || '', item.enrolltime));
                                 Taro.navigateTo({
                                     url: `/pages/patient/index`,
                                 });

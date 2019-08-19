@@ -23,11 +23,13 @@ export interface IPatient {
 }
 
 export interface IPatientState {
-    index: string;
+    patient_id: string;
+    enrolltime: string;
 }
 
 const INIT_STATE: IPatientState = {
-    index: '',
+    patient_id: '',
+    enrolltime: '',
 };
 
 export function zeroPatient(): IPatient {
@@ -55,7 +57,8 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
         case PATIENT_INDEX:
             console.log('PATIENT_INDEX: action', action);
             return {
-                index: action.payload.index,
+                patient_id: action.payload.patient_id,
+                enrolltime: action.payload.enrolltime,
             };
         default:
             return state;

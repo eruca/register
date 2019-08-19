@@ -18,20 +18,20 @@ import db from '../../utils/db';
 import { IReducers } from '../../reducers';
 
 export default function Patient() {
-    const { index } = useSelector((state: IReducers) => state.patients);
+    const { patient_id } = useSelector((state: IReducers) => state.patients);
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
-        if (index !== '') {
+        if (patient_id !== '') {
             const promise = db
                 .collection('patients')
-                .doc(index)
+                .doc(patient_id)
                 .get();
             if (promise) {
                 promise.then(res => setPatient(convertToLocal(res.data as IPatient)));
             }
         }
-    }, [index, setPatient]);
+    }, [patient_id, setPatient]);
     console.log('patient =>', patient);
 
     const onSubmit = () => {
@@ -41,7 +41,7 @@ export default function Patient() {
             return;
         }
 
-        if (index === '') {
+        if (patient_id === '') {
             db.collection('patients').add({
                 data: convertToPatient(patient),
                 success: function() {
@@ -51,7 +51,7 @@ export default function Patient() {
             });
         } else {
             db.collection('patients')
-                .doc(index)
+                .doc(patient_id)
                 .set({
                     data: convertToPatientWithoutId(patient),
                     success: function() {
@@ -220,9 +220,9 @@ export default function Patient() {
                     ])}
                 />
                 <AtButton type="primary" formType="submit">
-                    {index === '' ? '提交' : '修改'}
+                    {patient_id === '' ? '提交' : '修改'}
                 </AtButton>
-                {index !== '' && (
+                {patient_id !== '' && (
                     <AtButton
                         type="primary"
                         className="margin-top-1px"
