@@ -66,7 +66,9 @@ export default function List() {
                             key={i}
                             title={`${item.hospId} - ${item.name}`}
                             onClick={() => {
-                                dispatch(select(item._id || '', item.enrolltime));
+                                dispatch(
+                                    select(item._id || '', item.hospId, item.name, item.enrolltime)
+                                );
                                 Taro.navigateTo({
                                     url: `/pages/patient/index`,
                                 });
