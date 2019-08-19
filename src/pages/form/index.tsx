@@ -1,273 +1,258 @@
-import Taro, { useState, useCallback } from '@tarojs/taro';
+import Taro, { useState, useCallback, useEffect } from '@tarojs/taro';
 import dayjs from 'dayjs';
 import { useSelector } from '@tarojs/redux';
 import { View, Picker } from '@tarojs/components';
 import { AtForm, AtInput, AtSwitch, AtButton, AtMessage } from 'taro-ui';
 
 import { zeroRecord, IRecord } from '../../reducers/records';
-import { useStringField } from '../../utils';
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
-import {
-    test_0_4999,
-    test_0_10f,
-    test_1_99,
-    test_100_299,
-    test_1_39f,
-    test_0_1999,
-} from '../../utils/regexp';
-import { nasalFeedTubeTypes, AGIs } from './config';
-import db from '../../utils/db';
+import { nasalFeedTubeTypes, AGIs, convertToLocal, validate, convertToIRecord } from './config';
+import { recordsCollection } from '../../utils/db';
 
 export default function Form() {
-    const { record_index } = useSelector((state: IReducers) => {
-        return { record_index: state.records.index };
-    });
-    if (record_index === '') {
-        return <View>没有数据</View>;
-    }
+    const { record_id } = useSelector((state: IReducers) => state.records);
 
-    let record: IRecord = zeroRecord();
-    const future = db
-        .collection('records')
-        .where({ _id: record_index })
-        // .doc(record_index)
-        .get();
-    if (future === undefined) {
-        console.log('没有数据');
-        return <View>没有数据</View>;
-    } else {
-        future.then(res => {
-            const data = res.data as Array<IRecord>;
-            if (data.length === 1) {
-                record = data[0];
+    const [record, setRecord] = useState(convertToLocal(zeroRecord()));
+    useEffect(() => {
+        if (record_id) {
+            const promise = recordsCollection.doc(record_id).get();
+            if (promise) {
+                promise.then(res => setRecord(convertToLocal(res.data as IRecord)));
             }
-        });
-    }
+        }
+    }, [record_id, setRecord]);
 
-    const defaultRecord = record.rowid === '' ? zeroRecord() : record;
+    console.log('defaultRecord => ', record);
 
-    console.log('defaultRecord', defaultRecord);
-    const [recordtime, setRecordTime] = useState(defaultRecord.recordtime);
-    const setToday = useCallback(() => setRecordTime(dayjs().format('YYYY-MM-DD')), [
-        setRecordTime,
-    ]);
-
-    const [nasalFeedTubeType, setNasalFeedTubeType] = useState(defaultRecord.nasalFeedTubeType);
-    const [enteralCalories, setEnteralCalories, enteralCaloriesValidator] = useStringField(
-        defaultRecord.enteralCalories,
-        '肠内热卡错误',
-        test_0_4999
-    );
-    const [parenteralCalories, setParenteralCalories, parenteralCaloriesValidator] = useStringField(
-        defaultRecord.parenteralCalories,
-        '肠外热卡错误',
-        test_0_4999
-    );
-    const [totalProtein, setTotalProtein, totalProteinValidator] = useStringField(
-        defaultRecord.totalProtein,
-        '总蛋白错误',
-        test_1_99
-    );
-    const [prealbumin, setPrealbumin, prealbuminValidator] = useStringField(
-        defaultRecord.prealbumin,
-        '前白蛋白错误',
-        test_1_99
-    );
-    const [albumin, setAlbumin, albuminValidator] = useStringField(
-        defaultRecord.albumin,
-        '白蛋白错误',
-        test_1_99
-    );
-    const [serumTransferrin, setSerumTransferrin, serumTransferrinValidator] = useStringField(
-        defaultRecord.serumTransferrin,
-        '转铁蛋白错误',
-        test_0_10f
-    );
-    const [lymphocyteCount, setLymphocyteCount, lymphocyteCountValidator] = useStringField(
-        defaultRecord.lymphocyteCount,
-        '淋巴细胞计算错误',
-        test_0_10f
-    );
-    const [hemoglobin, setHemoglobin, hemoglobinValidator] = useStringField(
-        defaultRecord.hemoglobin,
-        '血红蛋白错误',
-        test_1_39f
-    );
-    const [fastingGlucose, setFastingGlucose, fastingGlucoseValidator] = useStringField(
-        defaultRecord.fastingGlucose,
-        '空腹血糖',
-        test_1_99
-    );
-    const [gastricRetention, setGastricRetention, gastricRetentionValidator] = useStringField(
-        defaultRecord.gastricRetention,
-        '胃潴留错误',
-        test_0_1999
-    );
-    const [misinhalation, setMisinhalation] = useState(defaultRecord.misinhalation);
-    const [diarrhea, setDiarrhea] = useState(defaultRecord.diarrhea);
-    const [gastrointestinalHemorrhage, setGastrointestingHemorrhage] = useState(
-        defaultRecord.gastrointestinalHemorrhage
-    );
-    const [injectionOfAlbumin, setInjectionOfAlbumin, injectionOfAlbuminValidator] = useStringField(
-        defaultRecord.injectionOfAlbumin,
-        '输白蛋白错误',
-        test_100_299
-    );
-    const [agiIndex, setAgiIndex] = useState(0);
-
-    const onSubmit = e => {
-        e.preventDefault();
-        if (
-            enteralCaloriesValidator() &&
-            parenteralCaloriesValidator() &&
-            totalProteinValidator() &&
-            prealbuminValidator() &&
-            albuminValidator() &&
-            serumTransferrinValidator() &&
-            lymphocyteCountValidator() &&
-            hemoglobinValidator() &&
-            fastingGlucoseValidator() &&
-            gastricRetentionValidator() &&
-            injectionOfAlbuminValidator()
-        ) {
-            console.log('hello world');
+    const onSubmit = () => {
+        const message = validate(record);
+        if (message !== '') {
+            Taro.atMessage({ message, type: 'error' });
+            return;
+        }
+        if (record_id === '') {
+            recordsCollection.add({
+                data: convertToIRecord(record),
+                success: function() {
+                    Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                },
+                fail: console.error,
+            });
+        } else {
+            console.log('modify');
+            recordsCollection.doc(record_id).set({
+                data: convertToIRecord(record, false),
+                success: function() {
+                    Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                },
+                fail: console.error,
+            });
         }
     };
+
     return (
         <View>
             <AtMessage />
-            <AtForm onSubmit={onSubmit} onReset={() => {}}>
+            <AtForm onSubmit={onSubmit}>
                 <View className="at-row">
                     <View className="at-col at-col-9">
                         <Picker
                             mode="date"
-                            value={recordtime}
-                            onChange={v => setRecordTime(v.detail.value)}
+                            value={record.recordtime}
+                            onChange={useCallback(
+                                v => setRecord({ ...record, recordtime: v.detail.value }),
+                                [record, setRecord]
+                            )}
                         >
-                            <FormField name="记录时间" value={recordtime} />
+                            <FormField name="记录时间" value={record.recordtime} />
                         </Picker>
                     </View>
                     <View className="at-col at-col-3" style="margin-top:2px">
-                        <AtButton onClick={setToday} type="primary">
+                        <AtButton
+                            onClick={useCallback(
+                                () =>
+                                    setRecord({
+                                        ...record,
+                                        recordtime: dayjs().format('YYYY-MM-DD'),
+                                    }),
+                                [record, setRecord]
+                            )}
+                            type="primary"
+                        >
                             今天
                         </AtButton>
                     </View>
                 </View>
                 <Picker
                     mode="selector"
-                    value={nasalFeedTubeType}
+                    value={record.nasalFeedTubeType}
                     range={nasalFeedTubeTypes}
-                    onChange={v => setNasalFeedTubeType(v.detail.value)}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, nasalFeedTubeType: v.detail.value }),
+                        [record, setRecord]
+                    )}
                 >
-                    <FormField name="鼻饲管类型" value={nasalFeedTubeTypes[nasalFeedTubeType]} />
+                    <FormField
+                        name="鼻饲管类型"
+                        value={nasalFeedTubeTypes[record.nasalFeedTubeType]}
+                    />
                 </Picker>
                 <AtInput
                     name="enteralCalories"
                     title="肠内热卡(kcal):"
                     placeholder="0-5000kcal"
                     type="text"
-                    value={enteralCalories === 0 ? '' : enteralCalories.toString()}
-                    onChange={v => setEnteralCalories(v)}
+                    value={record.enteralCalories}
+                    onChange={useCallback(
+                        (v: string) => setRecord({ ...record, enteralCalories: v }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="parenteralCalories"
                     title="肠外热卡(kcal):"
                     type="text"
                     placeholder="0-5000kcal"
-                    value={parenteralCalories === 0 ? '' : parenteralCalories.toString()}
-                    onChange={v => setParenteralCalories(v)}
+                    value={record.parenteralCalories}
+                    onChange={useCallback(
+                        (v: string) => setRecord({ ...record, parenteralCalories: v }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="totalProtein"
                     title="总蛋白(g):"
                     type="text"
                     placeholder="0-5000kcal"
-                    value={totalProtein === 0 ? '' : totalProtein.toString()}
-                    onChange={v => setTotalProtein(v)}
+                    value={record.totalProtein}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, totalProtein: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="prealbumin"
                     title="前白蛋白(mg/L):"
                     placeholder="280-360"
                     type="text"
-                    value={prealbumin === 0 ? '' : prealbumin.toString()}
-                    onChange={v => setPrealbumin(v)}
+                    value={record.prealbumin}
+                    onChange={useCallback(v => setRecord({ ...record, prealbumin: v as string }), [
+                        record,
+                        setRecord,
+                    ])}
                 />
                 <AtInput
                     name="albumin"
                     title="白蛋白(g):"
                     placeholder="30-60"
                     type="text"
-                    value={albumin === 0 ? '' : albumin.toString()}
-                    onChange={v => setAlbumin(v)}
+                    value={record.albumin}
+                    onChange={useCallback(v => setRecord({ ...record, albumin: v as string }), [
+                        record,
+                        setRecord,
+                    ])}
                 />
                 <AtInput
                     name="serumTransfferin"
                     title="转铁蛋白(g):"
                     placeholder="30-60"
                     type="text"
-                    value={serumTransferrin === 0 ? '' : serumTransferrin.toString()}
-                    onChange={v => setSerumTransferrin(v)}
+                    value={record.serumTransferrin}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, serumTransferrin: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="lymphocyteCount"
                     title="淋巴细胞计数:"
                     placeholder="300-600"
                     type="text"
-                    value={lymphocyteCount === 0 ? '' : lymphocyteCount.toString()}
-                    onChange={v => setLymphocyteCount(v)}
+                    value={record.lymphocyteCount}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, lymphocyteCount: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="hemoglobin"
                     title="血红蛋白(g/l):"
                     placeholder="90-200"
                     type="text"
-                    value={hemoglobin === 0 ? '' : hemoglobin.toString()}
-                    onChange={v => setHemoglobin(v)}
+                    value={record.hemoglobin}
+                    onChange={useCallback(v => setRecord({ ...record, hemoglobin: v as string }), [
+                        record,
+                        setRecord,
+                    ])}
                 />
                 <AtInput
                     name="fastingGlucose"
                     title="空腹血糖(mmol/L):"
                     type="text"
                     placeholder="3.9-11.1"
-                    value={fastingGlucose === 0 ? '' : fastingGlucose.toString()}
-                    onChange={v => setFastingGlucose(v)}
+                    value={record.fastingGlucose}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, fastingGlucose: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="gastricRetention"
                     title="胃潴留(ml):"
                     placeholder="0-1000"
                     type="text"
-                    value={gastricRetention === 0 ? '' : gastricRetention.toString()}
-                    onChange={v => setGastricRetention(v)}
+                    value={record.gastricRetention}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, gastricRetention: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="输白蛋白"
                     title="白蛋白(g):"
                     placeholder="0-20"
                     type="text"
-                    value={injectionOfAlbumin === 0 ? '' : injectionOfAlbumin.toString()}
-                    onChange={v => setInjectionOfAlbumin(v)}
+                    value={record.injectionOfAlbumin}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, injectionOfAlbumin: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtSwitch
                     title="误吸"
-                    checked={misinhalation}
-                    onChange={v => setMisinhalation(v)}
+                    checked={record.misinhalation}
+                    onChange={useCallback(v => setRecord({ ...record, misinhalation: v }), [
+                        record,
+                        setRecord,
+                    ])}
                 />
-                <AtSwitch title="腹泻" checked={diarrhea} onChange={v => setDiarrhea(v)} />
+                <AtSwitch
+                    title="腹泻"
+                    checked={record.diarrhea}
+                    onChange={useCallback(v => setRecord({ ...record, diarrhea: v }), [
+                        record,
+                        setRecord,
+                    ])}
+                />
                 <AtSwitch
                     title="消化道出血"
-                    checked={gastrointestinalHemorrhage}
-                    onChange={v => setGastrointestingHemorrhage(v)}
+                    checked={record.gastrointestinalHemorrhage}
+                    onChange={useCallback(
+                        v => setRecord({ ...record, gastrointestinalHemorrhage: v }),
+                        [record, setRecord]
+                    )}
                 />
                 <Picker
                     mode="selector"
-                    value={agiIndex}
+                    value={record.agiIndex}
                     range={AGIs}
-                    onChange={v => setAgiIndex(v.detail.value)}
+                    onChange={useCallback(v => setRecord({ ...record, agiIndex: v.detail.value }), [
+                        record,
+                        setRecord,
+                    ])}
                 >
-                    <FormField name="AGI 评级" value={AGIs[agiIndex]} />
+                    <FormField name="AGI 评级" value={AGIs[record.agiIndex]} />
                 </Picker>
                 <AtButton type="primary" formType="submit">
                     提交

@@ -49,7 +49,7 @@ export default function Patient() {
             });
         } else {
             patientsCollection.doc(patient_id).set({
-                data: convertToPatientWithoutId(patient),
+                data: convertToPatient(patient, false),
                 success: function() {
                     Taro.atMessage({ message: '修改记录成功', type: 'success' });
                 },

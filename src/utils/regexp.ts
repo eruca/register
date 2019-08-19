@@ -7,9 +7,9 @@ export function test_1_39f(v: string): boolean {
     return re1_39f.test(v);
 }
 
-const re1_99 = /^(?:[1-9]|[1-9]\d)$/;
-export function test_1_99(v: string): boolean {
-    return re1_99.test(v);
+const re0_99 = /^(?:\d|[1-9]\d)$/;
+export function test_0_99(v: string): boolean {
+    return re0_99.test(v);
 }
 const re16_139 = /^(?:[1-9]\d|1[1-3]\d)$/;
 export function test_16_139(v: string): boolean {
@@ -31,4 +31,13 @@ export function test_0_1999(v: string): boolean {
 const re0_4999 = /\d|[1-9]\d{1,2}|[1-4]\d{3}/;
 export function test_0_4999(v: any) {
     return re0_4999.test(v as string);
+}
+const re20_999 = /[2-9]\d|[1-9]\d\d/;
+export function test_20_999(v: string) {
+    return re20_999.test(v);
+}
+
+const re0_200f = /(?:\d|[1-9]\d|[1-2]\d\d)(\.\d+)?/;
+export function test_0_200f(v: string) {
+    return re0_200f.test(v);
 }

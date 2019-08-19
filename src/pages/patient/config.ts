@@ -133,9 +133,8 @@ export function convertToLocal(patient: IPatient): LocalPatient {
     };
 }
 
-export function convertToPatient(patient: LocalPatient): IPatient {
-    return {
-        _id: patient._id,
+export function convertToPatient(patient: LocalPatient, withID: boolean = true): IPatient {
+    const newOne: IPatient = {
         hospId: patient.hospId,
         name: patient.name,
         isMale: patient.isMale,
@@ -152,26 +151,10 @@ export function convertToPatient(patient: LocalPatient): IPatient {
         agi: parseInt(patient.agi),
         nrs2002: parseInt(patient.nrs2002),
     };
-}
-
-export function convertToPatientWithoutId(patient: LocalPatient): IPatient {
-    return {
-        hospId: patient.hospId,
-        name: patient.name,
-        isMale: patient.isMale,
-        admittime: patient.admittime,
-        enrolltime: patient.enrolltime,
-        diagnoseIndex: patient.diagnoseIndex,
-        needVentilation: patient.needVentilation,
-        needVesopressor: patient.needVesopressor,
-        age: parseInt(patient.age),
-        bed: parseInt(patient.bed),
-        height: parseInt(patient.height),
-        weight: parseInt(patient.weight),
-        apache2: parseInt(patient.apache2),
-        agi: parseInt(patient.agi),
-        nrs2002: parseInt(patient.nrs2002),
-    };
+    if (withID) {
+        newOne['_id'] = patient._id;
+    }
+    return newOne;
 }
 
 export function validate(patient: LocalPatient): string {

@@ -4,7 +4,7 @@ import { RECORD_INDEX } from '../constants/record';
 import { IAction } from '../actions/base';
 
 export interface IRecord {
-    rowid: string;
+    _id?: string;
     patientid: string;
     recordtime: string;
     nasalFeedTubeType: number;
@@ -22,12 +22,11 @@ export interface IRecord {
     diarrhea: boolean; // 腹泻
     gastrointestinalHemorrhage: boolean; // 消化道出血
     injectionOfAlbumin: number; // 注射白蛋白量
-    agiScore: number;
+    agiIndex: number;
 }
 
 export function zeroRecord(): IRecord {
     return {
-        rowid: '',
         patientid: 'ppp',
         recordtime: dayjs().format('YYYY-MM-DD'),
         nasalFeedTubeType: 0,
@@ -45,24 +44,26 @@ export function zeroRecord(): IRecord {
         diarrhea: false,
         gastrointestinalHemorrhage: false,
         injectionOfAlbumin: 0,
-        agiScore: 0,
+        agiIndex: 0,
     };
 }
 
 export interface IRecordState {
-    index: string;
+    record_id: string;
 }
 
 const INIT_STATE: IRecordState = {
-    index: '',
+    record_id: '',
 };
 
 export default function records(state = INIT_STATE, action: IAction): IRecordState {
     switch (action.type) {
         case RECORD_INDEX:
             console.log('PATIENT_INDEX: action', action);
+            const { record_id } = action.payload;
+
             return {
-                index: action.payload.index,
+                record_id,
             };
         default:
             return state;

@@ -4,11 +4,11 @@ import dayjs from 'dayjs';
 import { useSelector, useDispatch } from '@tarojs/redux';
 import { AtGrid, AtDivider, AtButton } from 'taro-ui';
 
-import './index.scss';
-import { indexOfPatientRecord } from '../../actions/records';
+import { selectRecord, deselectRecord } from '../../actions/records';
 import { IReducers } from '../../reducers';
 import { recordsCollection } from '../../utils/db';
 import { IRecord } from '../../reducers/records';
+import './index.scss';
 
 const dispatch = useDispatch();
 
@@ -25,10 +25,12 @@ export default function Grid() {
     useEffect(() => {
         recordsCollection
             .where({ patientid: patient_id })
+            .orderBy('recordtime', 'asc')
             .get()
             .then(res => setPatientRecords(res.data as Array<IRecord>));
     }, [patient_id, setPatientRecords]);
 
+    console.log('patientRecords ->', patientRecords);
     const gridValue =
         patientRecords.length > 0
             ? patientRecords.map(({ recordtime }) => ({
@@ -36,9 +38,19 @@ export default function Grid() {
               }))
             : [];
 
-    const gridOnClick = useCallback((item, index) => {
-        console.log('item', item, 'index', index);
-        dispatch(indexOfPatientRecord(index));
+    const gridOnClick = useCallback(
+        (item, index) => {
+            console.log('item', item, 'index', index, 'patientRecords', patientRecords);
+            dispatch(selectRecord(patientRecords[index]._id || ''));
+            Taro.navigateTo({
+                url: '/pages/form/index',
+            });
+        },
+        [patientRecords]
+    );
+
+    const newRecord = useCallback(() => {
+        dispatch(deselectRecord());
         Taro.navigateTo({
             url: '/pages/form/index',
         });
@@ -47,14 +59,7 @@ export default function Grid() {
     return (
         <View>
             <View style="margin-bottom:5px">{`${hospId}-${name}: ${enrolltime}`}</View>
-            <AtButton
-                type="primary"
-                onClick={() =>
-                    Taro.navigateTo({
-                        url: '/pages/form/index',
-                    })
-                }
-            >
+            <AtButton type="primary" onClick={newRecord}>
                 进行记录
                 <Text style="font-size:0.6em;color:#7e6148">
                     第{dayjs().diff(dayjs(enrolltime), 'day')}天
