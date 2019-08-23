@@ -20,6 +20,11 @@ export function test_20_299(v: string): boolean {
     return weightNum.test(v);
 }
 
+const num = /^\d+$/;
+export function test_num(v: string): boolean {
+    return num.test(v);
+}
+
 export const selector = [
     '呼吸系统病变',
     '心血管系统病变',
@@ -88,6 +93,16 @@ export const config: Map<string, ConfigType> = [
         message: 'NRS2002评分不能为空',
         validator: test_1_99, // todo :需要修正
     },
+    {
+        key: 'venttime',
+        message: '呼吸机时间必须是整数',
+        validator: test_num,
+    },
+    {
+        key: 'stayoficu',
+        message: '住ICU时间必须是整数',
+        validator: test_num,
+    },
 ].reduce((m, { key, validator, message }) => {
     m.set(key, { validator, message });
     return m;
@@ -110,6 +125,10 @@ export interface LocalPatient {
     apache2: string;
     agi: string;
     nrs2002: string;
+    venttime: string;
+    stayoficu: string;
+    resultIndex: number;
+    isAliveDischarge: boolean;
 }
 
 export function convertToLocal(patient: IPatient): LocalPatient {
@@ -123,6 +142,11 @@ export function convertToLocal(patient: IPatient): LocalPatient {
         diagnoseIndex: patient.diagnoseIndex,
         needVentilation: patient.needVentilation,
         needVesopressor: patient.needVesopressor,
+        resultIndex: patient.resultIndex,
+        isAliveDischarge: patient.isAliveDischarge,
+
+        venttime: patient.venttime.toString(),
+        stayoficu: patient.stayoficu.toString(),
         age: patient.age.toString(),
         bed: patient.bed.toString(),
         height: patient.height.toString(),
@@ -143,6 +167,11 @@ export function convertToPatient(patient: LocalPatient, withID: boolean = true):
         diagnoseIndex: patient.diagnoseIndex,
         needVentilation: patient.needVentilation,
         needVesopressor: patient.needVesopressor,
+        resultIndex: patient.resultIndex,
+        isAliveDischarge: patient.isAliveDischarge,
+
+        venttime: parseInt(patient.venttime),
+        stayoficu: parseInt(patient.stayoficu),
         age: parseInt(patient.age),
         bed: parseInt(patient.bed),
         height: parseInt(patient.height),

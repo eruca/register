@@ -8,14 +8,7 @@ import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
-import {
-    selector,
-    LocalPatient,
-    convertToLocal,
-    validate,
-    convertToPatient,
-    convertToPatientWithoutId,
-} from './config';
+import { selector, LocalPatient, convertToLocal, validate, convertToPatient } from './config';
 import './index.scss';
 
 export default function Patient() {
@@ -164,7 +157,8 @@ export default function Patient() {
                     range={selector}
                     value={patient.diagnoseIndex}
                     onChange={useCallback(
-                        e => setPatient({ ...patient, diagnoseIndex: e.detail.value }),
+                        e =>
+                            setPatient({ ...patient, diagnoseIndex: parseInt(e.detail.value, 10) }),
                         [patient, setPatient]
                     )}
                 >

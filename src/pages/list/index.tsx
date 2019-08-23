@@ -30,7 +30,7 @@ export default function List() {
             .then(res => setPatients(res.data as Array<IPatient>));
     }, [cnt, setPatients]);
 
-    console.log('patients ->', patients);
+    console.log('patients ->',patients);
 
     const [hospId, setHospId] = useState('');
     const filtered = useMemo(() => {

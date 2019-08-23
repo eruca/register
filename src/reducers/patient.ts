@@ -5,6 +5,7 @@ import { IAction } from '../actions/base';
 
 export interface IPatient {
     _id?: string;
+    _openid?: string;
     hospId: string;
     name: string;
     isMale: boolean;
@@ -20,21 +21,11 @@ export interface IPatient {
     apache2: number;
     agi: number;
     nrs2002: number;
+    venttime: number;
+    stayoficu: number;
+    resultIndex: number;
+    isAliveDischarge: boolean;
 }
-
-export interface IPatientState {
-    patient_id: string;
-    hospId: string;
-    name: string;
-    enrolltime: string;
-}
-
-const INIT_STATE: IPatientState = {
-    patient_id: '',
-    hospId: '',
-    name: '',
-    enrolltime: '',
-};
 
 export function zeroPatient(): IPatient {
     return {
@@ -53,8 +44,32 @@ export function zeroPatient(): IPatient {
         apache2: 0,
         agi: 0,
         nrs2002: 0,
+        venttime: 0,
+        stayoficu: 0,
+        resultIndex: 0,
+        isAliveDischarge: true,
     };
 }
+
+export function deleteId(patient: IPatient): IPatient {
+    const { _id, _openid, ...res } = patient;
+
+    return res;
+}
+
+export interface IPatientState {
+    patient_id: string;
+    hospId: string;
+    name: string;
+    enrolltime: string;
+}
+
+const INIT_STATE: IPatientState = {
+    patient_id: '',
+    hospId: '',
+    name: '',
+    enrolltime: '',
+};
 
 export default function patients(state = INIT_STATE, action: IAction): IPatientState {
     switch (action.type) {
