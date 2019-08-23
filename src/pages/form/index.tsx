@@ -1,6 +1,6 @@
 import Taro, { useState, useCallback, useEffect } from '@tarojs/taro';
 import dayjs from 'dayjs';
-import { useSelector } from '@tarojs/redux';
+import { useSelector, useDispatch } from '@tarojs/redux';
 import { View, Picker } from '@tarojs/components';
 import { AtForm, AtInput, AtSwitch, AtButton, AtMessage } from 'taro-ui';
 
@@ -9,21 +9,40 @@ import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
 import { nasalFeedTubeTypes, AGIs, convertToLocal, validate, convertToIRecord } from './config';
 import { recordsCollection } from '../../utils/db';
+import { forceRender } from '../../actions/records';
+
+const dispatch = useDispatch();
+
+const onAddSuccess = function() {
+    Taro.atMessage({ message: '添加记录成功', type: 'success' });
+    dispatch(forceRender());
+};
+
+const onModifySuccess = function() {
+    Taro.atMessage({ message: '修改记录成功', type: 'success' });
+    dispatch(forceRender());
+};
 
 export default function Form() {
-    const { record_id } = useSelector((state: IReducers) => state.records);
+    const { record_id, patient_id, enrolltime } = useSelector((state: IReducers) => ({
+        record_id: state.records.record_id,
+        ...state.patients,
+    }));
 
-    const [record, setRecord] = useState(convertToLocal(zeroRecord()));
+    const [record, setRecord] = useState(convertToLocal(zeroRecord(patient_id)));
     useEffect(() => {
+        console.log('ask for database: record_id:', record_id);
         if (record_id) {
             const promise = recordsCollection.doc(record_id).get();
             if (promise) {
-                promise.then(res => setRecord(convertToLocal(res.data as IRecord)));
+                promise.then(res => {
+                    console.log('get data from database', res.data);
+                    setRecord(convertToLocal(res.data as IRecord));
+                });
             }
         }
     }, [record_id, setRecord]);
-
-    console.log('defaultRecord => ', record);
+    console.log(`${patient_id}. record`, record);
 
     const onSubmit = () => {
         const message = validate(record);
@@ -34,18 +53,14 @@ export default function Form() {
         if (record_id === '') {
             recordsCollection.add({
                 data: convertToIRecord(record),
-                success: function() {
-                    Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                },
+                success: onAddSuccess,
                 fail: console.error,
             });
         } else {
             console.log('modify');
             recordsCollection.doc(record_id).set({
                 data: convertToIRecord(record, false),
-                success: function() {
-                    Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                },
+                success: onModifySuccess,
                 fail: console.error,
             });
         }
@@ -65,7 +80,13 @@ export default function Form() {
                                 [record, setRecord]
                             )}
                         >
-                            <FormField name="记录时间" value={record.recordtime} />
+                            <FormField
+                                name="记录时间"
+                                value={
+                                    record.recordtime +
+                                    ` (${dayjs(record.recordtime).diff(dayjs(enrolltime), 'day')})`
+                                }
+                            />
                         </Picker>
                     </View>
                     <View className="at-col at-col-3" style="margin-top:2px">

@@ -3,7 +3,7 @@ import { View, Text } from '@tarojs/components';
 
 interface IProps {
     name: string;
-    value: string;
+    value: any;
 }
 
 export default function FormField({ name, value }: IProps) {

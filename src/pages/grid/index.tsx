@@ -13,8 +13,11 @@ import './index.scss';
 const dispatch = useDispatch();
 
 export default function Grid() {
-    const { patient_id, enrolltime, hospId, name } = useSelector(
-        (state: IReducers) => state.patients
+    const { patient_id, enrolltime, hospId, name, force_render_count } = useSelector(
+        (state: IReducers) => ({
+            ...state.patients,
+            force_render_count: state.records.force_render_count,
+        })
     );
     console.log('patient_id', patient_id, 'enrolltime', enrolltime);
     if (patient_id === '') {
@@ -23,12 +26,13 @@ export default function Grid() {
 
     const [patientRecords, setPatientRecords] = useState<Array<IRecord>>([]);
     useEffect(() => {
+        console.log('ask for records, dependent one', force_render_count);
         recordsCollection
             .where({ patientid: patient_id })
             .orderBy('recordtime', 'asc')
             .get()
             .then(res => setPatientRecords(res.data as Array<IRecord>));
-    }, [patient_id, setPatientRecords]);
+    }, [patient_id, setPatientRecords, force_render_count]);
 
     console.log('patientRecords ->', patientRecords);
     const gridValue =
