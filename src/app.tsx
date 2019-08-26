@@ -2,11 +2,12 @@ import '@tarojs/async-await';
 import Taro, { Component, Config } from '@tarojs/taro';
 import { Provider } from '@tarojs/redux';
 
-import Index from './pages/index';
-
+import Index from './pages/index/index3';
 import configStore from './store';
-
 import './app.scss';
+import { syncOpenid, userSync } from './actions/user';
+import { IAction } from './actions/base';
+import { IUserState } from './reducers/user';
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -15,8 +16,6 @@ import './app.scss';
 // }
 
 const store = configStore();
-
-Taro.cloud.init();
 
 class App extends Component {
     /**
@@ -34,33 +33,28 @@ class App extends Component {
             'pages/grid/index',
             'pages/list/index',
             'pages/form/index',
+            'pages/user/index',
         ],
 
         tabBar: {
             list: [
                 {
-                    pagePath: 'pages/index/index',
-                    text: '首页',
-                    iconPath: './assets/home.png',
-                    selectedIconPath: './assets/home_selected.png',
-                },
-                {
                     pagePath: 'pages/list/index',
                     text: '所有患者',
-                    iconPath: './assets/user.png',
-                    selectedIconPath: './assets/user_selected.png',
+                    iconPath: './assets/list.png',
+                    selectedIconPath: './assets/list_selected.png',
                 },
-                // {
-                //     pagePath: 'pages/form/index',
-                //     text: '登记',
-                //     iconPath: './assets/form.png',
-                //     selectedIconPath: './assets/form_selected.png',
-                // },
                 {
                     pagePath: 'pages/result/index',
                     text: '结局',
-                    iconPath: './assets/result.png',
-                    selectedIconPath: './assets/result_selected.png',
+                    iconPath: './assets/summary.png',
+                    selectedIconPath: './assets/summary_selected.png',
+                },
+                {
+                    pagePath: 'pages/index/index',
+                    text: '我的',
+                    iconPath: './assets/user.png',
+                    selectedIconPath: './assets/user_selected.png',
                 },
             ],
             color: '#a6a6a6',
@@ -76,7 +70,23 @@ class App extends Component {
         },
     };
 
-    componentDidMount() {}
+    componentWillMount() {}
+
+    componentDidMount() {
+        if (!Taro.cloud) {
+            console.error('请使用2.2.3或以上的基础库以使用云能力');
+        } else {
+            Taro.cloud.init({ traceUser: true });
+            Taro.cloud.callFunction({
+                name: 'getContext',
+                success(res) {
+                    console.log('in call function', res);
+                    store.dispatch(userSync((res.result as any)['0'] as IUserState));
+                },
+                fail: console.error,
+            });
+        }
+    }
 
     componentDidShow() {}
 
