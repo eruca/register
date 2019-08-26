@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { PATIENT_INDEX } from '../constants/patient';
+import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
 import { IAction } from '../actions/base';
 
 export interface IPatient {
@@ -62,6 +62,10 @@ export interface IPatientState {
     hospId: string;
     name: string;
     enrolltime: string;
+
+    currentPage: number;
+    pageSize: number;
+    total: number;
 }
 
 const INIT_STATE: IPatientState = {
@@ -69,6 +73,10 @@ const INIT_STATE: IPatientState = {
     hospId: '',
     name: '',
     enrolltime: '',
+
+    total: 0,
+    currentPage: 1,
+    pageSize: 20,
 };
 
 export default function patients(state = INIT_STATE, action: IAction): IPatientState {
@@ -77,11 +85,25 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
             console.log('PATIENT_INDEX: action', action);
             const { patient_id, hospId, name, enrolltime } = action.payload;
             return {
+                ...state,
                 patient_id,
                 hospId,
                 name,
                 enrolltime,
             };
+
+        case PATIENT_TOTAL:
+            return {
+                ...state,
+                total: action.payload.total,
+            };
+
+        case PATIENT_CURRENT:
+            return {
+                ...state,
+                currentPage: action.payload.currentPage,
+            };
+
         default:
             return state;
     }

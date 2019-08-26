@@ -1,4 +1,4 @@
-import { PATIENT_INDEX } from '../constants/patient';
+import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
 import { IAction } from './base';
 
 // export function add(item: IPatient): IAction {
@@ -28,5 +28,19 @@ export function deselect(): IAction {
     return {
         type: PATIENT_INDEX,
         payload: { patient_id: '', enrolltime: '', hospId: '', name: '' },
+    };
+}
+
+export function patient_total(total: number) {
+    return {
+        type: PATIENT_TOTAL,
+        payload: { total },
+    };
+}
+
+export function patient_current(currentPage: number) {
+    return {
+        type: PATIENT_CURRENT,
+        payload: { currentPage },
     };
 }

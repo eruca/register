@@ -1,6 +1,6 @@
 import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
-import { useSelector } from '@tarojs/redux';
+import { useSelector, useDispatch } from '@tarojs/redux';
 import { AtForm, AtInput, AtButton, AtSwitch, AtMessage } from 'taro-ui';
 
 import { zeroPatient, IPatient } from '../../reducers/patient';
@@ -8,11 +8,12 @@ import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
+import { patient_total } from '../../actions/patient';
 import { selector, LocalPatient, convertToLocal, validate, convertToPatient } from './config';
 import './index.scss';
 
 export default function Patient() {
-    const { patient_id } = useSelector((state: IReducers) => state.patients);
+    const { patient_id, total } = useSelector((state: IReducers) => state.patients);
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
@@ -37,6 +38,8 @@ export default function Patient() {
                 data: convertToPatient(patient),
                 success: function() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                    // 添加成功，则patients总数+1
+                    useDispatch()(patient_total(total + 1));
                 },
                 fail: console.error,
             });

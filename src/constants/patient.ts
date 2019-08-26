@@ -1,2 +1,4 @@
 export const PATIENT_ADD = 'PATIENT_ADD';
 export const PATIENT_INDEX = 'PATIENT_INDEX';
+export const PATIENT_TOTAL = 'PATIENT_TOTAL'
+export const PATIENT_CURRENT = 'PATIENT_CURRENT'
