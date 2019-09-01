@@ -76,7 +76,7 @@ const INIT_STATE: IPatientState = {
 
     total: 0,
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 20, // 20
 };
 
 export default function patients(state = INIT_STATE, action: IAction): IPatientState {

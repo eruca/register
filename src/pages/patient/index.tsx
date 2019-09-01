@@ -12,6 +12,8 @@ import { patient_total } from '../../actions/patient';
 import { selector, LocalPatient, convertToLocal, validate, convertToPatient } from './config';
 import './index.scss';
 
+const dispatch = useDispatch();
+
 export default function Patient() {
     const { patient_id, total } = useSelector((state: IReducers) => state.patients);
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
@@ -39,7 +41,7 @@ export default function Patient() {
                 success: function() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
                     // 添加成功，则patients总数+1
-                    useDispatch()(patient_total(total + 1));
+                    dispatch(patient_total(total + 1));
                 },
                 fail: console.error,
             });
