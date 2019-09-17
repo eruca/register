@@ -66,6 +66,8 @@ export interface IPatientState {
     currentPage: number;
     pageSize: number;
     total: number;
+    patient_date_total: number;
+    patient_result_total: number;
 }
 
 const INIT_STATE: IPatientState = {
@@ -75,6 +77,8 @@ const INIT_STATE: IPatientState = {
     enrolltime: '',
 
     total: 0,
+    patient_date_total: 0,
+    patient_result_total: 0,
     currentPage: 1,
     pageSize: 20, // 20
 };
@@ -95,7 +99,7 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
         case PATIENT_TOTAL:
             return {
                 ...state,
-                total: action.payload.total,
+                ...action.payload,
             };
 
         case PATIENT_CURRENT:

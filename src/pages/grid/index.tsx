@@ -1,5 +1,4 @@
 import Taro, { useState } from '@tarojs/taro';
-
 import { View } from '@tarojs/components';
 import { useSelector } from '@tarojs/redux';
 import { AtSegmentedControl } from 'taro-ui';

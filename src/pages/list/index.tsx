@@ -13,6 +13,7 @@ import {
     AtModalHeader,
 } from 'taro-ui';
 import { useDispatch, useSelector } from '@tarojs/redux';
+import dayjs from 'dayjs';
 
 import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
@@ -47,13 +48,19 @@ const options = [
 ];
 
 export default function List() {
-    const { _openid, total, pageSize, currentPage } = useSelector((state: IReducers) => ({
-        _openid: state.user._openid,
-        total: state.patients.total,
-        pageSize: state.patients.pageSize,
-        currentPage: state.patients.currentPage,
-    }));
+    const { _openid, total, date_total, result_total, pageSize, currentPage } = useSelector(
+        (state: IReducers) => ({
+            _openid: state.user._openid,
+            total: state.patients.total,
+            date_total: state.patients.patient_date_total,
+            result_total: state.patients.patient_result_total,
+            pageSize: state.patients.pageSize,
+            currentPage: state.patients.currentPage,
+        })
+    );
 
+    // 到底是数据库没下载，还是数据本身就是空
+    const [loaded, setLoaded] = useState<boolean>(false);
     const [patients, setPatients] = useState<Array<IPatient>>([]);
     const [searchText, setSearchText] = useState('');
     const [searchUtil, setSearchUtil] = useState({ curr: 1, clicked: false });
@@ -65,9 +72,12 @@ export default function List() {
                 .where({ _openid })
                 .skip((currentPage - 1) * pageSize)
                 .limit(pageSize)
-                .orderBy('name', 'asc')
+                .orderBy('enrolltime', 'desc')
                 .get()
-                .then(res => setPatients(res.data as Array<IPatient>));
+                .then(res => {
+                    setPatients(res.data as Array<IPatient>);
+                    setLoaded(true);
+                });
         }
     }, [searchUtil.clicked, setPatients, _openid, currentPage, pageSize, total]);
 
@@ -87,15 +97,6 @@ export default function List() {
             fail: console.error,
         });
     };
-
-    // const patients = useMemo(() => {
-    //     if (searchText === '') {
-    //         return patients;
-    //     }
-    //     return patients.filter((item: IPatient) =>
-    //         fuzzysearch(searchText, item.hospId + item.name)
-    //     );
-    // }, [patients, searchText]);
 
     const onChange = useCallback(
         (v: string) => {
@@ -138,7 +139,18 @@ export default function List() {
             .remove({
                 success: ({ stats }) => {
                     console.log('e', stats);
-                    dispatch(patient_total(total - stats.removed));
+                    const new_date_total =
+                        date_total - dayjs().diff(dayjs(patients[openIndex].enrolltime), 'd') > 7
+                            ? 1
+                            : 0;
+
+                    dispatch(
+                        patient_total(
+                            total - stats.removed,
+                            new_date_total,
+                            result_total - patients[openIndex].venttime ? 0 : 1
+                        )
+                    );
                     onClosed();
                     setModelOpened(false);
                 },
@@ -162,8 +174,10 @@ export default function List() {
                 onChange={onChange}
                 onActionClick={onSearch}
             />
-            {filtered.length === 0 ? (
+            {loaded === false ? (
                 <Loading />
+            ) : filtered.length === 0 ? (
+                '目前数据为空'
             ) : (
                 <AtList>
                     {filtered.map((item, index) => (
@@ -176,7 +190,11 @@ export default function List() {
                             onClosed={onClosed}
                         >
                             <AtListItem
-                                title={`${item.hospId} - ${item.name}`}
+                                title={`${item.hospId}-${item.name}: ${dayjs().diff(
+                                    dayjs(item.enrolltime),
+                                    'day'
+                                )}d`}
+                                extraText={`${item.venttime ? '✔️' : ''}`}
                                 onClick={() => {
                                     dispatch(
                                         select(

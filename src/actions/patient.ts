@@ -31,10 +31,14 @@ export function deselect(): IAction {
     };
 }
 
-export function patient_total(total: number) {
+export function patient_total(
+    total: number,
+    patient_date_total: number,
+    patient_result_total: number
+) {
     return {
         type: PATIENT_TOTAL,
-        payload: { total },
+        payload: { total, patient_date_total, patient_result_total },
     };
 }
 

@@ -13,6 +13,7 @@ export interface IUserState {
     province: string;
     hosp: string;
     dept: string;
+    is_super: boolean;
 }
 
 const INIT_STATE: IUserState = {
@@ -27,6 +28,7 @@ const INIT_STATE: IUserState = {
     province: '',
     hosp: '',
     dept: '',
+    is_super: false,
 };
 
 export default function user(state = INIT_STATE, action: IAction): IUserState {

@@ -82,7 +82,13 @@ class App extends Component {
                 success(res) {
                     console.log('in call function', res);
                     store.dispatch(userSync((res.result as any)['0'] as IUserState));
-                    store.dispatch(patient_total((res.result as any).total));
+                    store.dispatch(
+                        patient_total(
+                            (res.result as any).total,
+                            (res.result as any).patient_date_total,
+                            (res.result as any).patient_result_total
+                        )
+                    );
                 },
                 fail: console.error,
             });
