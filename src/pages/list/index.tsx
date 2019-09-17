@@ -51,9 +51,12 @@ export default function List() {
     const {
         _openid,
         total,
+        mytotal,
         is_super,
         date_total,
+        mydate_total,
         result_total,
+        myresult_total,
         pageSize,
         currentPage,
     } = useSelector((state: IReducers) => ({
@@ -62,6 +65,9 @@ export default function List() {
         total: state.patients.total,
         date_total: state.patients.patient_date_total,
         result_total: state.patients.patient_result_total,
+        mytotal: state.patients.mytotal,
+        mydate_total: state.patients.mypatient_date_total,
+        myresult_total: state.patients.mypatient_result_total,
         pageSize: state.patients.pageSize,
         currentPage: state.patients.currentPage,
     }));
@@ -148,16 +154,18 @@ export default function List() {
             .remove({
                 success: ({ stats }) => {
                     console.log('e', stats);
-                    const new_date_total =
-                        date_total - dayjs().diff(dayjs(patients[openIndex].enrolltime), 'd') > 7
-                            ? 1
-                            : 0;
+                    const sub_day =
+                        dayjs().diff(dayjs(patients[openIndex].enrolltime), 'd') > 7 ? 1 : 0;
+                    const sub_result = patients[openIndex].venttime ? 0 : 1;
 
                     dispatch(
                         patient_total(
                             total - stats.removed,
-                            new_date_total,
-                            result_total - patients[openIndex].venttime ? 0 : 1
+                            date_total - sub_day,
+                            result_total - sub_result,
+                            mytotal - stats.removed,
+                            mydate_total - sub_day,
+                            myresult_total - sub_result
                         )
                     );
                     onClosed();

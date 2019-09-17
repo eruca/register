@@ -16,12 +16,19 @@ import './index.scss';
 const dispatch = useDispatch();
 
 export default function Patient() {
-    const { patient_id, total, patient_result_total, patient_date_total, _openid } = useSelector(
-        (state: IReducers) => ({
-            ...state.patients,
-            _openid: state.user._openid,
-        })
-    );
+    const {
+        patient_id,
+        total,
+        patient_result_total,
+        patient_date_total,
+        mytotal,
+        mypatient_result_total,
+        mypatient_date_total,
+        _openid,
+    } = useSelector((state: IReducers) => ({
+        ...state.patients,
+        _openid: state.user._openid,
+    }));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
@@ -43,17 +50,23 @@ export default function Patient() {
 
         if (patient_id === '') {
             const convertedPatient = convertToPatient(patient);
-            const new_date_total =
-                patient_date_total - dayjs().diff(dayjs(convertedPatient.enrolltime), 'd') < 7
-                    ? 0
-                    : 1;
-            const new_result_total = patient_result_total - convertedPatient.venttime ? 1 : 0;
+            const add_date = dayjs().diff(dayjs(convertedPatient.enrolltime), 'd') < 7 ? 0 : 1;
+            const add_result = convertedPatient.venttime ? 1 : 0;
             patientsCollection.add({
                 data: convertedPatient,
                 success: function() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
                     // 添加成功，则patients总数+1
-                    dispatch(patient_total(total + 1, new_date_total, new_result_total));
+                    dispatch(
+                        patient_total(
+                            total + 1,
+                            patient_date_total + add_date,
+                            patient_result_total + add_result,
+                            mytotal + 1,
+                            mypatient_date_total + add_date,
+                            mypatient_result_total + add_result
+                        )
+                    );
                 },
                 fail: console.error,
             });

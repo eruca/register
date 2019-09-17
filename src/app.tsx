@@ -86,7 +86,10 @@ class App extends Component {
                         patient_total(
                             (res.result as any).total,
                             (res.result as any).patient_date_total,
-                            (res.result as any).patient_result_total
+                            (res.result as any).patient_result_total,
+                            (res.result as any).mytotal,
+                            (res.result as any).mypatient_date_total,
+                            (res.result as any).mypatient_result_total
                         )
                     );
                 },

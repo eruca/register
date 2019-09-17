@@ -1,6 +1,11 @@
 import dayjs from 'dayjs';
 
-import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
+import {
+    PATIENT_INDEX,
+    PATIENT_TOTAL,
+    PATIENT_CURRENT,
+    PATIENT_TOTAL_INIT,
+} from '../constants/patient';
 import { IAction } from '../actions/base';
 
 export interface IPatient {
@@ -69,6 +74,9 @@ export interface IPatientState {
     total: number;
     patient_date_total: number;
     patient_result_total: number;
+    mytotal: number;
+    mypatient_date_total: number;
+    mypatient_result_total: number;
 }
 
 const INIT_STATE: IPatientState = {
@@ -78,6 +86,9 @@ const INIT_STATE: IPatientState = {
     name: '',
     enrolltime: '',
 
+    mytotal: 0,
+    mypatient_date_total: 0,
+    mypatient_result_total: 0,
     total: 0,
     patient_date_total: 0,
     patient_result_total: 0,
@@ -97,6 +108,11 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
                 hospId,
                 name,
                 enrolltime,
+            };
+        case PATIENT_TOTAL_INIT:
+            return {
+                ...state,
+                ...action.payload,
             };
 
         case PATIENT_TOTAL:

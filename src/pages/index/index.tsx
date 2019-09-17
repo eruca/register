@@ -11,8 +11,19 @@ import { usersCollection } from '../../utils/db';
 const dispatch = useDispatch();
 
 export default function Index() {
-    const { user, total, date_total, result_total } = useSelector((state: IReducers) => ({
+    const {
+        user,
+        total,
+        mytotal,
+        mydate_total,
+        myresult_total,
+        date_total,
+        result_total,
+    } = useSelector((state: IReducers) => ({
         user: state.user,
+        mytotal: state.patients.mytotal,
+        mydate_total: state.patients.mypatient_date_total,
+        myresult_total: state.patients.mypatient_result_total,
         total: state.patients.total,
         date_total: state.patients.patient_date_total,
         result_total: state.patients.patient_result_total,
@@ -40,9 +51,15 @@ export default function Index() {
                         <View className="at-col at-col-6">已有结果</View>
                     </View>
                     <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">{`${result_total}/${total}`}</View>
-                        <View className="at-col at-col-6">{`${date_total}/${total}`}</View>
+                        <View className="at-col at-col-6">{`${mydate_total}/${mytotal}`}</View>
+                        <View className="at-col at-col-6">{`${myresult_total}/${mytotal}`}</View>
                     </View>
+                    {user.is_super && (
+                        <View className="at-row at-row__justify--center">
+                            <View className="at-col at-col-6">{`${date_total}/${total}`}</View>
+                            <View className="at-col at-col-6">{`${result_total}/${total}`}</View>
+                        </View>
+                    )}
                 </AtCard>
             </View>
             <AtButton
