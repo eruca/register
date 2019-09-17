@@ -59,6 +59,7 @@ export function deleteId(patient: IPatient): IPatient {
 
 export interface IPatientState {
     patient_id: string;
+    _openid: string;
     hospId: string;
     name: string;
     enrolltime: string;
@@ -72,6 +73,7 @@ export interface IPatientState {
 
 const INIT_STATE: IPatientState = {
     patient_id: '',
+    _openid: '',
     hospId: '',
     name: '',
     enrolltime: '',
@@ -87,10 +89,11 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
     switch (action.type) {
         case PATIENT_INDEX:
             console.log('PATIENT_INDEX: action', action);
-            const { patient_id, hospId, name, enrolltime } = action.payload;
+            const { patient_id, _openid, hospId, name, enrolltime } = action.payload;
             return {
                 ...state,
                 patient_id,
+                _openid,
                 hospId,
                 name,
                 enrolltime,

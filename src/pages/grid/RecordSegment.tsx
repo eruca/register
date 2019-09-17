@@ -13,10 +13,13 @@ import { IRecord } from '../../reducers/records';
 const dispatch = useDispatch();
 
 export default function RecordSegment() {
-    const { patient_id, enrolltime, force_render_count } = useSelector((state: IReducers) => ({
-        ...state.patients,
-        force_render_count: state.records.force_render_count,
-    }));
+    const { patient_id, _openid, user_openid, enrolltime, force_render_count } = useSelector(
+        (state: IReducers) => ({
+            ...state.patients,
+            force_render_count: state.records.force_render_count,
+            user_openid: state.user._openid,
+        })
+    );
     console.log('patient_id', patient_id, 'enrolltime', enrolltime);
     if (patient_id === '') {
         return <View>没有数据</View>;
@@ -63,7 +66,7 @@ export default function RecordSegment() {
             <AtDivider content={`${gridValue.length > 0 ? '记录内容' : '没有内容'}`} />
             {gridValue.length > 0 && <AtGrid data={gridValue} onClick={gridOnClick} />}
             <AtDivider />
-            <AtButton type="primary" onClick={newRecord}>
+            <AtButton type="primary" onClick={newRecord} disabled={_openid !== user_openid}>
                 进行记录
                 <Text style="font-size:0.6em;color:#7e6148">
                     第{dayjs().diff(dayjs(enrolltime), 'day')}天

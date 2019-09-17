@@ -16,8 +16,11 @@ import './index.scss';
 const dispatch = useDispatch();
 
 export default function Patient() {
-    const { patient_id, total, patient_result_total, patient_date_total } = useSelector(
-        (state: IReducers) => state.patients
+    const { patient_id, total, patient_result_total, patient_date_total, _openid } = useSelector(
+        (state: IReducers) => ({
+            ...state.patients,
+            _openid: state.user._openid,
+        })
     );
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
@@ -227,7 +230,7 @@ export default function Patient() {
                         setPatient,
                     ])}
                 />
-                <AtButton type="primary" formType="submit">
+                <AtButton type="primary" formType="submit" disabled={_openid !== patient._openid}>
                     {patient_id === '' ? '提交' : '修改'}
                 </AtButton>
                 {patient_id !== '' && (

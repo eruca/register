@@ -110,6 +110,7 @@ export const config: Map<string, ConfigType> = [
 
 export interface LocalPatient {
     _id?: string;
+    _openid?: string;
     hospId: string;
     name: string;
     isMale: boolean;
@@ -134,6 +135,7 @@ export interface LocalPatient {
 export function convertToLocal(patient: IPatient): LocalPatient {
     return {
         _id: patient._id,
+        _openid: patient._openid,
         hospId: patient.hospId,
         name: patient.name,
         isMale: patient.isMale,
@@ -182,6 +184,7 @@ export function convertToPatient(patient: LocalPatient, withID: boolean = true):
     };
     if (withID) {
         newOne['_id'] = patient._id;
+        newOne['_openid'] = patient._openid;
     }
     return newOne;
 }

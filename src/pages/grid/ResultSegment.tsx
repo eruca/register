@@ -17,7 +17,11 @@ const selectors = [
 ];
 
 export default function ResultSegment() {
-    const { patient_id } = useSelector((state: IReducers) => state.patients);
+    const { patient_id, user_openid, patient_openid } = useSelector((state: IReducers) => ({
+        patient_id: state.patients.patient_id,
+        user_openid: state.user._openid,
+        patient_openid: state.patients._openid,
+    }));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
@@ -67,6 +71,7 @@ export default function ResultSegment() {
                         patient,
                         setPatient,
                     ])}
+                    disabled = {patient_openid !== user_openid}
                 />
                 <AtInput
                     type="number"
@@ -77,6 +82,7 @@ export default function ResultSegment() {
                         patient,
                         setPatient,
                     ])}
+                    disabled = {patient_openid !== user_openid}
                 />
                 <Picker
                     mode="selector"
@@ -86,6 +92,7 @@ export default function ResultSegment() {
                         e => setPatient({ ...patient, resultIndex: parseInt(e.detail.value, 10) }),
                         [patient, setPatient]
                     )}
+                    disabled = {patient_openid !== user_openid}
                 >
                     <FormField name="入组时间" value={selectors[patient.resultIndex]} />
                 </Picker>
@@ -96,8 +103,9 @@ export default function ResultSegment() {
                         setPatient,
                         patient,
                     ])}
+                    disabled = {patient_openid !== user_openid}
                 />
-                <AtButton type="primary" formType="submit">
+                <AtButton type="primary" formType="submit" disabled={patient_id != user_openid}>
                     提交
                 </AtButton>
             </AtForm>

@@ -48,16 +48,23 @@ const options = [
 ];
 
 export default function List() {
-    const { _openid, total, date_total, result_total, pageSize, currentPage } = useSelector(
-        (state: IReducers) => ({
-            _openid: state.user._openid,
-            total: state.patients.total,
-            date_total: state.patients.patient_date_total,
-            result_total: state.patients.patient_result_total,
-            pageSize: state.patients.pageSize,
-            currentPage: state.patients.currentPage,
-        })
-    );
+    const {
+        _openid,
+        total,
+        is_super,
+        date_total,
+        result_total,
+        pageSize,
+        currentPage,
+    } = useSelector((state: IReducers) => ({
+        _openid: state.user._openid,
+        is_super: state.user.is_super,
+        total: state.patients.total,
+        date_total: state.patients.patient_date_total,
+        result_total: state.patients.patient_result_total,
+        pageSize: state.patients.pageSize,
+        currentPage: state.patients.currentPage,
+    }));
 
     // 到底是数据库没下载，还是数据本身就是空
     const [loaded, setLoaded] = useState<boolean>(false);
@@ -87,7 +94,9 @@ export default function List() {
     const onSearch = () => {
         Taro.cloud.callFunction({
             name: 'onSearch',
-            data: { searchText },
+            data: {
+                searchText: !is_super && searchText.substring(0, 3) === 'r:+' ? '' : searchText,
+            },
             success(res) {
                 console.log('e', (res.result as any).event, 'found', (res.result as any).found);
                 setPatients((res.result as any).found as Array<IPatient>);
@@ -199,6 +208,7 @@ export default function List() {
                                     dispatch(
                                         select(
                                             item._id || '',
+                                            item._openid || '',
                                             item.hospId,
                                             item.name,
                                             item.enrolltime
