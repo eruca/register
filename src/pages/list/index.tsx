@@ -170,7 +170,7 @@ export default function List() {
                 showActionButton
                 actionName="搜索"
                 value={searchText}
-                placeholder="输入病案号/姓名"
+                placeholder="输入病案号+姓名/r:0"
                 onChange={onChange}
                 onActionClick={onSearch}
             />
