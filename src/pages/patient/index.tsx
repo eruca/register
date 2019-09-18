@@ -93,7 +93,6 @@ export default function Patient() {
                     name="hospId"
                     title="病案号:"
                     type="text"
-                    autoFocus={true}
                     value={patient.hospId}
                     onChange={useCallback((v: string) => setPatient({ ...patient, hospId: v }), [
                         patient,
