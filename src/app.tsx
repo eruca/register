@@ -46,7 +46,7 @@ class App extends Component {
                 },
                 {
                     pagePath: 'pages/result/index',
-                    text: '结局',
+                    text: '统计',
                     iconPath: './assets/summary.png',
                     selectedIconPath: './assets/summary_selected.png',
                 },
