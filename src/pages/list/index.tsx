@@ -17,9 +17,10 @@ import dayjs from 'dayjs';
 
 import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
-import { deselect, select, patient_current, patient_total } from '../../actions/patient';
+import { deselect, select, patient_current } from '../../actions/patient';
 import db from '../../utils/db';
 import { IReducers } from '../../reducers';
+import { forceRerender } from '../../actions/user';
 
 import './index.scss';
 
@@ -48,31 +49,16 @@ const options = [
 ];
 
 export default function List() {
-    const {
-        _openid,
-        is_super,
-        force_rerender,
-        total,
-        mytotal,
-        date_total,
-        mydate_total,
-        result_total,
-        myresult_total,
-        pageSize,
-        currentPage,
-    } = useSelector((state: IReducers) => ({
-        _openid: state.user._openid,
-        is_super: state.user.is_super,
-        force_rerender: state.user.force_rerender,
-        total: state.patients.total,
-        date_total: state.patients.patient_date_total,
-        result_total: state.patients.patient_result_total,
-        mytotal: state.patients.mytotal,
-        mydate_total: state.patients.mypatient_date_total,
-        myresult_total: state.patients.mypatient_result_total,
-        pageSize: state.patients.pageSize,
-        currentPage: state.patients.currentPage,
-    }));
+    const { _openid, is_super, force_rerender, mytotal, pageSize, currentPage } = useSelector(
+        (state: IReducers) => ({
+            _openid: state.user._openid,
+            is_super: state.user.is_super,
+            force_rerender: state.user.force_rerender,
+            mytotal: state.patients.mytotal,
+            pageSize: state.patients.pageSize,
+            currentPage: state.patients.currentPage,
+        })
+    );
 
     // 到底是数据库没下载，还是数据本身就是空
     const [loaded, setLoaded] = useState<boolean>(false);
@@ -94,7 +80,7 @@ export default function List() {
                     setLoaded(true);
                 });
         }
-    }, [searchUtil.clicked, mytotal, force_rerender, setPatients, _openid, currentPage, pageSize]);
+    }, [searchUtil.clicked, force_rerender, setPatients, _openid, currentPage, pageSize]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 
@@ -156,20 +142,7 @@ export default function List() {
             .remove({
                 success: ({ stats }) => {
                     console.log('e', stats);
-                    const sub_day =
-                        dayjs().diff(dayjs(patients[openIndex].enrolltime), 'd') > 7 ? 1 : 0;
-                    const sub_result = patients[openIndex].venttime ? 0 : 1;
-
-                    dispatch(
-                        patient_total(
-                            total - stats.removed,
-                            date_total - sub_day,
-                            result_total - sub_result,
-                            mytotal - stats.removed,
-                            mydate_total - sub_day,
-                            myresult_total - sub_result
-                        )
-                    );
+                    dispatch(forceRerender());
                     onClosed();
                     setModelOpened(false);
                 },
@@ -235,7 +208,7 @@ export default function List() {
             )}
             <View style="margin-top:10rpx">
                 <AtPagination
-                    total={!searchUtil.clicked ? total : patients.length} // 需要设置是否按了搜索按钮
+                    total={!searchUtil.clicked ? mytotal : patients.length} // 需要设置是否按了搜索按钮
                     pageSize={pageSize}
                     current={!searchUtil.clicked ? currentPage : searchUtil.curr}
                     onPageChange={onPageChange}
@@ -269,4 +242,8 @@ export default function List() {
 
 List.options = {
     addGlobalClass: true,
+};
+
+List.config = {
+    navigationBarTitleText: '病人列表',
 };

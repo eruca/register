@@ -96,8 +96,8 @@ export const config: Map<string, ConfigType> = [
     },
     {
         key: 'nrs2002',
-        message: 'NRS2002评分不能为空',
-        validator: test_1_99, // todo :需要修正
+        message: 'NRS2002评分0~23',
+        validator: torentScore, // todo :需要修正
     },
     {
         key: 'venttime',

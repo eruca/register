@@ -1,14 +1,15 @@
 import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { useSelector, useDispatch } from '@tarojs/redux';
-import { AtForm, AtInput, AtButton, AtSwitch, AtMessage } from 'taro-ui';
+import { AtForm, AtInput, AtButton, AtSwitch, AtMessage, AtIcon, AtFloatLayout } from 'taro-ui';
 
 import { zeroPatient, IPatient } from '../../reducers/patient';
 import FormField from '../../components/FormField';
+import NRS2002 from '../../components/NRS2002';
 import Loading from '../../components/Loading';
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
-import { patient_total } from '../../actions/patient';
+import { forceRerender } from '../../actions/user';
 import { selector, LocalPatient, convertToLocal, validate, convertToPatient } from './config';
 import './index.scss';
 
@@ -21,6 +22,7 @@ export default function Patient() {
         force_rerender: state.user.force_rerender,
     }));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
+    const [floatLay, setFloatLay] = useState(false);
 
     // 如果patient_id已被选择，就从数据库获取该patient数据
     useEffect(() => {
@@ -46,23 +48,7 @@ export default function Patient() {
                 success: function() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
                     // 添加成功，则再次从数据库获取统计信息
-                    Taro.cloud.callFunction({
-                        name: 'getStatistic',
-                        success: res => {
-                            console.log('getStatistic', res);
-                            dispatch(
-                                patient_total(
-                                    (res.result as any).total,
-                                    (res.result as any).patient_date_total,
-                                    (res.result as any).patient_result_total,
-                                    (res.result as any).mytotal,
-                                    (res.result as any).mypatient_date_total,
-                                    (res.result as any).mypatient_result_total
-                                )
-                            );
-                        },
-                        fail: console.error,
-                    });
+                    dispatch(forceRerender());
                 },
                 fail: console.error,
             });
@@ -72,23 +58,7 @@ export default function Patient() {
                 success: function() {
                     Taro.atMessage({ message: '修改记录成功', type: 'success' });
                     // 修改成功，则再次从数据库获取统计信息
-                    Taro.cloud.callFunction({
-                        name: 'getStatistic',
-                        success: res => {
-                            console.log('getStatistic', res);
-                            dispatch(
-                                patient_total(
-                                    (res.result as any).total,
-                                    (res.result as any).patient_date_total,
-                                    (res.result as any).patient_result_total,
-                                    (res.result as any).mytotal,
-                                    (res.result as any).mypatient_date_total,
-                                    (res.result as any).mypatient_result_total
-                                )
-                            );
-                        },
-                        fail: console.error,
-                    });
+                    dispatch(forceRerender());
                 },
                 fail: console.error,
             });
@@ -245,17 +215,31 @@ export default function Patient() {
                         setPatient,
                     ])}
                 />
-                <AtInput
-                    name="nrs2002"
-                    title="NRS2002:"
-                    type="text"
-                    placeholder="不能为空"
-                    value={patient.nrs2002 === '0' && patient_id === '' ? '' : patient.nrs2002}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, nrs2002: v }), [
-                        patient,
-                        setPatient,
-                    ])}
-                />
+                <View className="at-row at-row__align--center">
+                    <View className="at-col at-col-10">
+                        <AtInput
+                            name="nrs2002"
+                            title="NRS2002:"
+                            type="text"
+                            placeholder="0-23"
+                            value={
+                                patient.nrs2002 === '0' && patient_id === '' ? '' : patient.nrs2002
+                            }
+                            onChange={useCallback(
+                                (v: string) => setPatient({ ...patient, nrs2002: v }),
+                                [patient, setPatient]
+                            )}
+                        />
+                    </View>
+                    <View className="at-col at-col-2" style={{ marginRight: '5PX' }}>
+                        <AtIcon
+                            value="help"
+                            size="30"
+                            color="#F00"
+                            onClick={() => setFloatLay(true)}
+                        />
+                    </View>
+                </View>
                 <AtInput
                     name="enteralNutritionToleranceScore"
                     title="耐受性评分:"
@@ -289,12 +273,19 @@ export default function Patient() {
                     </AtButton>
                 )}
             </AtForm>
+            <AtFloatLayout
+                isOpened={floatLay}
+                title="营养风险筛查NRS2002"
+                onClose={() => setFloatLay(false)}
+            >
+                <NRS2002 />
+            </AtFloatLayout>
         </View>
     );
 }
 
 Patient.config = {
-    navigationBarTitleText: '登记内容',
+    navigationBarTitleText: '登记病人',
 };
 
 Patient.options = {

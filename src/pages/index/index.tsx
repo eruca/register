@@ -79,3 +79,7 @@ export default function Index() {
 Index.options = {
     addGlobalClass: true,
 };
+
+Index.config = {
+    navigationBarTitleText: '个人信息',
+};

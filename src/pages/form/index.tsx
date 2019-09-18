@@ -9,19 +9,19 @@ import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
 import { nasalFeedTubeTypes, AGIs, convertToLocal, validate, convertToIRecord } from './config';
 import { recordsCollection } from '../../utils/db';
-import { forceRender } from '../../actions/records';
+import { forceRerender } from '../../actions/user';
 import EnteralNutritionTolerance from './desc';
 
 const dispatch = useDispatch();
 
 const onAddSuccess = function() {
     Taro.atMessage({ message: '添加记录成功', type: 'success' });
-    dispatch(forceRender());
+    dispatch(forceRerender());
 };
 
 const onModifySuccess = function() {
     Taro.atMessage({ message: '修改记录成功', type: 'success' });
-    dispatch(forceRender());
+    dispatch(forceRerender());
 };
 
 export default function Form() {
@@ -356,4 +356,8 @@ export default function Form() {
 
 Form.options = {
     addGlobalClass: true,
+};
+
+Form.config = {
+    navigationBarTitleText: '记录',
 };

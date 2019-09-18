@@ -51,3 +51,7 @@ export default function User() {
         </View>
     );
 }
+
+User.config = {
+    navigationBarTitleText: '用户信息',
+};
