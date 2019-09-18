@@ -1,4 +1,4 @@
-import { USER_ADD, USER_OPENID, USER_HOSP_DEPT } from '../constants/user';
+import { USER_ADD, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
 import { IAction } from './base';
 import { IUserState } from '../reducers/user';
 
@@ -20,5 +20,11 @@ export function syncHospDept(hosp: string, dept: string): IAction {
     return {
         type: USER_HOSP_DEPT,
         payload: { hosp, dept },
+    };
+}
+
+export function forceRerender(): IAction {
+    return {
+        type: USER_FORCE_RERENDER,
     };
 }

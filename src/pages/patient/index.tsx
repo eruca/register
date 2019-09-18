@@ -15,9 +15,10 @@ import './index.scss';
 const dispatch = useDispatch();
 
 export default function Patient() {
-    const { patient_id, _openid } = useSelector((state: IReducers) => ({
+    const { patient_id, _openid, force_rerender } = useSelector((state: IReducers) => ({
         ...state.patients,
         _openid: state.user._openid,
+        force_rerender: state.user.force_rerender,
     }));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
@@ -29,7 +30,7 @@ export default function Patient() {
                 promise.then(res => setPatient(convertToLocal(res.data as IPatient)));
             }
         }
-    }, [patient_id, setPatient]);
+    }, [patient_id, setPatient, force_rerender]);
     console.log('patient =>', patient, 'patient_id', patient_id);
 
     const onSubmit = () => {

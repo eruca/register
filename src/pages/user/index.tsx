@@ -1,9 +1,13 @@
 import Taro, { useState } from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { AtForm, AtInput, AtButton } from 'taro-ui';
-import { useSelector } from '@tarojs/redux';
-import { IReducers } from 'src/reducers';
+import { AtForm, AtInput, AtButton, AtMessage } from 'taro-ui';
+import { useSelector, useDispatch } from '@tarojs/redux';
+
+import { IReducers } from '../../reducers';
 import { usersCollection } from '../../utils/db';
+import { syncHospDept } from '../../actions/user';
+
+const dispatch = useDispatch();
 
 export default function User() {
     const { dept: defaultDept, hosp: defaultHosp, _id } = useSelector(
@@ -17,6 +21,8 @@ export default function User() {
             data: { dept, hosp },
             success(res) {
                 console.log('success', res);
+                dispatch(syncHospDept(hosp, dept));
+                Taro.atMessage({ message: '修改成功', type: 'success' });
             },
             fail: console.error,
         });
@@ -24,6 +30,7 @@ export default function User() {
 
     return (
         <View>
+            <AtMessage />
             <AtForm onSubmit={onSubmit}>
                 <AtInput
                     title="医院"

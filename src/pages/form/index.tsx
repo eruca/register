@@ -25,10 +25,13 @@ const onModifySuccess = function() {
 };
 
 export default function Form() {
-    const { record_id, patient_id, enrolltime } = useSelector((state: IReducers) => ({
-        record_id: state.records.record_id,
-        ...state.patients,
-    }));
+    const { record_id, patient_id, enrolltime, force_rerender } = useSelector(
+        (state: IReducers) => ({
+            record_id: state.records.record_id,
+            force_rerender: state.user.force_rerender,
+            ...state.patients,
+        })
+    );
 
     // 控制浮动层
     const [floatLay, setfloatLay] = useState(false);
@@ -44,7 +47,7 @@ export default function Form() {
                 });
             }
         }
-    }, [record_id, setRecord]);
+    }, [record_id, setRecord, force_rerender]);
     console.log(`${patient_id}. record`, record);
 
     const onSubmit = () => {

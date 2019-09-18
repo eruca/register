@@ -80,7 +80,7 @@ class App extends Component {
             Taro.cloud.callFunction({
                 name: 'getContext',
                 success(res) {
-                    console.log('in call function', res);
+                    console.log('getContext', res);
                     store.dispatch(userSync((res.result as any)['0'] as IUserState));
                 },
                 fail: console.error,

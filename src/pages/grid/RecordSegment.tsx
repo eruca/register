@@ -1,5 +1,4 @@
 import Taro, { useCallback, useEffect, useState } from '@tarojs/taro';
-
 import { View, Text } from '@tarojs/components';
 import dayjs from 'dayjs';
 import { useSelector, useDispatch } from '@tarojs/redux';
@@ -13,11 +12,11 @@ import { IRecord } from '../../reducers/records';
 const dispatch = useDispatch();
 
 export default function RecordSegment() {
-    const { patient_id, _openid, user_openid, enrolltime, force_render_count } = useSelector(
+    const { patient_id, _openid, user_openid, enrolltime, force_rerender } = useSelector(
         (state: IReducers) => ({
             ...state.patients,
-            force_render_count: state.records.force_render_count,
             user_openid: state.user._openid,
+            force_rerender: state.user.force_rerender,
         })
     );
     console.log('patient_id', patient_id, 'enrolltime', enrolltime);
@@ -27,13 +26,13 @@ export default function RecordSegment() {
 
     const [patientRecords, setPatientRecords] = useState<Array<IRecord>>([]);
     useEffect(() => {
-        console.log('ask for records, dependent one', force_render_count);
+        console.log('ask for records, dependent one', force_rerender);
         recordsCollection
             .where({ patientid: patient_id })
             .orderBy('recordtime', 'asc')
             .get()
             .then(res => setPatientRecords(res.data as Array<IRecord>));
-    }, [patient_id, setPatientRecords, force_render_count]);
+    }, [patient_id, setPatientRecords, force_rerender]);
 
     console.log('patientRecords ->', patientRecords);
     const gridValue =

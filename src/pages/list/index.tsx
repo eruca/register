@@ -19,9 +19,9 @@ import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
 import { deselect, select, patient_current, patient_total } from '../../actions/patient';
 import db from '../../utils/db';
+import { IReducers } from '../../reducers';
 
 import './index.scss';
-import { IReducers } from '../../reducers';
 
 const dispatch = useDispatch();
 
@@ -50,9 +50,10 @@ const options = [
 export default function List() {
     const {
         _openid,
+        is_super,
+        force_rerender,
         total,
         mytotal,
-        is_super,
         date_total,
         mydate_total,
         result_total,
@@ -62,6 +63,7 @@ export default function List() {
     } = useSelector((state: IReducers) => ({
         _openid: state.user._openid,
         is_super: state.user.is_super,
+        force_rerender: state.user.force_rerender,
         total: state.patients.total,
         date_total: state.patients.patient_date_total,
         result_total: state.patients.patient_result_total,
@@ -92,7 +94,7 @@ export default function List() {
                     setLoaded(true);
                 });
         }
-    }, [searchUtil.clicked, mytotal, setPatients, _openid, currentPage, pageSize]);
+    }, [searchUtil.clicked, mytotal, force_rerender, setPatients, _openid, currentPage, pageSize]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 
