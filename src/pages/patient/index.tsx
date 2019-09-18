@@ -136,7 +136,7 @@ export default function Patient() {
                     title="年龄(岁):"
                     type="text"
                     placeholder="1-139"
-                    value={patient.age}
+                    value={patient.age === '0' && patient_id === '' ? '' : patient.age}
                     onChange={useCallback((v: string) => setPatient({ ...patient, age: v }), [
                         patient,
                         setPatient,
@@ -147,7 +147,7 @@ export default function Patient() {
                     title="床号:"
                     type="text"
                     placeholder="1-100"
-                    value={patient.bed}
+                    value={patient.bed === '0' && patient_id === '' ? '' : patient.bed}
                     onChange={useCallback((v: string) => setPatient({ ...patient, bed: v }), [
                         patient,
                         setPatient,
@@ -178,7 +178,7 @@ export default function Patient() {
                     title="身高(cm):"
                     type="number"
                     placeholder="100-250"
-                    value={patient.height}
+                    value={patient.height === '0' && patient_id === '' ? '' : patient.height}
                     onChange={useCallback((v: string) => setPatient({ ...patient, height: v }), [
                         patient,
                         setPatient,
@@ -189,7 +189,7 @@ export default function Patient() {
                     title="体重(Kg):"
                     type="digit"
                     placeholder="30-300"
-                    value={patient.weight}
+                    value={patient.weight === '0' && patient_id === '' ? '' : patient.weight}
                     onChange={useCallback((v: string) => setPatient({ ...patient, weight: v }), [
                         patient,
                         setPatient,
@@ -228,7 +228,7 @@ export default function Patient() {
                     title="Apache II:"
                     type="text"
                     placeholder="0-71"
-                    value={patient.apache2}
+                    value={patient.apache2 === '0' && patient_id === '' ? '' : patient.apache2}
                     onChange={useCallback((v: string) => setPatient({ ...patient, apache2: v }), [
                         patient,
                         setPatient,
@@ -239,7 +239,7 @@ export default function Patient() {
                     title="AGI:"
                     type="text"
                     placeholder="0-4"
-                    value={patient.agi}
+                    value={patient.agi === '0' && patient_id === '' ? '' : patient.agi}
                     onChange={useCallback((v: string) => setPatient({ ...patient, agi: v }), [
                         patient,
                         setPatient,
@@ -250,7 +250,7 @@ export default function Patient() {
                     title="NRS2002:"
                     type="text"
                     placeholder="不能为空"
-                    value={patient.nrs2002}
+                    value={patient.nrs2002 === '0' && patient_id === '' ? '' : patient.nrs2002}
                     onChange={useCallback((v: string) => setPatient({ ...patient, nrs2002: v }), [
                         patient,
                         setPatient,
@@ -261,7 +261,11 @@ export default function Patient() {
                     title="耐受性评分:"
                     type="text"
                     placeholder="0~24"
-                    value={patient.enteralNutritionToleranceScore}
+                    value={
+                        patient.enteralNutritionToleranceScore === '0' && patient_id === ''
+                            ? ''
+                            : patient.enteralNutritionToleranceScore
+                    }
                     onChange={useCallback(
                         (v: string) =>
                             setPatient({ ...patient, enteralNutritionToleranceScore: v }),
