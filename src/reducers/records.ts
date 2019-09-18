@@ -23,6 +23,7 @@ export interface IRecord {
     gastrointestinalHemorrhage: boolean; // 消化道出血
     injectionOfAlbumin: number; // 注射白蛋白量
     agiIndex: number;
+    enteralNutritionToleranceScore: number; // 肠内营养耐受性评分
 }
 
 export function zeroRecord(patient_id: string): IRecord {
@@ -45,6 +46,7 @@ export function zeroRecord(patient_id: string): IRecord {
         gastrointestinalHemorrhage: false,
         injectionOfAlbumin: 0,
         agiIndex: 0,
+        enteralNutritionToleranceScore: 0,
     };
 }
 

@@ -25,6 +25,12 @@ export function test_num(v: string): boolean {
     return num.test(v);
 }
 
+// 耐受性评分 0~24
+const torentScore = /^(?:\d|1\d|2[0-4])$/;
+export function test_torentScore(v: string): boolean {
+    return torentScore.test(v);
+}
+
 export const selector = [
     '呼吸系统病变',
     '心血管系统病变',
@@ -103,6 +109,11 @@ export const config: Map<string, ConfigType> = [
         message: '住ICU时间必须是整数',
         validator: test_num,
     },
+    {
+        key: 'enteralNutritionToleranceScore',
+        message: '肠内耐受性评分0~24分',
+        validator: test_torentScore,
+    },
 ].reduce((m, { key, validator, message }) => {
     m.set(key, { validator, message });
     return m;
@@ -130,6 +141,7 @@ export interface LocalPatient {
     stayoficu: string;
     resultIndex: number;
     isAliveDischarge: boolean;
+    enteralNutritionToleranceScore: string;
 }
 
 export function convertToLocal(patient: IPatient): LocalPatient {
@@ -156,6 +168,7 @@ export function convertToLocal(patient: IPatient): LocalPatient {
         apache2: patient.apache2.toString(),
         agi: patient.agi.toString(),
         nrs2002: patient.nrs2002.toString(),
+        enteralNutritionToleranceScore: (patient.enteralNutritionToleranceScore || 0).toString(),
     };
 }
 
@@ -181,6 +194,7 @@ export function convertToPatient(patient: LocalPatient, withID: boolean = true):
         apache2: parseInt(patient.apache2),
         agi: parseInt(patient.agi),
         nrs2002: parseInt(patient.nrs2002),
+        enteralNutritionToleranceScore: parseInt(patient.enteralNutritionToleranceScore),
     };
     if (withID) {
         newOne['_id'] = patient._id;
@@ -196,6 +210,7 @@ export function validate(patient: LocalPatient): string {
             continue;
         }
 
+        console.log('obj', obj, key, patient[key]);
         if (!obj.validator(patient[key])) {
             return obj.message;
         }

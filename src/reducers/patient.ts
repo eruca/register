@@ -1,11 +1,6 @@
 import dayjs from 'dayjs';
 
-import {
-    PATIENT_INDEX,
-    PATIENT_TOTAL,
-    PATIENT_CURRENT,
-    PATIENT_TOTAL_INIT,
-} from '../constants/patient';
+import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
 import { IAction } from '../actions/base';
 
 export interface IPatient {
@@ -30,6 +25,7 @@ export interface IPatient {
     stayoficu: number;
     resultIndex: number;
     isAliveDischarge: boolean;
+    enteralNutritionToleranceScore: number;
 }
 
 export function zeroPatient(): IPatient {
@@ -53,6 +49,7 @@ export function zeroPatient(): IPatient {
         stayoficu: 0,
         resultIndex: 0,
         isAliveDischarge: true,
+        enteralNutritionToleranceScore: 0,
     };
 }
 
@@ -108,11 +105,6 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
                 hospId,
                 name,
                 enrolltime,
-            };
-        case PATIENT_TOTAL_INIT:
-            return {
-                ...state,
-                ...action.payload,
             };
 
         case PATIENT_TOTAL:

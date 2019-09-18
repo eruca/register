@@ -7,7 +7,7 @@ import {
     test_20_999,
     test_0_200f,
 } from '../../utils/regexp';
-import { test_20_299 } from '../patient/config';
+import { test_20_299, test_torentScore } from '../patient/config';
 
 export const nasalFeedTubeTypes = ['胃管', '空肠管'];
 export const AGIs = ['AGI Ⅰ级', 'AGI Ⅱ级', 'AGI Ⅲ级', 'AGI Ⅳ级'];
@@ -32,6 +32,7 @@ export interface LocalRecord {
     gastrointestinalHemorrhage: boolean; // 消化道出血
     injectionOfAlbumin: string; // 注射白蛋白量
     agiIndex: number;
+    enteralNutritionToleranceScore: string; // 肠道耐受性评分
 }
 
 export function convertToLocal(record: IRecord): LocalRecord {
@@ -56,6 +57,7 @@ export function convertToLocal(record: IRecord): LocalRecord {
         fastingGlucose: record.fastingGlucose.toString(), // 空腹血糖
         gastricRetention: record.gastricRetention.toString(), // 胃潴留量
         injectionOfAlbumin: record.injectionOfAlbumin.toString(), // 注射白蛋白量
+        enteralNutritionToleranceScore: (record.enteralNutritionToleranceScore || 0).toString(),
     };
 }
 
@@ -80,6 +82,7 @@ export function convertToIRecord(record: LocalRecord, withID: boolean = true): I
         fastingGlucose: parseInt(record.fastingGlucose, 10), // 空腹血糖
         gastricRetention: parseInt(record.gastricRetention, 10), // 胃潴留量
         injectionOfAlbumin: parseInt(record.injectionOfAlbumin, 10), // 注射白蛋白量
+        enteralNutritionToleranceScore: parseInt(record.enteralNutritionToleranceScore),
     };
     if (withID) {
         newOne['_id'] = record._id;
@@ -147,6 +150,11 @@ const config: Map<string, ConfigType> = [
         key: 'injectionOfAlbumin',
         message: '输白蛋白0-200',
         validator: test_0_200f,
+    },
+    {
+        key: 'enteralNutritionToleranceScore',
+        message: '肠内耐受性评分0~24分',
+        validator: test_torentScore,
     },
 ].reduce((m, { key, validator, message }) => {
     m.set(key, { validator, message });

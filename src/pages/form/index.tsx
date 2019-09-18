@@ -2,7 +2,7 @@ import Taro, { useState, useCallback, useEffect } from '@tarojs/taro';
 import dayjs from 'dayjs';
 import { useSelector, useDispatch } from '@tarojs/redux';
 import { View, Picker } from '@tarojs/components';
-import { AtForm, AtInput, AtSwitch, AtButton, AtMessage } from 'taro-ui';
+import { AtForm, AtInput, AtSwitch, AtButton, AtMessage, AtIcon, AtFloatLayout } from 'taro-ui';
 
 import { zeroRecord, IRecord } from '../../reducers/records';
 import FormField from '../../components/FormField';
@@ -10,6 +10,7 @@ import { IReducers } from '../../reducers';
 import { nasalFeedTubeTypes, AGIs, convertToLocal, validate, convertToIRecord } from './config';
 import { recordsCollection } from '../../utils/db';
 import { forceRender } from '../../actions/records';
+import EnteralNutritionTolerance from './desc';
 
 const dispatch = useDispatch();
 
@@ -29,6 +30,8 @@ export default function Form() {
         ...state.patients,
     }));
 
+    // 控制浮动层
+    const [floatLay, setfloatLay] = useState(false);
     const [record, setRecord] = useState(convertToLocal(zeroRecord(patient_id)));
     useEffect(() => {
         console.log('ask for database: record_id:', record_id);
@@ -275,10 +278,41 @@ export default function Form() {
                 >
                     <FormField name="AGI 评级" value={AGIs[record.agiIndex]} />
                 </Picker>
+                <View className="at-row at-row__align--center">
+                    <View className="at-col at-col-10">
+                        <AtInput
+                            name="enteralNutritionToleranceScore"
+                            title="耐受性评分:"
+                            type="text"
+                            placeholder="0~24"
+                            value={record.enteralNutritionToleranceScore}
+                            onChange={useCallback(
+                                (v: string) =>
+                                    setRecord({ ...record, enteralNutritionToleranceScore: v }),
+                                [record, setRecord]
+                            )}
+                        />
+                    </View>
+                    <View className="at-col at-col-2" style={{ marginRight: '5PX' }}>
+                        <AtIcon
+                            value="help"
+                            size="30"
+                            color="#F00"
+                            onClick={() => setfloatLay(true)}
+                        />
+                    </View>
+                </View>
                 <AtButton type="primary" formType="submit">
-                    提交
+                    {record_id === '' ? '提交' : '修改'}
                 </AtButton>
             </AtForm>
+            <AtFloatLayout
+                isOpened={floatLay}
+                title="肠内营养耐受性评分"
+                onClose={() => setfloatLay(false)}
+            >
+                <EnteralNutritionTolerance />
+            </AtFloatLayout>
         </View>
     );
 }

@@ -243,6 +243,18 @@ export default function Patient() {
                         setPatient,
                     ])}
                 />
+                <AtInput
+                    name="enteralNutritionToleranceScore"
+                    title="耐受性评分:"
+                    type="text"
+                    placeholder="0~24"
+                    value={patient.enteralNutritionToleranceScore}
+                    onChange={useCallback(
+                        (v: string) =>
+                            setPatient({ ...patient, enteralNutritionToleranceScore: v }),
+                        [patient, setPatient]
+                    )}
+                />
                 <AtButton type="primary" formType="submit" disabled={_openid !== patient._openid}>
                     {patient_id === '' ? '提交' : '修改'}
                 </AtButton>
