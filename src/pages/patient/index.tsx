@@ -2,7 +2,6 @@ import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { useSelector, useDispatch } from '@tarojs/redux';
 import { AtForm, AtInput, AtButton, AtSwitch, AtMessage } from 'taro-ui';
-import dayjs from 'dayjs';
 
 import { zeroPatient, IPatient } from '../../reducers/patient';
 import FormField from '../../components/FormField';
@@ -16,21 +15,13 @@ import './index.scss';
 const dispatch = useDispatch();
 
 export default function Patient() {
-    const {
-        patient_id,
-        total,
-        patient_result_total,
-        patient_date_total,
-        mytotal,
-        mypatient_result_total,
-        mypatient_date_total,
-        _openid,
-    } = useSelector((state: IReducers) => ({
+    const { patient_id, _openid } = useSelector((state: IReducers) => ({
         ...state.patients,
         _openid: state.user._openid,
     }));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
+    // 如果patient_id已被选择，就从数据库获取该patient数据
     useEffect(() => {
         if (patient_id !== '') {
             const promise = patientsCollection.doc(patient_id).get();
@@ -49,24 +40,28 @@ export default function Patient() {
         }
 
         if (patient_id === '') {
-            const convertedPatient = convertToPatient(patient);
-            const add_date = dayjs().diff(dayjs(convertedPatient.enrolltime), 'd') < 7 ? 0 : 1;
-            const add_result = convertedPatient.venttime ? 1 : 0;
             patientsCollection.add({
-                data: convertedPatient,
+                data: convertToPatient(patient),
                 success: function() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                    // 添加成功，则patients总数+1
-                    dispatch(
-                        patient_total(
-                            total + 1,
-                            patient_date_total + add_date,
-                            patient_result_total + add_result,
-                            mytotal + 1,
-                            mypatient_date_total + add_date,
-                            mypatient_result_total + add_result
-                        )
-                    );
+                    // 添加成功，则再次从数据库获取统计信息
+                    Taro.cloud.callFunction({
+                        name: 'getStatistic',
+                        success: res => {
+                            console.log('getStatistic', res);
+                            dispatch(
+                                patient_total(
+                                    (res.result as any).total,
+                                    (res.result as any).patient_date_total,
+                                    (res.result as any).patient_result_total,
+                                    (res.result as any).mytotal,
+                                    (res.result as any).mypatient_date_total,
+                                    (res.result as any).mypatient_result_total
+                                )
+                            );
+                        },
+                        fail: console.error,
+                    });
                 },
                 fail: console.error,
             });
@@ -75,6 +70,24 @@ export default function Patient() {
                 data: convertToPatient(patient, false),
                 success: function() {
                     Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                    // 修改成功，则再次从数据库获取统计信息
+                    Taro.cloud.callFunction({
+                        name: 'getStatistic',
+                        success: res => {
+                            console.log('getStatistic', res);
+                            dispatch(
+                                patient_total(
+                                    (res.result as any).total,
+                                    (res.result as any).patient_date_total,
+                                    (res.result as any).patient_result_total,
+                                    (res.result as any).mytotal,
+                                    (res.result as any).mypatient_date_total,
+                                    (res.result as any).mypatient_result_total
+                                )
+                            );
+                        },
+                        fail: console.error,
+                    });
                 },
                 fail: console.error,
             });

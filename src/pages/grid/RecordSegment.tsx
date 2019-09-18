@@ -68,7 +68,7 @@ export default function RecordSegment() {
             <AtDivider />
             <AtButton type="primary" onClick={newRecord} disabled={_openid !== user_openid}>
                 进行记录
-                <Text style="font-size:0.6em;color:#7e6148">
+                <Text style="font-size:0.6em;color:yellow">
                     第{dayjs().diff(dayjs(enrolltime), 'day')}天
                 </Text>
             </AtButton>

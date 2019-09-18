@@ -92,7 +92,7 @@ export default function List() {
                     setLoaded(true);
                 });
         }
-    }, [searchUtil.clicked, setPatients, _openid, currentPage, pageSize, total]);
+    }, [searchUtil.clicked, mytotal, setPatients, _openid, currentPage, pageSize]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 

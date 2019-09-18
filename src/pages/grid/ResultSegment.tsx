@@ -105,7 +105,7 @@ export default function ResultSegment() {
                     ])}
                     disabled = {patient_openid !== user_openid}
                 />
-                <AtButton type="primary" formType="submit" disabled={patient_id != user_openid}>
+                <AtButton type="primary" formType="submit" disabled={patient_openid != user_openid}>
                     提交
                 </AtButton>
             </AtForm>

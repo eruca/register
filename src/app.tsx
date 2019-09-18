@@ -82,6 +82,13 @@ class App extends Component {
                 success(res) {
                     console.log('in call function', res);
                     store.dispatch(userSync((res.result as any)['0'] as IUserState));
+                },
+                fail: console.error,
+            });
+            Taro.cloud.callFunction({
+                name: 'getStatistic',
+                success: res => {
+                    console.log('getStatistic', res);
                     store.dispatch(
                         patient_total(
                             (res.result as any).total,
