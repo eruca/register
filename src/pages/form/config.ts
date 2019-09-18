@@ -108,12 +108,12 @@ const config: Map<string, ConfigType> = [
     },
     {
         key: 'totalProtein',
-        message: '总蛋白1-99',
-        validator: test_0_99,
+        message: '总蛋白20-299',
+        validator: test_20_299,
     },
     {
         key: 'prealbumin',
-        message: '前蛋白1-99',
+        message: '前蛋白20-999',
         validator: test_20_999,
     },
     {
@@ -128,8 +128,8 @@ const config: Map<string, ConfigType> = [
     },
     {
         key: 'lymphocyteCount',
-        message: '淋巴细胞计数0-10',
-        validator: test_0_10f,
+        message: '淋巴细胞计数0-200',
+        validator: test_0_200f,
     },
     {
         key: 'hemoglobin',

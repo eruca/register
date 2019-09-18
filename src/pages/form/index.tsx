@@ -130,7 +130,11 @@ export default function Form() {
                     title="肠内热卡(kcal):"
                     placeholder="0-5000kcal"
                     type="text"
-                    value={record.enteralCalories}
+                    value={
+                        record.enteralCalories === '0' && record_id === ''
+                            ? ''
+                            : record.enteralCalories
+                    }
                     onChange={useCallback(
                         (v: string) => setRecord({ ...record, enteralCalories: v }),
                         [record, setRecord]
@@ -141,7 +145,11 @@ export default function Form() {
                     title="肠外热卡(kcal):"
                     type="text"
                     placeholder="0-5000kcal"
-                    value={record.parenteralCalories}
+                    value={
+                        record.parenteralCalories === '0' && record_id === ''
+                            ? ''
+                            : record.parenteralCalories
+                    }
                     onChange={useCallback(
                         (v: string) => setRecord({ ...record, parenteralCalories: v }),
                         [record, setRecord]
@@ -151,8 +159,10 @@ export default function Form() {
                     name="totalProtein"
                     title="总蛋白(g):"
                     type="text"
-                    placeholder="0-5000kcal"
-                    value={record.totalProtein}
+                    placeholder="50-80"
+                    value={
+                        record.totalProtein === '0' && record_id === '' ? '' : record.totalProtein
+                    }
                     onChange={useCallback(
                         v => setRecord({ ...record, totalProtein: v as string }),
                         [record, setRecord]
@@ -161,9 +171,9 @@ export default function Form() {
                 <AtInput
                     name="prealbumin"
                     title="前白蛋白(mg/L):"
-                    placeholder="280-360"
+                    placeholder="170-420"
                     type="text"
-                    value={record.prealbumin}
+                    value={record.prealbumin === '0' && record_id === '' ? '' : record.prealbumin}
                     onChange={useCallback(v => setRecord({ ...record, prealbumin: v as string }), [
                         record,
                         setRecord,
@@ -172,9 +182,9 @@ export default function Form() {
                 <AtInput
                     name="albumin"
                     title="白蛋白(g):"
-                    placeholder="30-60"
+                    placeholder="30-50"
                     type="text"
-                    value={record.albumin}
+                    value={record.albumin === '0' && record_id === '' ? '' : record.albumin}
                     onChange={useCallback(v => setRecord({ ...record, albumin: v as string }), [
                         record,
                         setRecord,
@@ -185,7 +195,11 @@ export default function Form() {
                     title="转铁蛋白(g):"
                     placeholder="30-60"
                     type="text"
-                    value={record.serumTransferrin}
+                    value={
+                        record.serumTransferrin === '0' && record_id === ''
+                            ? ''
+                            : record.serumTransferrin
+                    }
                     onChange={useCallback(
                         v => setRecord({ ...record, serumTransferrin: v as string }),
                         [record, setRecord]
@@ -193,10 +207,14 @@ export default function Form() {
                 />
                 <AtInput
                     name="lymphocyteCount"
-                    title="淋巴细胞计数:"
-                    placeholder="300-600"
+                    title="淋巴细胞计数(10^9/L):"
+                    placeholder="0-100"
                     type="text"
-                    value={record.lymphocyteCount}
+                    value={
+                        record.lymphocyteCount === '0' && record_id === ''
+                            ? ''
+                            : record.lymphocyteCount
+                    }
                     onChange={useCallback(
                         v => setRecord({ ...record, lymphocyteCount: v as string }),
                         [record, setRecord]
@@ -207,7 +225,7 @@ export default function Form() {
                     title="血红蛋白(g/l):"
                     placeholder="90-200"
                     type="text"
-                    value={record.hemoglobin}
+                    value={record.hemoglobin === '0' && record_id === '' ? '' : record.hemoglobin}
                     onChange={useCallback(v => setRecord({ ...record, hemoglobin: v as string }), [
                         record,
                         setRecord,
@@ -218,7 +236,11 @@ export default function Form() {
                     title="空腹血糖(mmol/L):"
                     type="text"
                     placeholder="3.9-11.1"
-                    value={record.fastingGlucose}
+                    value={
+                        record.fastingGlucose === '0' && record_id === ''
+                            ? ''
+                            : record.fastingGlucose
+                    }
                     onChange={useCallback(
                         v => setRecord({ ...record, fastingGlucose: v as string }),
                         [record, setRecord]
@@ -229,18 +251,26 @@ export default function Form() {
                     title="胃潴留(ml):"
                     placeholder="0-1000"
                     type="text"
-                    value={record.gastricRetention}
+                    value={
+                        record.gastricRetention === '0' && record_id === ''
+                            ? ''
+                            : record.gastricRetention
+                    }
                     onChange={useCallback(
                         v => setRecord({ ...record, gastricRetention: v as string }),
                         [record, setRecord]
                     )}
                 />
                 <AtInput
-                    name="输白蛋白"
-                    title="白蛋白(g):"
-                    placeholder="0-20"
+                    name="injectionOfAlbumin"
+                    title="输白蛋白(g):"
+                    placeholder="0-60"
                     type="text"
-                    value={record.injectionOfAlbumin}
+                    value={
+                        record.injectionOfAlbumin === '0' && record_id === ''
+                            ? ''
+                            : record.injectionOfAlbumin
+                    }
                     onChange={useCallback(
                         v => setRecord({ ...record, injectionOfAlbumin: v as string }),
                         [record, setRecord]
@@ -288,7 +318,11 @@ export default function Form() {
                             title="耐受性评分:"
                             type="text"
                             placeholder="0~24"
-                            value={record.enteralNutritionToleranceScore}
+                            value={
+                                record.enteralNutritionToleranceScore === '0' && record_id === ''
+                                    ? ''
+                                    : record.enteralNutritionToleranceScore
+                            }
                             onChange={useCallback(
                                 (v: string) =>
                                     setRecord({ ...record, enteralNutritionToleranceScore: v }),
