@@ -254,7 +254,11 @@ export default function Patient() {
                         [patient, setPatient]
                     )}
                 />
-                <AtButton type="primary" formType="submit" disabled={_openid !== patient._openid}>
+                <AtButton
+                    type="primary"
+                    formType="submit"
+                    disabled={_openid !== patient._openid && patient_id !== ''}
+                >
                     {patient_id === '' ? '提交' : '修改'}
                 </AtButton>
                 {patient_id !== '' && (
