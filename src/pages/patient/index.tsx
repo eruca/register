@@ -7,6 +7,7 @@ import { zeroPatient, IPatient } from '../../reducers/patient';
 import FormField from '../../components/FormField';
 import NRS2002 from '../../components/NRS2002';
 import Loading from '../../components/Loading';
+import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
@@ -22,7 +23,8 @@ export default function Patient() {
         force_rerender: state.user.force_rerender,
     }));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
-    const [floatLay, setFloatLay] = useState(false);
+    // 现在有2个浮层，用0 => 关闭， 1 => NRS2002, 2 => EnteralNutritionTolenance
+    const [floatLay, setFloatLay] = useState(0);
 
     // 如果patient_id已被选择，就从数据库获取该patient数据
     useEffect(() => {
@@ -236,26 +238,39 @@ export default function Patient() {
                             value="help"
                             size="30"
                             color="#F00"
-                            onClick={() => setFloatLay(true)}
+                            onClick={() => setFloatLay(1)}
                         />
                     </View>
                 </View>
-                <AtInput
-                    name="enteralNutritionToleranceScore"
-                    title="耐受性评分:"
-                    type="text"
-                    placeholder="0~24"
-                    value={
-                        patient.enteralNutritionToleranceScore === '0' && patient_id === ''
-                            ? ''
-                            : patient.enteralNutritionToleranceScore
-                    }
-                    onChange={useCallback(
-                        (v: string) =>
-                            setPatient({ ...patient, enteralNutritionToleranceScore: v }),
-                        [patient, setPatient]
-                    )}
-                />
+                <View className="at-row at-row__align--center">
+                    <View className="at-col at-col-10">
+                        <AtInput
+                            name="enteralNutritionToleranceScore"
+                            title="耐受性评分:"
+                            type="text"
+                            placeholder="0~24"
+                            value={
+                                patient.enteralNutritionToleranceScore === '0' && patient_id === ''
+                                    ? ''
+                                    : patient.enteralNutritionToleranceScore
+                            }
+                            onChange={useCallback(
+                                (v: string) =>
+                                    setPatient({ ...patient, enteralNutritionToleranceScore: v }),
+                                [patient, setPatient]
+                            )}
+                        />
+                    </View>
+                    <View className="at-col at-col-2" style={{ marginRight: '5PX' }}>
+                        <AtIcon
+                            value="help"
+                            size="30"
+                            color="#F00"
+                            onClick={() => setFloatLay(2)}
+                        />
+                    </View>
+                </View>
+
                 <AtButton
                     type="primary"
                     formType="submit"
@@ -274,11 +289,11 @@ export default function Patient() {
                 )}
             </AtForm>
             <AtFloatLayout
-                isOpened={floatLay}
+                isOpened={!!floatLay}
                 title="营养风险筛查NRS2002"
-                onClose={() => setFloatLay(false)}
+                onClose={() => setFloatLay(0)}
             >
-                <NRS2002 />
+                {floatLay == 1 ? <NRS2002 /> : <EnteralNutritionTolerance />}
             </AtFloatLayout>
         </View>
     );

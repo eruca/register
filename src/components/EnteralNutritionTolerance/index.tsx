@@ -89,5 +89,5 @@ export default function EnteralNutritionTolerance() {
 }
 
 EnteralNutritionTolerance.options = {
-    addGlobalClass: true
-}
+    addGlobalClass: true,
+};

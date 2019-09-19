@@ -10,7 +10,7 @@ import { IReducers } from '../../reducers';
 import { nasalFeedTubeTypes, AGIs, convertToLocal, validate, convertToIRecord } from './config';
 import { recordsCollection } from '../../utils/db';
 import { forceRerender } from '../../actions/user';
-import EnteralNutritionTolerance from './desc';
+import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
 
 const dispatch = useDispatch();
 
