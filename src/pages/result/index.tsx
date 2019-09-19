@@ -174,10 +174,8 @@ export default function Result() {
                     </View>
                     <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
                         <View className="at-col at-col-6">总计</View>
-                        <View className="at-col at-col-3">{mygroup.get('sum') || 0}</View>
-                        <View className="at-col at-col-3">
-                            {group.reduce((acc, curr: any) => acc + curr.num, 0)}
-                        </View>
+                        <View className="at-col at-col-3">{mytotal}</View>
+                        <View className="at-col at-col-3">{total}</View>
                     </View>
                 </AtCard>
             </View>
@@ -197,10 +195,8 @@ export default function Result() {
                 ))}
                 <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
                     <View className="at-col at-col-6">总计</View>
-                    <View className="at-col at-col-3">{mygroup.get('sum') || 0}</View>
-                    <View className="at-col at-col-3">
-                        {group.reduce((acc, curr: any) => acc + curr.num, 0)}
-                    </View>
+                    <View className="at-col at-col-3">{mytotal}</View>
+                    <View className="at-col at-col-3">{total}</View>
                 </View>
             </AtCard>
 
