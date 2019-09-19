@@ -7,7 +7,6 @@ import configStore from './store';
 import './app.scss';
 import { userSync } from './actions/user';
 import { IUserState } from './reducers/user';
-import { patient_total } from './actions/patient';
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -82,23 +81,6 @@ class App extends Component {
                 success(res) {
                     console.log('getContext', res);
                     store.dispatch(userSync((res.result as any)['0'] as IUserState));
-                },
-                fail: console.error,
-            });
-            Taro.cloud.callFunction({
-                name: 'getStatistic',
-                success: res => {
-                    console.log('getStatistic', res);
-                    store.dispatch(
-                        patient_total(
-                            (res.result as any).total,
-                            (res.result as any).patient_date_total,
-                            (res.result as any).patient_result_total,
-                            (res.result as any).mytotal,
-                            (res.result as any).mypatient_date_total,
-                            (res.result as any).mypatient_result_total
-                        )
-                    );
                 },
                 fail: console.error,
             });

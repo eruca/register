@@ -6,6 +6,7 @@ import { AtCard, AtButton } from 'taro-ui';
 import { selector } from '../patient/config';
 import { forceRerender } from '../../actions/user';
 import { IReducers } from '../../reducers';
+import { patient_total } from '../../actions/patient';
 
 const origin = ['所有'];
 
@@ -50,6 +51,25 @@ export default function Result() {
     }, [setYears, user.force_rerender]);
 
     useEffect(() => {
+        Taro.cloud.callFunction({
+            name: 'getStatistic',
+            data: { year: years[selected] },
+            success: res => {
+                console.log('getStatistic', res);
+                dispatch(
+                    patient_total(
+                        (res.result as any).total,
+                        (res.result as any).patient_date_total,
+                        (res.result as any).patient_result_total,
+                        (res.result as any).mytotal,
+                        (res.result as any).mypatient_date_total,
+                        (res.result as any).mypatient_result_total
+                    )
+                );
+            },
+            fail: console.error,
+        });
+
         Taro.cloud.callFunction({
             name: 'groupby',
             data: {
