@@ -24,15 +24,6 @@ import { forceRerender } from '../../actions/user';
 
 import './index.scss';
 
-function newPatient() {
-    const dispatch = useDispatch();
-
-    dispatch(deselect());
-    Taro.navigateTo({
-        url: '/pages/patient/index',
-    });
-}
-
 const options = [
     {
         text: '取消',
@@ -50,7 +41,6 @@ const options = [
 
 export default function List() {
     const dispatch = useDispatch();
-
     const { _openid, is_super, force_rerender, mytotal, pageSize, currentPage } = useSelector(
         (state: IReducers) => ({
             _openid: state.user._openid,
@@ -217,7 +207,15 @@ export default function List() {
                 />
             </View>
             <View className="fab-button-right">
-                <AtFab size="small" onClick={newPatient}>
+                <AtFab
+                    size="small"
+                    onClick={useCallback(() => {
+                        dispatch(deselect());
+                        Taro.navigateTo({
+                            url: '/pages/patient/index',
+                        });
+                    }, [dispatch])}
+                >
                     <Text className="at-fab__icon at-icon at-icon-add" />
                 </AtFab>
             </View>
