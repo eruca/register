@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { RECORD_INDEX, RECORD_FORCE_REANDER } from '../constants/record';
+import { RECORD_INDEX } from '../constants/record';
 import { IAction } from '../actions/base';
 
 export interface IRecord {
@@ -52,12 +52,10 @@ export function zeroRecord(patient_id: string): IRecord {
 
 export interface IRecordState {
     record_id: string;
-    force_render_count: number;
 }
 
 const INIT_STATE: IRecordState = {
     record_id: '',
-    force_render_count: 0,
 };
 
 export default function records(state = INIT_STATE, action: IAction): IRecordState {
@@ -69,11 +67,6 @@ export default function records(state = INIT_STATE, action: IAction): IRecordSta
             return {
                 ...state,
                 record_id,
-            };
-        case RECORD_FORCE_REANDER:
-            return {
-                record_id: state.record_id,
-                force_render_count: state.force_render_count + 1,
             };
         default:
             return state;

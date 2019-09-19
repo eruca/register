@@ -11,7 +11,6 @@ import './index.scss';
 export default function Grid() {
     const { patient_id, enrolltime, hospId, name } = useSelector((state: IReducers) => ({
         ...state.patients,
-        force_render_count: state.records.force_render_count,
     }));
 
     if (patient_id === '') {
