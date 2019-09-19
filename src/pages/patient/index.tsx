@@ -194,6 +194,14 @@ export default function Patient() {
                         setPatient,
                     ])}
                 />
+                <AtSwitch
+                    title="使用短肽"
+                    checked={patient.useSmallPeptide}
+                    onChange={useCallback(v => setPatient({ ...patient, useSmallPeptide: v }), [
+                        patient,
+                        setPatient,
+                    ])}
+                />
                 <AtInput
                     name="apache2"
                     title="Apache II:"

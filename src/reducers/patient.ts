@@ -18,6 +18,7 @@ export interface IPatient {
     diagnoseIndex: number;
     needVesopressor: boolean;
     needVentilation: boolean;
+    useSmallPeptide: boolean;
     apache2: number;
     agi: number;
     nrs2002: number;
@@ -42,6 +43,7 @@ export function zeroPatient(): IPatient {
         diagnoseIndex: 0,
         needVesopressor: false,
         needVentilation: false,
+        useSmallPeptide: false,
         apache2: 0,
         agi: 0,
         nrs2002: 0,

@@ -97,7 +97,7 @@ export const config: Map<string, ConfigType> = [
     {
         key: 'nrs2002',
         message: 'NRS2002评分0~23',
-        validator: torentScore, // todo :需要修正
+        validator: test_torentScore, // todo :需要修正
     },
     {
         key: 'venttime',
@@ -134,6 +134,7 @@ export interface LocalPatient {
     diagnoseIndex: number;
     needVesopressor: boolean;
     needVentilation: boolean;
+    useSmallPeptide: boolean;
     apache2: string;
     agi: string;
     nrs2002: string;
@@ -156,6 +157,7 @@ export function convertToLocal(patient: IPatient): LocalPatient {
         diagnoseIndex: patient.diagnoseIndex,
         needVentilation: patient.needVentilation,
         needVesopressor: patient.needVesopressor,
+        useSmallPeptide: patient.useSmallPeptide,
         resultIndex: patient.resultIndex,
         isAliveDischarge: patient.isAliveDischarge,
 
@@ -182,6 +184,7 @@ export function convertToPatient(patient: LocalPatient, withID: boolean = true):
         diagnoseIndex: patient.diagnoseIndex,
         needVentilation: patient.needVentilation,
         needVesopressor: patient.needVesopressor,
+        useSmallPeptide: patient.useSmallPeptide,
         resultIndex: patient.resultIndex,
         isAliveDischarge: patient.isAliveDischarge,
 
