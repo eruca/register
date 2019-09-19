@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { AtButton, AtCard } from 'taro-ui';
+import { AtList, AtListItem } from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 
 import Head from '../../components/Head';
@@ -8,25 +8,10 @@ import { IReducers } from '../../reducers';
 import { userSync } from '../../actions/user';
 import { usersCollection } from '../../utils/db';
 
-const dispatch = useDispatch();
-
 export default function Index() {
-    const {
-        user,
-        total,
-        mytotal,
-        mydate_total,
-        myresult_total,
-        date_total,
-        result_total,
-    } = useSelector((state: IReducers) => ({
+    const dispatch = useDispatch();
+    const { user } = useSelector((state: IReducers) => ({
         user: state.user,
-        mytotal: state.patients.mytotal,
-        mydate_total: state.patients.mypatient_date_total,
-        myresult_total: state.patients.mypatient_result_total,
-        total: state.patients.total,
-        date_total: state.patients.patient_date_total,
-        result_total: state.patients.patient_result_total,
     }));
 
     const cb = es => {
@@ -45,33 +30,19 @@ export default function Index() {
         <View>
             <Head {...user} cb={cb} />
             <View style={{ margin: '10PX' }}>
-                <AtCard title="完成情况统计">
-                    <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">已达1周</View>
-                        <View className="at-col at-col-6">已有结果</View>
-                    </View>
-                    <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">{`${mydate_total}/${mytotal}`}</View>
-                        <View className="at-col at-col-6">{`${myresult_total}/${mytotal}`}</View>
-                    </View>
-                    {user.is_super && (
-                        <View className="at-row at-row__justify--center">
-                            <View className="at-col at-col-6">{`${date_total}/${total}`}</View>
-                            <View className="at-col at-col-6">{`${result_total}/${total}`}</View>
-                        </View>
-                    )}
-                </AtCard>
+                <AtList>
+                    <AtListItem
+                        title="修改个人信息"
+                        arrow="right"
+                        onClick={() =>
+                            Taro.navigateTo({
+                                url: '/pages/user/index',
+                            })
+                        }
+                    />
+                    <AtListItem title="关于我们" arrow="right" />
+                </AtList>
             </View>
-            <AtButton
-                type="primary"
-                onClick={() =>
-                    Taro.navigateTo({
-                        url: '/pages/user/index',
-                    })
-                }
-            >
-                修改个人信息
-            </AtButton>
         </View>
     );
 }

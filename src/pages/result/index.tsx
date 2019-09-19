@@ -11,7 +11,23 @@ const origin = ['所有'];
 
 export default function Result() {
     const dispatch = useDispatch();
-    const force_rerender = useSelector((state: IReducers) => state.user.force_rerender);
+    const {
+        user,
+        mytotal,
+        mydate_total,
+        myresult_total,
+        total,
+        date_total,
+        result_total,
+    } = useSelector((state: IReducers) => ({
+        user: state.user,
+        mytotal: state.patients.mytotal,
+        mydate_total: state.patients.mypatient_date_total,
+        myresult_total: state.patients.mypatient_result_total,
+        total: state.patients.total,
+        date_total: state.patients.patient_date_total,
+        result_total: state.patients.patient_result_total,
+    }));
 
     // 年份选择
     const [selected, setSelected] = useState(0);
@@ -31,7 +47,7 @@ export default function Result() {
             },
             fail: console.error,
         });
-    }, [setYears, force_rerender]);
+    }, [setYears, user.force_rerender]);
 
     useEffect(() => {
         Taro.cloud.callFunction({
@@ -52,7 +68,7 @@ export default function Result() {
             },
             fail: console.error,
         });
-    }, [setGroup, setMygroup, force_rerender]);
+    }, [setGroup, setMygroup, user.force_rerender]);
 
     console.log('selected', selected, years[selected]);
     return (
@@ -67,27 +83,48 @@ export default function Result() {
                     <AtButton type="primary">{years[selected]}</AtButton>
                 </View>
             </Picker>
-            <AtCard title="按病种">
-                <View className="at-row at-row__justify--center" style={{ color: '#6699FF' }}>
-                    <View className="at-col at-col-6">病种</View>
-                    <View className="at-col at-col-3">我的</View>
-                    <View className="at-col at-col-3">全部</View>
+
+            <AtCard title="完成情况统计">
+                <View className="at-row at-row__justify--center">
+                    <View className="at-col at-col-6">已达1周</View>
+                    <View className="at-col at-col-6">已有结果</View>
                 </View>
-                {group.map(item => (
+                <View className="at-row at-row__justify--center">
+                    <View className="at-col at-col-6">{`${mydate_total}/${mytotal}`}</View>
+                    <View className="at-col at-col-6">{`${myresult_total}/${mytotal}`}</View>
+                </View>
+                {user.is_super && (
                     <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">{selector[item['_id']]}</View>
-                        <View className="at-col at-col-3">{mygroup.get(item['_id']) || 0}</View>
-                        <View className="at-col at-col-3">{item['num']}</View>
+                        <View className="at-col at-col-6">{`${date_total}/${total}`}</View>
+                        <View className="at-col at-col-6">{`${result_total}/${total}`}</View>
                     </View>
-                ))}
-                <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
-                    <View className="at-col at-col-6">总计</View>
-                    <View className="at-col at-col-3">{mygroup.get('sum')}</View>
-                    <View className="at-col at-col-3">
-                        {group.reduce((acc, curr: any) => acc + curr.num, 0)}
-                    </View>
-                </View>
+                )}
             </AtCard>
+
+            <View style={{ marginTop: '5PX' }}>
+                <AtCard title="按病种">
+                    <View className="at-row at-row__justify--center" style={{ color: '#6699FF' }}>
+                        <View className="at-col at-col-6">病种</View>
+                        <View className="at-col at-col-3">我的</View>
+                        <View className="at-col at-col-3">全部</View>
+                    </View>
+                    {group.map(item => (
+                        <View className="at-row at-row__justify--center">
+                            <View className="at-col at-col-6">{selector[item['_id']]}</View>
+                            <View className="at-col at-col-3">{mygroup.get(item['_id']) || 0}</View>
+                            <View className="at-col at-col-3">{item['num']}</View>
+                        </View>
+                    ))}
+                    <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
+                        <View className="at-col at-col-6">总计</View>
+                        <View className="at-col at-col-3">{mygroup.get('sum')}</View>
+                        <View className="at-col at-col-3">
+                            {group.reduce((acc, curr: any) => acc + curr.num, 0)}
+                        </View>
+                    </View>
+                </AtCard>
+            </View>
+
             <View style={{ margin: '5PX 14PX 0 14PX' }}>
                 <AtButton
                     type="secondary"
