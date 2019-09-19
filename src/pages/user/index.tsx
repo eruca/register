@@ -7,9 +7,8 @@ import { IReducers } from '../../reducers';
 import { usersCollection } from '../../utils/db';
 import { syncHospDept } from '../../actions/user';
 
-const dispatch = useDispatch();
-
 export default function User() {
+    const dispatch = useDispatch();
     const { dept: defaultDept, hosp: defaultHosp, _id } = useSelector(
         (state: IReducers) => state.user
     );

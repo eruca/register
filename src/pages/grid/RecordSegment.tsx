@@ -9,9 +9,8 @@ import { IReducers } from '../../reducers';
 import { recordsCollection } from '../../utils/db';
 import { IRecord } from '../../reducers/records';
 
-const dispatch = useDispatch();
-
 export default function RecordSegment() {
+    const dispatch = useDispatch();
     const { patient_id, _openid, user_openid, enrolltime, force_rerender } = useSelector(
         (state: IReducers) => ({
             ...state.patients,

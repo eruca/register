@@ -12,14 +12,16 @@ import { recordsCollection } from '../../utils/db';
 import { forceRerender } from '../../actions/user';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
 
-const dispatch = useDispatch();
-
 const onAddSuccess = function() {
+    const dispatch = useDispatch();
+
     Taro.atMessage({ message: '添加记录成功', type: 'success' });
     dispatch(forceRerender());
 };
 
 const onModifySuccess = function() {
+    const dispatch = useDispatch();
+
     Taro.atMessage({ message: '修改记录成功', type: 'success' });
     dispatch(forceRerender());
 };

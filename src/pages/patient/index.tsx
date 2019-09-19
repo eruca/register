@@ -14,9 +14,8 @@ import { forceRerender } from '../../actions/user';
 import { selector, LocalPatient, convertToLocal, validate, convertToPatient } from './config';
 import './index.scss';
 
-const dispatch = useDispatch();
-
 export default function Patient() {
+    const dispatch = useDispatch();
     const { patient_id, _openid, force_rerender } = useSelector((state: IReducers) => ({
         ...state.patients,
         _openid: state.user._openid,
