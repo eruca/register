@@ -97,7 +97,7 @@ export default function ResultSegment() {
                     )}
                     disabled={patient_openid !== user_openid}
                 >
-                    <FormField name="入组时间" value={selectors[patient.resultIndex]} />
+                    <FormField name="转归" value={selectors[patient.resultIndex]} />
                 </Picker>
                 <AtSwitch
                     title="出院时是否存活"

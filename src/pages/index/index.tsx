@@ -40,7 +40,7 @@ export default function Index() {
                             })
                         }
                     />
-                    <AtListItem title="关于我们" arrow="right" />
+                    <AtListItem title="关于" note="微信号:nickwill" />
                 </AtList>
             </View>
         </View>
