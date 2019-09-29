@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 
 import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
-import { deselect, select, patient_current } from '../../actions/patient';
+import { deselect, select, patient_current, patient_total } from '../../actions/patient';
 import db from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
@@ -58,10 +58,32 @@ export default function List() {
     const [searchText, setSearchText] = useState('');
     const [searchUtil, setSearchUtil] = useState({ curr: 1, clicked: false });
 
+    // 在查询list时必须是全部数据，因为统计页面可能停留在某年，但查询必须修正过来
+    useEffect(() => {
+        Taro.cloud.callFunction({
+            name: 'getStatistic',
+            data: { year: '所有' },
+            success: res => {
+                console.log('getStatistic', res);
+                dispatch(
+                    patient_total(
+                        (res.result as any).total,
+                        (res.result as any).patient_date_total,
+                        (res.result as any).patient_result_total,
+                        (res.result as any).mytotal,
+                        (res.result as any).mypatient_date_total,
+                        (res.result as any).mypatient_result_total
+                    )
+                );
+            },
+            fail: console.error,
+        });
+    }, [force_rerender, currentPage]);
+
     useEffect(() => {
         // 如果是搜索，就直接使用onSearch找到所有数据
         if (!searchUtil.clicked) {
-            console.log("fetch patients list");
+            console.log('fetch patients list');
             db.collection('patients')
                 .where({ _openid })
                 .skip((currentPage - 1) * pageSize)
@@ -86,9 +108,9 @@ export default function List() {
             },
             success(res) {
                 console.log('e', (res.result as any).event, 'found', (res.result as any).found);
-                setPatients((res.result as any).found as Array<IPatient>);
                 // 按了搜索之后
                 setSearchUtil({ ...searchUtil, clicked: true });
+                setPatients((res.result as any).found as Array<IPatient>);
             },
             fail: console.error,
         });
@@ -175,10 +197,13 @@ export default function List() {
                             onClosed={onClosed}
                         >
                             <AtListItem
-                                title={`${item.hospId}-${item.name}: ${dayjs().diff(
+                                title={`${index +
+                                    1 +
+                                    ((searchUtil.clicked ? searchUtil.curr : currentPage) - 1) * // 依据是否点击search来确定currentPage
+                                        pageSize}: ${item.hospId}-${item.name}: ${dayjs().diff(
                                     dayjs(item.enrolltime),
                                     'day'
-                                )}d`}
+                                )}天`}
                                 extraText={`${item.stayoficu ? '✔️' : ''}`}
                                 onClick={() => {
                                     dispatch(
