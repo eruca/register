@@ -1,5 +1,5 @@
 .margin-bottom-10px {
-    margin-bottom: 10px;
+    margin-bottom: 10rpx;
 }
 
 .fab-button-left {
@@ -10,6 +10,7 @@
 
 .fab-button-right {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 10rpx;
+    right: 180rpx;
+    z-index: 20;
 }

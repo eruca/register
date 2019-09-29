@@ -199,7 +199,7 @@ export default function List() {
                     ))}
                 </AtList>
             )}
-            <View style="margin-top:10rpx">
+            <View style="margin:20rpx 0">
                 <AtPagination
                     total={!searchUtil.clicked ? mytotal : patients.length} // 需要设置是否按了搜索按钮
                     pageSize={pageSize}

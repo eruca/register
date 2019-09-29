@@ -200,7 +200,7 @@ export default function Result() {
                 </View>
             </AtCard>
 
-            <View style={{ margin: '5PX 14PX 0 14PX' }}>
+            <View style={{ margin: '5PX 14PX' }}>
                 <AtButton
                     type="secondary"
                     onClick={useCallback(() => dispatch(forceRerender()), [])}
