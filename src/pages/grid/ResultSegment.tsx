@@ -72,8 +72,9 @@ export default function ResultSegment() {
                 <AtInput
                     type="number"
                     title="机械通气时间(天):"
+                    placeholder="请填写天数"
                     name="venttime"
-                    value={patient.venttime}
+                    value={patient.venttime === '0' ? '' : patient.venttime}
                     onChange={useCallback((v: string) => setPatient({ ...patient, venttime: v }), [
                         patient,
                         setPatient,
@@ -83,8 +84,9 @@ export default function ResultSegment() {
                 <AtInput
                     type="number"
                     title="ICU住院时间(天):"
+                    placeholder="请填写天数"
                     name="stayoficu"
-                    value={patient.stayoficu}
+                    value={patient.stayoficu === '0' ? '' : patient.stayoficu}
                     onChange={useCallback((v: string) => setPatient({ ...patient, stayoficu: v }), [
                         patient,
                         setPatient,

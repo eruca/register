@@ -77,7 +77,7 @@ export default function Patient() {
                 <AtInput
                     name="hospId"
                     title="病案号:"
-                    type="text"
+                    type="number"
                     value={patient.hospId}
                     onChange={useCallback((v: string) => setPatient({ ...patient, hospId: v }), [
                         patient,
@@ -105,7 +105,7 @@ export default function Patient() {
                 <AtInput
                     name="age"
                     title="年龄(岁):"
-                    type="text"
+                    type="number"
                     placeholder="1-139"
                     value={patient.age === '0' && patient_id === '' ? '' : patient.age}
                     onChange={useCallback((v: string) => setPatient({ ...patient, age: v }), [
@@ -116,7 +116,7 @@ export default function Patient() {
                 <AtInput
                     name="bed"
                     title="床号:"
-                    type="text"
+                    type="number"
                     placeholder="1-100"
                     value={patient.bed === '0' && patient_id === '' ? '' : patient.bed}
                     onChange={useCallback((v: string) => setPatient({ ...patient, bed: v }), [
@@ -158,7 +158,7 @@ export default function Patient() {
                 <AtInput
                     name="weight"
                     title="体重(Kg):"
-                    type="digit"
+                    type="number"
                     placeholder="30-300"
                     value={patient.weight === '0' && patient_id === '' ? '' : patient.weight}
                     onChange={useCallback((v: string) => setPatient({ ...patient, weight: v }), [
@@ -205,7 +205,7 @@ export default function Patient() {
                 <AtInput
                     name="apache2"
                     title="Apache II:"
-                    type="text"
+                    type="number"
                     placeholder="0-71"
                     value={patient.apache2 === '0' && patient_id === '' ? '' : patient.apache2}
                     onChange={useCallback((v: string) => setPatient({ ...patient, apache2: v }), [
@@ -216,7 +216,7 @@ export default function Patient() {
                 <AtInput
                     name="agi"
                     title="AGI:"
-                    type="text"
+                    type="number"
                     placeholder="0-4"
                     value={patient.agi === '0' && patient_id === '' ? '' : patient.agi}
                     onChange={useCallback((v: string) => setPatient({ ...patient, agi: v }), [
@@ -229,7 +229,7 @@ export default function Patient() {
                         <AtInput
                             name="nrs2002"
                             title="NRS2002:"
-                            type="text"
+                            type="number"
                             placeholder="0-23"
                             value={
                                 patient.nrs2002 === '0' && patient_id === '' ? '' : patient.nrs2002
@@ -254,7 +254,7 @@ export default function Patient() {
                         <AtInput
                             name="enteralNutritionToleranceScore"
                             title="耐受性评分:"
-                            type="text"
+                            type="number"
                             placeholder="0~24"
                             value={
                                 patient.enteralNutritionToleranceScore === '0' && patient_id === ''

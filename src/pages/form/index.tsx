@@ -12,21 +12,8 @@ import { recordsCollection } from '../../utils/db';
 import { forceRerender } from '../../actions/user';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
 
-const onAddSuccess = function() {
-    const dispatch = useDispatch();
-
-    Taro.atMessage({ message: '添加记录成功', type: 'success' });
-    dispatch(forceRerender());
-};
-
-const onModifySuccess = function() {
-    const dispatch = useDispatch();
-
-    Taro.atMessage({ message: '修改记录成功', type: 'success' });
-    dispatch(forceRerender());
-};
-
 export default function Form() {
+    const dispatch = useDispatch();
     const { record_id, patient_id, enrolltime, force_rerender } = useSelector(
         (state: IReducers) => ({
             record_id: state.records.record_id,
@@ -61,14 +48,20 @@ export default function Form() {
         if (record_id === '') {
             recordsCollection.add({
                 data: convertToIRecord(record),
-                success: onAddSuccess,
+                success: function() {
+                    Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                    dispatch(forceRerender());
+                },
                 fail: console.error,
             });
         } else {
             console.log('modify');
             recordsCollection.doc(record_id).set({
                 data: convertToIRecord(record, false),
-                success: onModifySuccess,
+                success: function() {
+                    Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                    dispatch(forceRerender());
+                },
                 fail: console.error,
             });
         }
@@ -131,7 +124,7 @@ export default function Form() {
                     name="enteralCalories"
                     title="肠内热卡(kcal):"
                     placeholder="0-5000kcal"
-                    type="text"
+                    type="number"
                     value={
                         record.enteralCalories === '0' && record_id === ''
                             ? ''
@@ -145,7 +138,7 @@ export default function Form() {
                 <AtInput
                     name="parenteralCalories"
                     title="肠外热卡(kcal):"
-                    type="text"
+                    type="number"
                     placeholder="0-5000kcal"
                     value={
                         record.parenteralCalories === '0' && record_id === ''
@@ -160,7 +153,7 @@ export default function Form() {
                 <AtInput
                     name="totalProtein"
                     title="总蛋白(g):"
-                    type="text"
+                    type="digit"
                     placeholder="50-80"
                     value={
                         record.totalProtein === '0' && record_id === '' ? '' : record.totalProtein
@@ -174,7 +167,7 @@ export default function Form() {
                     name="prealbumin"
                     title="前白蛋白(mg/L):"
                     placeholder="170-420"
-                    type="text"
+                    type="digit"
                     value={record.prealbumin === '0' && record_id === '' ? '' : record.prealbumin}
                     onChange={useCallback(v => setRecord({ ...record, prealbumin: v as string }), [
                         record,
@@ -185,7 +178,7 @@ export default function Form() {
                     name="albumin"
                     title="白蛋白(g):"
                     placeholder="30-50"
-                    type="text"
+                    type="digit"
                     value={record.albumin === '0' && record_id === '' ? '' : record.albumin}
                     onChange={useCallback(v => setRecord({ ...record, albumin: v as string }), [
                         record,
@@ -196,7 +189,7 @@ export default function Form() {
                     name="serumTransfferin"
                     title="转铁蛋白(g):"
                     placeholder="30-60"
-                    type="text"
+                    type="digit"
                     value={
                         record.serumTransferrin === '0' && record_id === ''
                             ? ''
@@ -211,7 +204,7 @@ export default function Form() {
                     name="lymphocyteCount"
                     title="淋巴细胞计数(10^9/L):"
                     placeholder="0-100"
-                    type="text"
+                    type="digit"
                     value={
                         record.lymphocyteCount === '0' && record_id === ''
                             ? ''
@@ -226,7 +219,7 @@ export default function Form() {
                     name="hemoglobin"
                     title="血红蛋白(g/l):"
                     placeholder="90-200"
-                    type="text"
+                    type="number"
                     value={record.hemoglobin === '0' && record_id === '' ? '' : record.hemoglobin}
                     onChange={useCallback(v => setRecord({ ...record, hemoglobin: v as string }), [
                         record,
@@ -236,7 +229,7 @@ export default function Form() {
                 <AtInput
                     name="fastingGlucose"
                     title="空腹血糖(mmol/L):"
-                    type="text"
+                    type="digit"
                     placeholder="3.9-11.1"
                     value={
                         record.fastingGlucose === '0' && record_id === ''
@@ -252,7 +245,7 @@ export default function Form() {
                     name="gastricRetention"
                     title="胃潴留(ml):"
                     placeholder="0-1000"
-                    type="text"
+                    type="number"
                     value={
                         record.gastricRetention === '0' && record_id === ''
                             ? ''
@@ -267,7 +260,7 @@ export default function Form() {
                     name="injectionOfAlbumin"
                     title="输白蛋白(g):"
                     placeholder="0-60"
-                    type="text"
+                    type="number"
                     value={
                         record.injectionOfAlbumin === '0' && record_id === ''
                             ? ''
@@ -318,7 +311,7 @@ export default function Form() {
                         <AtInput
                             name="enteralNutritionToleranceScore"
                             title="耐受性评分:"
-                            type="text"
+                            type="number"
                             placeholder="0~24"
                             value={
                                 record.enteralNutritionToleranceScore === '0' && record_id === ''
