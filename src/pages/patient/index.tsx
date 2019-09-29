@@ -50,6 +50,7 @@ export default function Patient() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
                     // 添加成功，则再次从数据库获取统计信息
                     dispatch(forceRerender());
+                    setTimeout(() => Taro.navigateBack(), 800);
                 },
                 fail: console.error,
             });
@@ -60,6 +61,7 @@ export default function Patient() {
                     Taro.atMessage({ message: '修改记录成功', type: 'success' });
                     // 修改成功，则再次从数据库获取统计信息
                     dispatch(forceRerender());
+                    setTimeout(() => Taro.navigateBack(), 800);
                 },
                 fail: console.error,
             });

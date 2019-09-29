@@ -89,6 +89,7 @@ export default function List() {
                 .skip((currentPage - 1) * pageSize)
                 .limit(pageSize)
                 .orderBy('enrolltime', 'desc')
+                .orderBy('hospId', 'asc')
                 .get()
                 .then(res => {
                     setPatients(res.data as Array<IPatient>);
