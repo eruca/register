@@ -1,11 +1,12 @@
 import Taro, { useState, useCallback, useEffect } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { AtForm, AtInput, AtSwitch, AtButton, AtMessage } from 'taro-ui';
-import { useSelector } from '@tarojs/redux';
+import { useSelector, useDispatch } from '@tarojs/redux';
 
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
 import { IPatient, zeroPatient, deleteId } from '../../reducers/patient';
+import { forceRerender } from '../../actions/user';
 import { patientsCollection } from '../../utils/db';
 import { LocalPatient, convertToLocal, convertToPatient, validate } from '../patient/config';
 
@@ -17,6 +18,7 @@ const selectors = [
 ];
 
 export default function ResultSegment() {
+    const dispatch = useDispatch();
     const { patient_id, user_openid, patient_openid, force_rerender } = useSelector(
         (state: IReducers) => ({
             patient_id: state.patients.patient_id,
@@ -54,7 +56,9 @@ export default function ResultSegment() {
 
         patientsCollection.doc(patient_id).set({
             data: deleteId(convertToPatient(patient)),
-            success: function() {
+            success: function(res) {
+                console.log('result after change', res.data);
+                dispatch(forceRerender());
                 Taro.atMessage({ message: '更新结局成功', type: 'success' });
             },
             fail: console.error,

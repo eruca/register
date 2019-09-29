@@ -61,6 +61,7 @@ export default function List() {
     useEffect(() => {
         // 如果是搜索，就直接使用onSearch找到所有数据
         if (!searchUtil.clicked) {
+            console.log("fetch patients list");
             db.collection('patients')
                 .where({ _openid })
                 .skip((currentPage - 1) * pageSize)
@@ -178,7 +179,7 @@ export default function List() {
                                     dayjs(item.enrolltime),
                                     'day'
                                 )}d`}
-                                extraText={`${item.venttime ? '✔️' : ''}`}
+                                extraText={`${item.stayoficu ? '✔️' : ''}`}
                                 onClick={() => {
                                     dispatch(
                                         select(
