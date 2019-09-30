@@ -26,6 +26,7 @@ export interface LocalPatient {
     enteralNutritionToleranceScore: string;
 }
 
+// 只比较patient这部分，不比较Result那部分，那部分在Result处比较
 export function equal(lhs: LocalPatient, rhs: LocalPatient): boolean {
     return (
         lhs.hospId === rhs.hospId &&

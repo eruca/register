@@ -55,11 +55,11 @@ export function zeroPatient(): IPatient {
     };
 }
 
-export function deleteId(patient: IPatient): IPatient {
-    const { _id, _openid, ...res } = patient;
+// export function deleteId(patient: IPatient): IPatient {
+//     const { _id, _openid, ...res } = patient;
 
-    return res;
-}
+//     return res;
+// }
 
 export interface IPatientState {
     patient_id: string;

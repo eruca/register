@@ -22,9 +22,9 @@ export default function Patient() {
         _openid: state.user._openid,
         force_rerender: state.user.force_rerender,
     }));
+
     // 作为从数据库下载下来的数据
     const [finalPatient, setFinalPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
-
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
     // 现在有2个浮层，用0 => 关闭， 1 => NRS2002, 2 => EnteralNutritionTolenance
     const [floatLay, setFloatLay] = useState(0);
@@ -40,7 +40,7 @@ export default function Patient() {
                 });
             }
         }
-    }, [patient_id, setPatient, force_rerender]);
+    }, [patient_id, force_rerender, setPatient, setFinalPatient]);
     console.log('patient =>', patient, 'patient_id', patient_id);
 
     const onSubmit = () => {
@@ -57,7 +57,7 @@ export default function Patient() {
                     Taro.atMessage({ message: '添加记录成功', type: 'success' });
                     // 添加成功，则再次从数据库获取统计信息
                     dispatch(forceRerender());
-                    setTimeout(() => Taro.navigateBack(), 800);
+                    setTimeout(() => Taro.navigateBack(), 1000);
                 },
                 fail: console.error,
             });
@@ -68,7 +68,7 @@ export default function Patient() {
                     Taro.atMessage({ message: '修改记录成功', type: 'success' });
                     // 修改成功，则再次从数据库获取统计信息
                     dispatch(forceRerender());
-                    setTimeout(() => Taro.navigateBack(), 800);
+                    setTimeout(() => Taro.navigateBack(), 1000);
                 },
                 fail: console.error,
             });

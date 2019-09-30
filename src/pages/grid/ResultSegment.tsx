@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
-import { IPatient, zeroPatient, deleteId } from '../../reducers/patient';
+import { IPatient, zeroPatient } from '../../reducers/patient';
 import { forceRerender } from '../../actions/user';
 import { patientsCollection } from '../../utils/db';
 import { LocalPatient, convertToLocal, convertToPatient } from '../patient/config';
@@ -30,7 +30,6 @@ export default function ResultSegment() {
     );
     // 作为从数据库下载下来的数据
     const [finalPatient, setFinalPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
-
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
@@ -44,7 +43,7 @@ export default function ResultSegment() {
                 });
             }
         }
-    }, [patient_id, setPatient, force_rerender]);
+    }, [patient_id, force_rerender, setPatient, setFinalPatient]);
 
     console.log('patient_id', patient_id);
     console.table(patient);
@@ -64,7 +63,7 @@ export default function ResultSegment() {
         }
 
         patientsCollection.doc(patient_id).set({
-            data: deleteId(convertToPatient(patient)),
+            data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
             success: function(res) {
                 console.log('result after change', res.data);
                 dispatch(forceRerender());
@@ -73,8 +72,6 @@ export default function ResultSegment() {
             fail: console.error,
         });
     };
-
-    console.info('equal', equal(patient, finalPatient));
 
     return (
         <View>
@@ -138,14 +135,6 @@ export default function ResultSegment() {
 }
 
 function equal(lhs: LocalPatient, rhs: LocalPatient): boolean {
-    console.info(
-        lhs.venttime,
-        rhs.venttime,
-        lhs.venttime == rhs.venttime,
-        lhs.stayoficu == rhs.stayoficu,
-        lhs.resultIndex === rhs.resultIndex,
-        lhs.isAliveDischarge === rhs.isAliveDischarge
-    );
     return (
         lhs.venttime === rhs.venttime &&
         lhs.stayoficu === rhs.stayoficu &&
