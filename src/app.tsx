@@ -28,23 +28,23 @@ class App extends Component {
         pages: [
             'pages/index/index',
             'pages/patient/index',
-            'pages/result/index',
+            'pages/statistic/index',
             'pages/grid/index',
-            'pages/list/index',
-            'pages/form/index',
+            'pages/patients/index',
+            'pages/record/index',
             'pages/user/index',
         ],
 
         tabBar: {
             list: [
                 {
-                    pagePath: 'pages/list/index',
+                    pagePath: 'pages/patients/index',
                     text: '所有患者',
                     iconPath: './assets/list.png',
                     selectedIconPath: './assets/list_selected.png',
                 },
                 {
-                    pagePath: 'pages/result/index',
+                    pagePath: 'pages/statistic/index',
                     text: '统计',
                     iconPath: './assets/summary.png',
                     selectedIconPath: './assets/summary_selected.png',
