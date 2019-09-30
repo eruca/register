@@ -26,6 +26,28 @@ export interface LocalPatient {
     enteralNutritionToleranceScore: string;
 }
 
+export function equal(lhs: LocalPatient, rhs: LocalPatient): boolean {
+    return (
+        lhs.hospId === rhs.hospId &&
+        lhs.name === rhs.name &&
+        lhs.isMale === rhs.isMale &&
+        lhs.age === rhs.age &&
+        lhs.bed === rhs.bed &&
+        lhs.admittime === rhs.admittime &&
+        lhs.enrolltime === rhs.enrolltime &&
+        lhs.height === rhs.height &&
+        lhs.weight === rhs.weight &&
+        lhs.diagnoseIndex === rhs.diagnoseIndex &&
+        lhs.needVesopressor === rhs.needVesopressor &&
+        lhs.needVentilation === rhs.needVentilation &&
+        lhs.useSmallPeptide === rhs.useSmallPeptide &&
+        lhs.apache2 === rhs.apache2 &&
+        lhs.agi === rhs.agi &&
+        lhs.nrs2002 === rhs.nrs2002 &&
+        lhs.enteralNutritionToleranceScore === rhs.enteralNutritionToleranceScore
+    );
+}
+
 export function convertToLocal(patient: IPatient): LocalPatient {
     return {
         _id: patient._id,

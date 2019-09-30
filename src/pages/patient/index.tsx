@@ -11,7 +11,7 @@ import EnteralNutritionTolerance from '../../components/EnteralNutritionToleranc
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
-import { selector, LocalPatient, convertToLocal, convertToPatient } from './config';
+import { selector, LocalPatient, convertToLocal, convertToPatient, equal } from './config';
 import { validate } from './validator';
 import './index.scss';
 
@@ -22,6 +22,9 @@ export default function Patient() {
         _openid: state.user._openid,
         force_rerender: state.user.force_rerender,
     }));
+    // 作为从数据库下载下来的数据
+    const [finalPatient, setFinalPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
+
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
     // 现在有2个浮层，用0 => 关闭， 1 => NRS2002, 2 => EnteralNutritionTolenance
     const [floatLay, setFloatLay] = useState(0);
@@ -31,7 +34,10 @@ export default function Patient() {
         if (patient_id !== '') {
             const promise = patientsCollection.doc(patient_id).get();
             if (promise) {
-                promise.then(res => setPatient(convertToLocal(res.data as IPatient)));
+                promise.then(res => {
+                    setPatient(convertToLocal(res.data as IPatient));
+                    setFinalPatient(convertToLocal(res.data as IPatient));
+                });
             }
         }
     }, [patient_id, setPatient, force_rerender]);
@@ -283,7 +289,10 @@ export default function Patient() {
                 <AtButton
                     type="primary"
                     formType="submit"
-                    disabled={_openid !== patient._openid && patient_id !== ''}
+                    disabled={
+                        (_openid !== patient._openid || equal(patient, finalPatient)) && // 不是本人的或者没有更改的
+                        patient_id !== '' // 新增的
+                    }
                 >
                     {patient_id === '' ? '提交' : '修改'}
                 </AtButton>
