@@ -4,13 +4,13 @@ import { LocalRecord } from './config';
 const config: Map<string, ConfigType> = [
     {
         key: 'enteralCalories',
-        message: '肠内热卡0-10000之间',
-        validator: validateInt(v => v >= 0 && v < 10000),
+        message: '肠内热卡0-5000之间',
+        validator: validateInt(v => v >= 0 && v < 5000),
     },
     {
         key: 'parenteralCalories',
-        message: '肠外热卡0-10000之间',
-        validator: validateInt(v => v >= 0 && v < 10000),
+        message: '肠外热卡0-5000之间',
+        validator: validateInt(v => v >= 0 && v < 5000),
     },
     {
         key: 'totalProtein',

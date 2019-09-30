@@ -116,10 +116,10 @@ export default function Patient() {
                     type="number"
                     placeholder="1-139"
                     value={patient.age === '0' && patient_id === '' ? '' : patient.age}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, age: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, age: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                 />
                 <AtInput
                     name="bed"
@@ -127,10 +127,10 @@ export default function Patient() {
                     type="number"
                     placeholder="1-100"
                     value={patient.bed === '0' && patient_id === '' ? '' : patient.bed}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, bed: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, bed: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                 />
                 <Picker
                     mode="date"
@@ -158,10 +158,10 @@ export default function Patient() {
                     type="number"
                     placeholder="100-250"
                     value={patient.height === '0' && patient_id === '' ? '' : patient.height}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, height: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, height: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                 />
                 <AtInput
                     name="weight"
@@ -169,10 +169,10 @@ export default function Patient() {
                     type="number"
                     placeholder="30-300"
                     value={patient.weight === '0' && patient_id === '' ? '' : patient.weight}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, weight: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, weight: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                 />
                 <Picker
                     mode="selector"
@@ -216,10 +216,10 @@ export default function Patient() {
                     type="number"
                     placeholder="0-71"
                     value={patient.apache2 === '0' && patient_id === '' ? '' : patient.apache2}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, apache2: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, apache2: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                 />
                 <AtInput
                     name="agi"
@@ -227,10 +227,10 @@ export default function Patient() {
                     type="number"
                     placeholder="0-4"
                     value={patient.agi === '0' && patient_id === '' ? '' : patient.agi}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, agi: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, agi: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                 />
                 <View className="at-row at-row__align--center">
                     <View className="at-col at-col-10">
@@ -243,7 +243,7 @@ export default function Patient() {
                                 patient.nrs2002 === '0' && patient_id === '' ? '' : patient.nrs2002
                             }
                             onChange={useCallback(
-                                (v: string) => setPatient({ ...patient, nrs2002: v }),
+                                (v: string) => setPatient({ ...patient, nrs2002: v ? v : '0' }),
                                 [patient, setPatient]
                             )}
                         />
@@ -271,7 +271,10 @@ export default function Patient() {
                             }
                             onChange={useCallback(
                                 (v: string) =>
-                                    setPatient({ ...patient, enteralNutritionToleranceScore: v }),
+                                    setPatient({
+                                        ...patient,
+                                        enteralNutritionToleranceScore: v ? v : '0',
+                                    }),
                                 [patient, setPatient]
                             )}
                         />
@@ -311,7 +314,8 @@ export default function Patient() {
                 title="营养风险筛查NRS2002"
                 onClose={() => setFloatLay(0)}
             >
-                {floatLay == 1 ? <NRS2002 /> : <EnteralNutritionTolerance />}
+                {floatLay === 1 && <NRS2002 />}
+                {floatLay === 2 && <EnteralNutritionTolerance />}
             </AtFloatLayout>
         </View>
     );

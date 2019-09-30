@@ -28,6 +28,9 @@ export default function ResultSegment() {
             force_rerender: state.user.force_rerender,
         })
     );
+    // 作为从数据库下载下来的数据
+    const [finalPatient, setFinalPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
+
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
@@ -35,7 +38,10 @@ export default function ResultSegment() {
             const promise = patientsCollection.doc(patient_id).get();
             if (promise) {
                 console.log('patient_id', patient_id);
-                promise.then(res => setPatient(convertToLocal(res.data as IPatient)));
+                promise.then(res => {
+                    setPatient(convertToLocal(res.data as IPatient));
+                    setFinalPatient(convertToLocal(res.data as IPatient));
+                });
             }
         }
     }, [patient_id, setPatient, force_rerender]);
@@ -68,6 +74,8 @@ export default function ResultSegment() {
         });
     };
 
+    console.info('equal', equal(patient, finalPatient));
+
     return (
         <View>
             <AtMessage />
@@ -78,10 +86,10 @@ export default function ResultSegment() {
                     placeholder="请填写天数"
                     name="venttime"
                     value={patient.venttime === '0' ? '' : patient.venttime}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, venttime: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, venttime: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                     disabled={patient_openid !== user_openid}
                 />
                 <AtInput
@@ -90,10 +98,10 @@ export default function ResultSegment() {
                     placeholder="请填写天数"
                     name="stayoficu"
                     value={patient.stayoficu === '0' ? '' : patient.stayoficu}
-                    onChange={useCallback((v: string) => setPatient({ ...patient, stayoficu: v }), [
-                        patient,
-                        setPatient,
-                    ])}
+                    onChange={useCallback(
+                        (v: string) => setPatient({ ...patient, stayoficu: v ? v : '0' }),
+                        [patient, setPatient]
+                    )}
                     disabled={patient_openid !== user_openid}
                 />
                 <Picker
@@ -117,10 +125,31 @@ export default function ResultSegment() {
                     ])}
                     disabled={patient_openid !== user_openid}
                 />
-                <AtButton type="primary" formType="submit" disabled={patient_openid != user_openid}>
+                <AtButton
+                    type="primary"
+                    formType="submit"
+                    disabled={patient_openid !== user_openid || equal(patient, finalPatient)}
+                >
                     提交
                 </AtButton>
             </AtForm>
         </View>
+    );
+}
+
+function equal(lhs: LocalPatient, rhs: LocalPatient): boolean {
+    console.info(
+        lhs.venttime,
+        rhs.venttime,
+        lhs.venttime == rhs.venttime,
+        lhs.stayoficu == rhs.stayoficu,
+        lhs.resultIndex === rhs.resultIndex,
+        lhs.isAliveDischarge === rhs.isAliveDischarge
+    );
+    return (
+        lhs.venttime === rhs.venttime &&
+        lhs.stayoficu === rhs.stayoficu &&
+        lhs.resultIndex === rhs.resultIndex &&
+        lhs.isAliveDischarge === rhs.isAliveDischarge
     );
 }
