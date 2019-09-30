@@ -1,10 +1,10 @@
-import { USER_ADD, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
+import { USER_SYNC, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
 import { IAction } from './base';
 import { IUserState } from '../reducers/user';
 
 export function userSync(user: IUserState): IAction {
     return {
-        type: USER_ADD,
+        type: USER_SYNC,
         payload: { ...user },
     };
 }

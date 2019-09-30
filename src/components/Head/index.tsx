@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { useState, useEffect } from '@tarojs/taro';
 import { View, Button } from '@tarojs/components';
 import { AtAvatar } from 'taro-ui';
 import { IUserState } from '../../reducers/user';
@@ -8,6 +8,12 @@ export interface IProps extends IUserState {
 }
 
 export default function Head({ avatarUrl, nickName, hosp, dept, cb }: IProps) {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setVisible(true), 1000);
+    }, []);
+
     return (
         <View style="margin:20rpx">
             <View style="display:flex;flex-direction:row">
@@ -20,8 +26,8 @@ export default function Head({ avatarUrl, nickName, hosp, dept, cb }: IProps) {
                         {hosp} - {dept}
                     </View>
                 </View>
-                {!nickName && (
-                    <View style="width:200rpx">
+                {visible && !nickName && (
+                    <View style="width:260rpx">
                         <Button
                             className="btn"
                             openType="getUserInfo"

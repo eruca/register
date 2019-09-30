@@ -1,5 +1,5 @@
 import { IAction } from '../actions/base';
-import { USER_ADD, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
+import { USER_SYNC, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
 
 export interface IUserState {
     _id: string;
@@ -36,7 +36,7 @@ const INIT_STATE: IUserState = {
 
 export default function user(state = INIT_STATE, action: IAction): IUserState {
     switch (action.type) {
-        case USER_ADD:
+        case USER_SYNC:
             return {
                 ...state,
                 ...action.payload,
