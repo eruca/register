@@ -7,7 +7,8 @@ import { AtForm, AtInput, AtSwitch, AtButton, AtMessage, AtIcon, AtFloatLayout }
 import { zeroRecord, IRecord } from '../../reducers/records';
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
-import { nasalFeedTubeTypes, AGIs, convertToLocal, validate, convertToIRecord } from './config';
+import { nasalFeedTubeTypes, AGIs, convertToLocal, convertToIRecord } from './config';
+import { validate } from './validator';
 import { recordsCollection } from '../../utils/db';
 import { forceRerender } from '../../actions/user';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';

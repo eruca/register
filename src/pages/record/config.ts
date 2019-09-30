@@ -1,13 +1,5 @@
 import { IRecord } from '../../reducers/records';
-import {
-    test_0_4999,
-    test_0_10f,
-    test_0_99,
-    test_0_1999,
-    test_20_999,
-    test_0_200f,
-} from '../../utils/regexp';
-import { test_20_299, test_torentScore } from '../patient/config';
+
 
 export const nasalFeedTubeTypes = ['胃管', '空肠管'];
 export const AGIs = ['AGI Ⅰ级', 'AGI Ⅱ级', 'AGI Ⅲ级', 'AGI Ⅳ级'];
@@ -88,89 +80,4 @@ export function convertToIRecord(record: LocalRecord, withID: boolean = true): I
         newOne['_id'] = record._id;
     }
     return newOne;
-}
-
-type ConfigType = {
-    message: string;
-    validator: (v: any) => boolean;
-};
-
-const config: Map<string, ConfigType> = [
-    {
-        key: 'enteralCalories',
-        message: '肠内热卡0-4999之间',
-        validator: test_0_4999,
-    },
-    {
-        key: 'parenteralCalories',
-        message: '肠外热卡0-4999之间',
-        validator: test_0_4999,
-    },
-    {
-        key: 'totalProtein',
-        message: '总蛋白20-299',
-        validator: test_20_299,
-    },
-    {
-        key: 'prealbumin',
-        message: '前蛋白20-999',
-        validator: test_20_999,
-    },
-    {
-        key: 'albumin',
-        message: '白蛋白1-99',
-        validator: test_0_99,
-    },
-    {
-        key: 'serumTransferrin',
-        message: '转铁蛋白0-10',
-        validator: test_0_10f,
-    },
-    {
-        key: 'lymphocyteCount',
-        message: '淋巴细胞计数0-200',
-        validator: test_0_200f,
-    },
-    {
-        key: 'hemoglobin',
-        message: '血红蛋白20-299',
-        validator: test_20_299,
-    },
-    {
-        key: 'fastingGlucose',
-        message: '空腹血糖0-200',
-        validator: test_0_200f,
-    },
-    {
-        key: 'gastricRetention',
-        message: '胃潴留0-1999',
-        validator: test_0_1999,
-    },
-    {
-        key: 'injectionOfAlbumin',
-        message: '输白蛋白0-200',
-        validator: test_0_200f,
-    },
-    {
-        key: 'enteralNutritionToleranceScore',
-        message: '肠内耐受性评分0~24分',
-        validator: test_torentScore,
-    },
-].reduce((m, { key, validator, message }) => {
-    m.set(key, { validator, message });
-    return m;
-}, new Map());
-
-export function validate(record: LocalRecord): string {
-    for (const key of Object.keys(record)) {
-        const obj = config.get(key);
-        if (obj === undefined) {
-            continue;
-        }
-
-        if (!obj.validator(record[key])) {
-            return obj.message;
-        }
-    }
-    return '';
 }

@@ -11,7 +11,8 @@ import EnteralNutritionTolerance from '../../components/EnteralNutritionToleranc
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
-import { selector, LocalPatient, convertToLocal, validate, convertToPatient } from './config';
+import { selector, LocalPatient, convertToLocal, convertToPatient } from './config';
+import { validate } from './validator';
 import './index.scss';
 
 export default function Patient() {
@@ -69,7 +70,6 @@ export default function Patient() {
     };
 
     // 如果是已经有patient_id, 但是这个时候网络断了，那么就会出现这种情况
-
     return patient_id !== '' && !patient._id ? (
         <Loading />
     ) : (

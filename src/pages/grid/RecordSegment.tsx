@@ -46,7 +46,7 @@ export default function RecordSegment() {
             console.log('item', item, 'index', index, 'patientRecords', patientRecords);
             dispatch(selectRecord(patientRecords[index]._id || ''));
             Taro.navigateTo({
-                url: '/pages/form/index',
+                url: '/pages/record/index',
             });
         },
         [patientRecords]
@@ -55,7 +55,7 @@ export default function RecordSegment() {
     const newRecord = useCallback(() => {
         dispatch(deselectRecord());
         Taro.navigateTo({
-            url: '/pages/form/index',
+            url: '/pages/record/index',
         });
     }, []);
 

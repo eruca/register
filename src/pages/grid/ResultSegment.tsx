@@ -8,7 +8,8 @@ import { IReducers } from '../../reducers';
 import { IPatient, zeroPatient, deleteId } from '../../reducers/patient';
 import { forceRerender } from '../../actions/user';
 import { patientsCollection } from '../../utils/db';
-import { LocalPatient, convertToLocal, convertToPatient, validate } from '../patient/config';
+import { LocalPatient, convertToLocal, convertToPatient } from '../patient/config';
+import { validateResult } from './validator';
 
 const selectors = [
     '好转至普通病房',
@@ -48,7 +49,9 @@ export default function ResultSegment() {
 
         console.log('patient in submit');
         console.table(patient);
-        const message = validate(patient);
+        // 验证病人的结果设置
+
+        const message = validateResult(patient.venttime, patient.stayoficu, patient.admittime);
         if (message !== '') {
             Taro.atMessage({ message, type: 'error' });
             return;
