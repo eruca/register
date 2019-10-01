@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from '@tarojs/redux';
 import dayjs from 'dayjs';
 
 import Loading from '../../components/Loading';
-import { IPatient } from '../../reducers/patient';
+import { IPatient, Statistic } from '../../reducers/patient';
 import { deselect, select, patient_current, patient_total } from '../../actions/patient';
 import db from '../../utils/db';
 import { IReducers } from '../../reducers';
@@ -41,16 +41,24 @@ const options = [
 
 export default function List() {
     const dispatch = useDispatch();
-    const { _openid, is_super, force_rerender, mytotal, pageSize, currentPage } = useSelector(
-        (state: IReducers) => ({
-            _openid: state.user._openid,
-            is_super: state.user.is_super,
-            force_rerender: state.user.force_rerender,
-            mytotal: state.patients.mytotal,
-            pageSize: state.patients.pageSize,
-            currentPage: state.patients.currentPage,
-        })
-    );
+    const {
+        _openid,
+        is_super,
+        listType,
+        force_rerender,
+        mytotal,
+        pageSize,
+        currentPage,
+    } = useSelector((state: IReducers) => ({
+        _openid: state.user._openid,
+        authority: state.user.authority,
+        listType: state.user.listType,
+        is_super: state.user.is_super,
+        force_rerender: state.user.force_rerender,
+        mytotal: state.patients.meTotal,
+        pageSize: state.patients.pageSize,
+        currentPage: state.patients.currentPage,
+    }));
 
     // 到底是数据库没下载，还是数据本身就是空
     const [loaded, setLoaded] = useState<boolean>(false);
@@ -65,56 +73,47 @@ export default function List() {
             data: { year: '所有' },
             success: res => {
                 console.log('getStatistic', res);
-                dispatch(
-                    patient_total(
-                        (res.result as any).total,
-                        (res.result as any).patient_date_total,
-                        (res.result as any).patient_result_total,
-                        (res.result as any).mytotal,
-                        (res.result as any).mypatient_date_total,
-                        (res.result as any).mypatient_result_total
-                    )
-                );
+                dispatch(patient_total(res.result as Statistic));
             },
             fail: console.error,
         });
-    }, [force_rerender, currentPage]);
+    }, [force_rerender, currentPage, listType]);
 
     useEffect(() => {
         // 如果是搜索，就直接使用onSearch找到所有数据
         if (!searchUtil.clicked) {
             console.log('fetch patients list');
-            db.collection('patients')
-                .where({ _openid })
-                .skip((currentPage - 1) * pageSize)
-                .limit(pageSize)
-                .orderBy('enrolltime', 'desc')
-                .orderBy('hospId', 'asc')
-                .get()
-                .then(res => {
-                    setPatients(res.data as Array<IPatient>);
+            Taro.cloud.callFunction({
+                name: 'getPatients',
+                data: { offset: (currentPage - 1) * pageSize, size: pageSize, listType },
+                success: (res: any) => {
+                    console.log('getPatients', res);
+                    setPatients(res.result.found as Array<IPatient>);
                     setLoaded(true);
-                });
+                },
+            });
         }
-    }, [searchUtil.clicked, force_rerender, setPatients, _openid, currentPage, pageSize]);
+    }, [searchUtil.clicked, force_rerender, setPatients, _openid, currentPage, pageSize, listType]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 
     // todo : 需要在全局搜索
     const onSearch = () => {
-        Taro.cloud.callFunction({
-            name: 'onSearch',
-            data: {
-                searchText: !is_super && searchText.substring(0, 3) === 'r:+' ? '' : searchText,
-            },
-            success(res) {
-                console.log('e', (res.result as any).event, 'found', (res.result as any).found);
-                // 按了搜索之后
-                setSearchUtil({ ...searchUtil, clicked: true });
-                setPatients((res.result as any).found as Array<IPatient>);
-            },
-            fail: console.error,
-        });
+        if (searchText !== '') {
+            Taro.cloud.callFunction({
+                name: 'onSearch',
+                data: {
+                    searchText: !is_super && searchText.substring(0, 3) === 'r:+' ? '' : searchText,
+                },
+                success(res) {
+                    console.log('e', (res.result as any).event, 'found', (res.result as any).found);
+                    // 按了搜索之后
+                    setSearchUtil({ ...searchUtil, clicked: true });
+                    setPatients((res.result as any).found as Array<IPatient>);
+                },
+                fail: console.error,
+            });
+        }
     };
 
     const onChange = useCallback(

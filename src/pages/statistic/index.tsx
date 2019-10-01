@@ -6,37 +6,24 @@ import { AtCard, AtButton } from 'taro-ui';
 import { selector } from '../patient/config';
 import { forceRerender } from '../../actions/user';
 import { IReducers } from '../../reducers';
+import { Statistic } from '../../reducers/patient';
 import { patient_total } from '../../actions/patient';
 
 const origin = ['所有'];
 
 export default function Result() {
     const dispatch = useDispatch();
-    const {
-        user,
-        mytotal,
-        mydate_total,
-        myresult_total,
-        total,
-        date_total,
-        result_total,
-    } = useSelector((state: IReducers) => ({
+    const { user, patients } = useSelector((state: IReducers) => ({
         user: state.user,
-        mytotal: state.patients.mytotal,
-        mydate_total: state.patients.mypatient_date_total,
-        myresult_total: state.patients.mypatient_result_total,
-        total: state.patients.total,
-        date_total: state.patients.patient_date_total,
-        result_total: state.patients.patient_result_total,
+        patients: state.patients,
     }));
 
     // 年份选择
     const [selected, setSelected] = useState(0);
     // 从数据库来获取年份
     const [years, setYears] = useState(origin);
-    const [group, setGroup] = useState([]);
-    const [mygroup, setMygroup] = useState(new Map());
-    const [nutrients, setNutrients] = useState(new Map());
+    const [map, setMap] = useState(new Map());
+    const [items, setItems] = useState<string[]>([]);
 
     useEffect(() => {
         Taro.cloud.callFunction({
@@ -57,16 +44,7 @@ export default function Result() {
             data: { year: years[selected] },
             success: res => {
                 console.log('getStatistic', res);
-                dispatch(
-                    patient_total(
-                        (res.result as any).total,
-                        (res.result as any).patient_date_total,
-                        (res.result as any).patient_result_total,
-                        (res.result as any).mytotal,
-                        (res.result as any).mypatient_date_total,
-                        (res.result as any).mypatient_result_total
-                    )
-                );
+                dispatch(patient_total({ ...res.result, event: undefined } as Statistic));
             },
             fail: console.error,
         });
@@ -77,48 +55,54 @@ export default function Result() {
                 year: years[selected],
             },
             success(res) {
-                console.log('groupby', res);
-                setGroup((res as any).result.group.list);
+                console.log("groupby", res);
+                const {
+                    nutrientGroup,
+                    groupNutrientGroup,
+                    meNutrientGroup,
+                    diseaseGroup,
+                    groupDiseaseGroup,
+                    meDiseaseGroup,
+                } = res.result;
 
-                const map = (res as any).result.mygroup.list.reduce((acc, currValue) => {
-                    acc.set(currValue['_id'], currValue['num']);
-                    acc.set('sum', (acc.get('sum') || 0) + currValue['num']);
-                    return acc;
-                }, new Map());
-                setMygroup(map);
+                const _map = new Map();
+                const tmpGroup: Array<string> = [];
+                (diseaseGroup as any).forEach(({ _id, num }) => {
+                    _map.set(selector[_id], num);
+                    tmpGroup.push(selector[_id]);
+                });
+                setItems(tmpGroup);
 
-                const nutrientMap = new Map();
-                (res as any).result.nutrients.list.forEach(item => {
-                    if (item._id === false || item._id === null) {
-                        nutrientMap.set(
-                            'peptide-0',
-                            (nutrientMap.get('peptide-0') || 0) + item.num
-                        );
-                    } else {
-                        nutrientMap.set(
-                            'peptide-1',
-                            (nutrientMap.get('peptide-1') || 0) + item.num
-                        );
-                    }
+                (groupDiseaseGroup as any).forEach(({ _id, num }) => {
+                    _map.set('group:' + selector[_id], num);
                 });
-                (res as any).result.mynutrients.list.forEach(item => {
-                    if (item._id === false || item._id === null) {
-                        nutrientMap.set(
-                            'mypeptide-0',
-                            (nutrientMap.get('mypeptide-0') || 0) + item.num
-                        );
-                    } else {
-                        nutrientMap.set(
-                            'mypeptide-1',
-                            (nutrientMap.get('mypeptide-1') || 0) + item.num
-                        );
-                    }
+
+                (meDiseaseGroup as any).forEach(({ _id, num }) => {
+                    _map.set('me:' + selector[_id], num);
                 });
-                setNutrients(nutrientMap);
+
+                (nutrientGroup as any).forEach(({ _id, num }) => {
+                    _map.set((!!_id).toString(), (_map.get((!!_id).toString()) || 0) + num);
+                });
+
+                (groupNutrientGroup as any).forEach(({ _id, num }) => {
+                    _map.set(
+                        'group:' + (!!_id).toString(),
+                        (_map.get('group:' + (!!_id).toString()) || 0) + num
+                    );
+                });
+
+                (meNutrientGroup as any).forEach(({ _id, num }) => {
+                    _map.set(
+                        'me:' + (!!_id).toString(),
+                        (_map.get('me:' + (!!_id).toString()) || 0) + num
+                    );
+                });
+                setMap(_map);
             },
             fail: console.error,
         });
-    }, [years[selected], setGroup, setMygroup, user.force_rerender]);
+    }, [years[selected], user.force_rerender]);
 
     console.log('selected', selected, years[selected]);
     return (
@@ -134,69 +118,79 @@ export default function Result() {
                 </View>
             </Picker>
 
-            <AtCard title="按完成情况">
-                <View className="at-row at-row__justify--center">
-                    <View className="at-col at-col-6">已达1周</View>
-                    <View className="at-col at-col-6">已有结果</View>
-                </View>
-                <View className="at-row at-row__justify--center">
-                    <View className="at-col at-col-6">{`${mydate_total}/${mytotal}`}</View>
-                    <View className="at-col at-col-6">{`${myresult_total}/${mytotal}`}</View>
-                </View>
-                {user.is_super && (
-                    <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">{`${date_total}/${total}`}</View>
-                        <View className="at-col at-col-6">{`${result_total}/${total}`}</View>
+
+            <View style={{ margin: '5PX 0' }}>
+                <AtCard title="按完成情况">
+                    <View className="at-row at-row__justify--center" style={{ color: '#6699FF' }}>
+                        <View className="at-col at-col-4">指标</View>
+                        <View className="at-col at-col-3">我的</View>
+                        <View className="at-col at-col-3">组内</View>
+                        <View className="at-col at-col-2">全部</View>
                     </View>
-                )}
-            </AtCard>
+                    <View className="at-row at-row__justify--center">
+                        <View className="at-col at-col-4">已达1周</View>
+                        <View className="at-col at-col-3">{`${patients.meWeekTotal}/${patients.meTotal}`}</View>
+                        <View className="at-col at-col-3">{`${patients.groupWeekTotal}/${patients.groupTotal}`}</View>
+                        <View className="at-col at-col-2">{`${patients.weekTotal}/${patients.total}`}</View>
+                    </View>
+                    <View className="at-row at-row__justify--center">
+                        <View className="at-col at-col-4">已有结果</View>
+                        <View className="at-col at-col-3">{`${patients.meResultTotal}/${patients.meTotal}`}</View>
+                        <View className="at-col at-col-3">{`${patients.groupResultTotal}/${patients.groupTotal}`}</View>
+                        <View className="at-col at-col-2">{`${patients.resultTotal}/${patients.total}`}</View>
+                    </View>
+                </AtCard>
+            </View>
 
             <View style={{ margin: '5PX 0' }}>
                 <AtCard title="按营养配方">
                     <View className="at-row at-row__justify--center" style={{ color: '#6699FF' }}>
-                        <View className="at-col at-col-6">配方</View>
+                        <View className="at-col at-col-4">配方</View>
                         <View className="at-col at-col-3">我的</View>
-                        <View className="at-col at-col-3">全部</View>
+                        <View className="at-col at-col-3">组内</View>
+                        <View className="at-col at-col-2">全部</View>
                     </View>
                     <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">短肽</View>
-                        <View className="at-col at-col-3">{`${nutrients.get('mypeptide-1') ||
-                            0}`}</View>
-                        <View className="at-col at-col-3">{`${nutrients.get('peptide-1') ||
-                            0}`}</View>
+                        <View className="at-col at-col-4">短肽</View>
+                        <View className="at-col at-col-3">{`${map.get('me:true') || 0}`}</View>
+                        <View className="at-col at-col-3">{`${map.get('group:true') || 0}`}</View>
+                        <View className="at-col at-col-2">{`${map.get('true') || 0}`}</View>
                     </View>
                     <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">整蛋白</View>
-                        <View className="at-col at-col-3">{`${nutrients.get('mypeptide-0') ||
-                            0}`}</View>
-                        <View className="at-col at-col-3">{`${nutrients.get('peptide-0') ||
-                            0}`}</View>
+                        <View className="at-col at-col-4">整蛋白</View>
+                        <View className="at-col at-col-3">{`${map.get('me:false') || 0}`}</View>
+                        <View className="at-col at-col-3">{`${map.get('group:false') || 0}`}</View>
+                        <View className="at-col at-col-2">{`${map.get('false') || 0}`}</View>
                     </View>
                     <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
-                        <View className="at-col at-col-6">总计</View>
-                        <View className="at-col at-col-3">{mytotal}</View>
-                        <View className="at-col at-col-3">{total}</View>
+                        <View className="at-col at-col-4">总计</View>
+                        <View className="at-col at-col-3">{patients.meTotal}</View>
+                        <View className="at-col at-col-3">{patients.groupTotal}</View>
+                        <View className="at-col at-col-2">{patients.total}</View>
                     </View>
                 </AtCard>
             </View>
 
             <AtCard title="按病种">
                 <View className="at-row at-row__justify--center" style={{ color: '#6699FF' }}>
-                    <View className="at-col at-col-6">病种</View>
-                    <View className="at-col at-col-3">我的</View>
-                    <View className="at-col at-col-3">全部</View>
+                    <View className="at-col at-col-7">病种</View>
+                    <View className="at-col at-col-2">我的</View>
+                    <View className="at-col at-col-2">组内</View>
+                    <View className="at-col at-col-1">全部</View>
                 </View>
-                {group.map(item => (
+                {items.map(item => (
                     <View className="at-row at-row__justify--center">
-                        <View className="at-col at-col-6">{selector[item['_id']]}</View>
-                        <View className="at-col at-col-3">{mygroup.get(item['_id']) || 0}</View>
-                        <View className="at-col at-col-3">{item['num']}</View>
+                        <View className="at-col at-col-7">{item}</View>
+                        <View className="at-col at-col-2">{map.get('me:' + item) || 0}</View>
+                        <View className="at-col at-col-2">{map.get('group:' + item) || 0}</View>
+                        <View className="at-col at-col-1">{map.get(item) || 0}</View>
                     </View>
                 ))}
                 <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
-                    <View className="at-col at-col-6">总计</View>
-                    <View className="at-col at-col-3">{mytotal}</View>
-                    <View className="at-col at-col-3">{total}</View>
+                    <View className="at-col at-col-7">总计</View>
+                    <View className="at-col at-col-2">{patients.meTotal}</View>
+                    <View className="at-col at-col-2">{patients.groupTotal}</View>
+                    <View className="at-col at-col-1">{patients.total}</View>
                 </View>
             </AtCard>
 

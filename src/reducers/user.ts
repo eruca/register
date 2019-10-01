@@ -1,7 +1,25 @@
 import { IAction } from '../actions/base';
-import { USER_SYNC, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
+import {
+    USER_SYNC,
+    USER_OPENID,
+    USER_HOSP_DEPT_COCODES,
+    USER_FORCE_RERENDER,
+} from '../constants/user';
 
-export interface IUserState {
+// Authority 代表权限系统
+export enum Authority {
+    Crew,
+    Admin,
+    Root,
+}
+
+export enum ListType {
+    Mine,
+    Group,
+    All,
+}
+
+export interface IUser {
     _id: string;
     _openid: string;
     avatarUrl: string;
@@ -15,7 +33,15 @@ export interface IUserState {
     dept: string;
     is_super: boolean;
 
+    invite_code?: string; // 邀请码
+    cocode: string; // 协作码
+    cocodes: string;
+    authority: Authority;
+}
+
+export interface IUserState extends IUser {
     force_rerender: number;
+    listType: ListType;
 }
 
 const INIT_STATE: IUserState = {
@@ -31,7 +57,11 @@ const INIT_STATE: IUserState = {
     hosp: '',
     dept: '',
     is_super: false,
+    cocode: '',
+    cocodes: '',
+    authority: Authority.Crew,
     force_rerender: 0,
+    listType: ListType.Mine,
 };
 
 export default function user(state = INIT_STATE, action: IAction): IUserState {
@@ -47,7 +77,7 @@ export default function user(state = INIT_STATE, action: IAction): IUserState {
                 _openid: action.payload.openid,
             };
 
-        case USER_HOSP_DEPT:
+        case USER_HOSP_DEPT_COCODES:
             return {
                 ...state,
                 ...action.payload,

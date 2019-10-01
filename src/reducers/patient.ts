@@ -55,13 +55,21 @@ export function zeroPatient(): IPatient {
     };
 }
 
-// export function deleteId(patient: IPatient): IPatient {
-//     const { _id, _openid, ...res } = patient;
+export interface Statistic {
+    total: number;
+    groupTotal: number;
+    meTotal: number;
 
-//     return res;
-// }
+    resultTotal: number;
+    groupResultTotal: number;
+    meResultTotal: number;
 
-export interface IPatientState {
+    weekTotal: number;
+    groupWeekTotal: number;
+    meWeekTotal: number;
+}
+
+export interface IPatientState extends Statistic {
     patient_id: string;
     _openid: string;
     hospId: string;
@@ -70,12 +78,6 @@ export interface IPatientState {
 
     currentPage: number;
     pageSize: number;
-    total: number;
-    patient_date_total: number;
-    patient_result_total: number;
-    mytotal: number;
-    mypatient_date_total: number;
-    mypatient_result_total: number;
 }
 
 const INIT_STATE: IPatientState = {
@@ -85,14 +87,18 @@ const INIT_STATE: IPatientState = {
     name: '',
     enrolltime: '',
 
-    mytotal: 0,
-    mypatient_date_total: 0,
-    mypatient_result_total: 0,
-    total: 0,
-    patient_date_total: 0,
-    patient_result_total: 0,
     currentPage: 1,
     pageSize: 20, // 20
+
+    total: 0,
+    groupTotal: 0,
+    meTotal: 0,
+    resultTotal: 0,
+    groupResultTotal: 0,
+    meResultTotal: 0,
+    weekTotal: 0,
+    groupWeekTotal: 0,
+    meWeekTotal: 0,
 };
 
 export default function patients(state = INIT_STATE, action: IAction): IPatientState {

@@ -80,7 +80,7 @@ class App extends Component {
                 name: 'getContext',
                 success(res) {
                     console.log('getContext', res);
-                    store.dispatch(userSync((res.result as any)['0'] as IUserState));
+                    store.dispatch(userSync((res.result as any)['record'] as IUserState));
                 },
                 fail: console.error,
             });

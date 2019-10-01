@@ -1,6 +1,11 @@
-import { USER_SYNC, USER_OPENID, USER_HOSP_DEPT, USER_FORCE_RERENDER } from '../constants/user';
+import {
+    USER_SYNC,
+    USER_OPENID,
+    USER_HOSP_DEPT_COCODES,
+    USER_FORCE_RERENDER,
+} from '../constants/user';
 import { IAction } from './base';
-import { IUserState } from '../reducers/user';
+import { IUserState, ListType } from '../reducers/user';
 
 export function userSync(user: IUserState): IAction {
     return {
@@ -16,10 +21,15 @@ export function syncOpenid(openid: string): IAction {
     };
 }
 
-export function syncHospDept(hosp: string, dept: string): IAction {
+export function syncHospDeptCocodes(
+    hosp: string,
+    dept: string,
+    cocodes: string,
+    listType: ListType
+): IAction {
     return {
-        type: USER_HOSP_DEPT,
-        payload: { hosp, dept },
+        type: USER_HOSP_DEPT_COCODES,
+        payload: { hosp, dept, cocodes, listType },
     };
 }
 

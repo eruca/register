@@ -1,5 +1,6 @@
 import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
 import { IAction } from './base';
+import { Statistic } from '../reducers/patient';
 
 export function select(
     patient_id: string,
@@ -25,24 +26,10 @@ export function deselect(): IAction {
     };
 }
 
-export function patient_total(
-    total: number,
-    patient_date_total: number,
-    patient_result_total: number,
-    mytotal: number,
-    mypatient_date_total: number,
-    mypatient_result_total: number
-) {
+export function patient_total(sta: Statistic) {
     return {
         type: PATIENT_TOTAL,
-        payload: {
-            total,
-            patient_date_total,
-            patient_result_total,
-            mytotal,
-            mypatient_date_total,
-            mypatient_result_total,
-        },
+        payload: sta,
     };
 }
 
