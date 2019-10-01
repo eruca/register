@@ -118,7 +118,7 @@ export default function Result() {
             },
             fail: console.error,
         });
-    }, [setGroup, setMygroup, user.force_rerender]);
+    }, [years[selected], setGroup, setMygroup, user.force_rerender]);
 
     console.log('selected', selected, years[selected]);
     return (
