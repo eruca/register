@@ -5,6 +5,7 @@ import { IAction } from '../actions/base';
 
 export interface IRecord {
     _id?: string;
+    _openid?: string;
     patientid: string;
     recordtime: string;
     nasalFeedTubeType: number;

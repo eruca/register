@@ -1,11 +1,11 @@
 import { IRecord } from '../../reducers/records';
 
-
 export const nasalFeedTubeTypes = ['胃管', '空肠管'];
 export const AGIs = ['AGI Ⅰ级', 'AGI Ⅱ级', 'AGI Ⅲ级', 'AGI Ⅳ级'];
 
 export interface LocalRecord {
     _id?: string;
+    _openid?: string;
     patientid: string;
     recordtime: string;
     nasalFeedTubeType: number;
@@ -30,6 +30,7 @@ export interface LocalRecord {
 export function convertToLocal(record: IRecord): LocalRecord {
     return {
         _id: record._id,
+        _openid: record._openid,
         patientid: record.patientid,
         recordtime: record.recordtime,
         nasalFeedTubeType: record.nasalFeedTubeType,
@@ -78,6 +79,29 @@ export function convertToIRecord(record: LocalRecord, withID: boolean = true): I
     };
     if (withID) {
         newOne['_id'] = record._id;
+        newOne['_openid'] = record._openid;
     }
     return newOne;
+}
+
+export function equal(lhs: LocalRecord, rhs: LocalRecord): boolean {
+    return (
+        lhs.recordtime === rhs.recordtime &&
+        lhs.nasalFeedTubeType === rhs.nasalFeedTubeType &&
+        lhs.misinhalation === rhs.misinhalation &&
+        lhs.diarrhea === rhs.diarrhea &&
+        lhs.gastrointestinalHemorrhage === rhs.gastrointestinalHemorrhage &&
+        lhs.agiIndex === rhs.agiIndex &&
+        lhs.enteralCalories === rhs.enteralCalories &&
+        lhs.parenteralCalories === rhs.parenteralCalories &&
+        lhs.totalProtein === rhs.totalProtein &&
+        lhs.prealbumin === rhs.prealbumin &&
+        lhs.serumTransferrin === rhs.serumTransferrin &&
+        lhs.lymphocyteCount === rhs.lymphocyteCount &&
+        lhs.hemoglobin === rhs.hemoglobin &&
+        lhs.fastingGlucose === rhs.fastingGlucose &&
+        lhs.gastricRetention === rhs.gastricRetention &&
+        lhs.injectionOfAlbumin === rhs.injectionOfAlbumin &&
+        lhs.enteralNutritionToleranceScore === rhs.enteralNutritionToleranceScore
+    );
 }

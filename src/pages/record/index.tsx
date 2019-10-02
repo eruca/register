@@ -7,7 +7,7 @@ import { AtForm, AtInput, AtSwitch, AtButton, AtMessage, AtIcon, AtFloatLayout }
 import { zeroRecord, IRecord } from '../../reducers/records';
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
-import { nasalFeedTubeTypes, AGIs, convertToLocal, convertToIRecord } from './config';
+import { nasalFeedTubeTypes, AGIs, convertToLocal, convertToIRecord, equal } from './config';
 import { validate } from './validator';
 import { recordsCollection } from '../../utils/db';
 import { forceRerender } from '../../actions/user';
@@ -15,16 +15,19 @@ import EnteralNutritionTolerance from '../../components/EnteralNutritionToleranc
 
 export default function Form() {
     const dispatch = useDispatch();
-    const { record_id, patient_id, enrolltime, force_rerender } = useSelector(
+    const { record_id, patient_id, _openid, enrolltime, force_rerender } = useSelector(
         (state: IReducers) => ({
             record_id: state.records.record_id,
             force_rerender: state.user.force_rerender,
+            _openid: state.user._openid,
             ...state.patients,
         })
     );
 
     // 控制浮动层
     const [floatLay, setfloatLay] = useState(false);
+
+    const [finalRecord, setFinalRecord] = useState(convertToLocal(zeroRecord(patient_id)));
     const [record, setRecord] = useState(convertToLocal(zeroRecord(patient_id)));
     useEffect(() => {
         console.log('ask for database: record_id:', record_id);
@@ -34,6 +37,7 @@ export default function Form() {
                 promise.then(res => {
                     console.log('get data from database', res.data);
                     setRecord(convertToLocal(res.data as IRecord));
+                    setFinalRecord(convertToLocal(res.data as IRecord));
                 });
             }
         }
@@ -335,7 +339,14 @@ export default function Form() {
                         />
                     </View>
                 </View>
-                <AtButton type="primary" formType="submit">
+                <AtButton
+                    type="primary"
+                    formType="submit"
+                    disabled={
+                        (_openid !== record._openid || equal(record, finalRecord)) &&
+                        record_id !== ''
+                    }
+                >
                     {record_id === '' ? '提交' : '修改'}
                 </AtButton>
             </AtForm>
