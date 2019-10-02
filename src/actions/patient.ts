@@ -1,11 +1,5 @@
-import {
-    PATIENT_INDEX,
-    PATIENT_TOTAL,
-    PATIENT_CURRENT,
-    PATIENT_SEARCHVALUE,
-} from '../constants/patient';
+import { PATIENT_INDEX } from '../constants/patient';
 import { IAction } from './base';
-import { Statistic } from '../reducers/patient';
 
 export function select(
     patient_id: string,
@@ -28,26 +22,5 @@ export function deselect(): IAction {
     return {
         type: PATIENT_INDEX,
         payload: { patient_id: '', enrolltime: '', hospId: '', name: '' },
-    };
-}
-
-export function patient_total(sta: Statistic) {
-    return {
-        type: PATIENT_TOTAL,
-        payload: sta,
-    };
-}
-
-export function patient_current(currentPage: number) {
-    return {
-        type: PATIENT_CURRENT,
-        payload: { currentPage },
-    };
-}
-
-export function patient_searchvalue(searchValue: string) {
-    return {
-        type: PATIENT_SEARCHVALUE,
-        payload: { searchValue },
     };
 }

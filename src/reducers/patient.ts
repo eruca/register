@@ -1,11 +1,6 @@
 import dayjs from 'dayjs';
 
-import {
-    PATIENT_INDEX,
-    PATIENT_TOTAL,
-    PATIENT_CURRENT,
-    PATIENT_SEARCHVALUE,
-} from '../constants/patient';
+import { PATIENT_INDEX } from '../constants/patient';
 import { IAction } from '../actions/base';
 
 export interface IPatient {
@@ -60,30 +55,12 @@ export function zeroPatient(): IPatient {
     };
 }
 
-export interface Statistic {
-    total: number;
-    groupTotal: number;
-    meTotal: number;
-
-    resultTotal: number;
-    groupResultTotal: number;
-    meResultTotal: number;
-
-    weekTotal: number;
-    groupWeekTotal: number;
-    meWeekTotal: number;
-}
-
-export interface IPatientState extends Statistic {
+export interface IPatientState {
     patient_id: string;
     _openid: string;
     hospId: string;
     name: string;
     enrolltime: string;
-
-    currentPage: number;
-    pageSize: number;
-    searchValue: string;
 }
 
 const INIT_STATE: IPatientState = {
@@ -92,20 +69,6 @@ const INIT_STATE: IPatientState = {
     hospId: '',
     name: '',
     enrolltime: '',
-
-    currentPage: 1,
-    pageSize: 20, // 20
-    searchValue: '',
-
-    total: 0,
-    groupTotal: 0,
-    meTotal: 0,
-    resultTotal: 0,
-    groupResultTotal: 0,
-    meResultTotal: 0,
-    weekTotal: 0,
-    groupWeekTotal: 0,
-    meWeekTotal: 0,
 };
 
 export default function patients(state = INIT_STATE, action: IAction): IPatientState {
@@ -120,24 +83,6 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
                 hospId,
                 name,
                 enrolltime,
-            };
-
-        case PATIENT_TOTAL:
-            return {
-                ...state,
-                ...action.payload,
-            };
-
-        case PATIENT_CURRENT:
-            return {
-                ...state,
-                currentPage: action.payload.currentPage,
-            };
-
-        case PATIENT_SEARCHVALUE:
-            return {
-                ...state,
-                searchValue: action.payload.searchValue,
             };
 
         default:

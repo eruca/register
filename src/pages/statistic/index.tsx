@@ -6,24 +6,53 @@ import { AtCard, AtButton } from 'taro-ui';
 import { selector } from '../patient/config';
 import { forceRerender } from '../../actions/user';
 import { IReducers } from '../../reducers';
-import { Statistic } from '../../reducers/patient';
-import { patient_total } from '../../actions/patient';
+
+interface Statistic {
+    total: number;
+    groupTotal: number;
+    meTotal: number;
+
+    resultTotal: number;
+    groupResultTotal: number;
+    meResultTotal: number;
+
+    weekTotal: number;
+    groupWeekTotal: number;
+    meWeekTotal: number;
+}
+
+function zeroStatistic(): Statistic {
+    return {
+        total: 0,
+        groupTotal: 0,
+        meTotal: 0,
+
+        resultTotal: 0,
+        groupResultTotal: 0,
+        meResultTotal: 0,
+
+        weekTotal: 0,
+        groupWeekTotal: 0,
+        meWeekTotal: 0,
+    };
+}
 
 const origin = ['所有'];
 
 export default function Result() {
     const dispatch = useDispatch();
-    const { user, patients } = useSelector((state: IReducers) => ({
+    const { user } = useSelector((state: IReducers) => ({
         user: state.user,
-        patients: state.patients,
     }));
 
     // 年份选择
     const [selected, setSelected] = useState(0);
     // 从数据库来获取年份
     const [years, setYears] = useState(origin);
+    // 对收集的病种分类转化为map
     const [map, setMap] = useState(new Map());
-    const [items, setItems] = useState<string[]>([]);
+    // 对是否完成，是否过1周统计数据
+    const [stat, setStat] = useState<Statistic>(zeroStatistic());
 
     useEffect(() => {
         Taro.cloud.callFunction({
@@ -44,7 +73,7 @@ export default function Result() {
             data: { year: years[selected] },
             success: res => {
                 console.log('getStatistic', res);
-                dispatch(patient_total({ ...res.result, event: undefined } as Statistic));
+                setStat({ ...res.result, event: undefined } as Statistic);
             },
             fail: console.error,
         });
@@ -55,7 +84,7 @@ export default function Result() {
                 year: years[selected],
             },
             success(res) {
-                console.log("groupby", res);
+                console.log('groupby', res);
                 const {
                     nutrientGroup,
                     groupNutrientGroup,
@@ -66,12 +95,13 @@ export default function Result() {
                 } = res.result;
 
                 const _map = new Map();
+                // 收集病例名称集合，还是放入_map中
                 const tmpGroup: Array<string> = [];
                 (diseaseGroup as any).forEach(({ _id, num }) => {
                     _map.set(selector[_id], num);
                     tmpGroup.push(selector[_id]);
                 });
-                setItems(tmpGroup);
+                _map.set('items', tmpGroup);
 
                 (groupDiseaseGroup as any).forEach(({ _id, num }) => {
                     _map.set('group:' + selector[_id], num);
@@ -118,7 +148,6 @@ export default function Result() {
                 </View>
             </Picker>
 
-
             <View style={{ margin: '5PX 0' }}>
                 <AtCard title="按完成情况">
                     <View className="at-row at-row__justify--center" style={{ color: '#6699FF' }}>
@@ -129,15 +158,15 @@ export default function Result() {
                     </View>
                     <View className="at-row at-row__justify--center">
                         <View className="at-col at-col-4">已达1周</View>
-                        <View className="at-col at-col-3">{`${patients.meWeekTotal}/${patients.meTotal}`}</View>
-                        <View className="at-col at-col-3">{`${patients.groupWeekTotal}/${patients.groupTotal}`}</View>
-                        <View className="at-col at-col-2">{`${patients.weekTotal}/${patients.total}`}</View>
+                        <View className="at-col at-col-3">{`${stat.meWeekTotal}/${stat.meTotal}`}</View>
+                        <View className="at-col at-col-3">{`${stat.groupWeekTotal}/${stat.groupTotal}`}</View>
+                        <View className="at-col at-col-2">{`${stat.weekTotal}/${stat.total}`}</View>
                     </View>
                     <View className="at-row at-row__justify--center">
                         <View className="at-col at-col-4">已有结果</View>
-                        <View className="at-col at-col-3">{`${patients.meResultTotal}/${patients.meTotal}`}</View>
-                        <View className="at-col at-col-3">{`${patients.groupResultTotal}/${patients.groupTotal}`}</View>
-                        <View className="at-col at-col-2">{`${patients.resultTotal}/${patients.total}`}</View>
+                        <View className="at-col at-col-3">{`${stat.meResultTotal}/${stat.meTotal}`}</View>
+                        <View className="at-col at-col-3">{`${stat.groupResultTotal}/${stat.groupTotal}`}</View>
+                        <View className="at-col at-col-2">{`${stat.resultTotal}/${stat.total}`}</View>
                     </View>
                 </AtCard>
             </View>
@@ -164,9 +193,9 @@ export default function Result() {
                     </View>
                     <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
                         <View className="at-col at-col-4">总计</View>
-                        <View className="at-col at-col-3">{patients.meTotal}</View>
-                        <View className="at-col at-col-3">{patients.groupTotal}</View>
-                        <View className="at-col at-col-2">{patients.total}</View>
+                        <View className="at-col at-col-3">{stat.meTotal}</View>
+                        <View className="at-col at-col-3">{stat.groupTotal}</View>
+                        <View className="at-col at-col-2">{stat.total}</View>
                     </View>
                 </AtCard>
             </View>
@@ -178,7 +207,7 @@ export default function Result() {
                     <View className="at-col at-col-2">组内</View>
                     <View className="at-col at-col-1">全部</View>
                 </View>
-                {items.map(item => (
+                {(map.get('items') || []).map(item => (
                     <View className="at-row at-row__justify--center">
                         <View className="at-col at-col-7">{item}</View>
                         <View className="at-col at-col-2">{map.get('me:' + item) || 0}</View>
@@ -188,9 +217,9 @@ export default function Result() {
                 ))}
                 <View className="at-row at-row__justify--center" style={{ color: '#FF9900' }}>
                     <View className="at-col at-col-7">总计</View>
-                    <View className="at-col at-col-2">{patients.meTotal}</View>
-                    <View className="at-col at-col-2">{patients.groupTotal}</View>
-                    <View className="at-col at-col-1">{patients.total}</View>
+                    <View className="at-col at-col-2">{stat.meTotal}</View>
+                    <View className="at-col at-col-2">{stat.groupTotal}</View>
+                    <View className="at-col at-col-1">{stat.total}</View>
                 </View>
             </AtCard>
 

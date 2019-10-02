@@ -16,14 +16,8 @@ import { useDispatch, useSelector } from '@tarojs/redux';
 import dayjs from 'dayjs';
 
 import Loading from '../../components/Loading';
-import { IPatient, Statistic } from '../../reducers/patient';
-import {
-    deselect,
-    select,
-    patient_current,
-    patient_total,
-    patient_searchvalue,
-} from '../../actions/patient';
+import { IPatient } from '../../reducers/patient';
+import { deselect, select } from '../../actions/patient';
 import db from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
@@ -45,25 +39,15 @@ const options = [
     },
 ];
 
+const pageSize = 20;
+
 export default function List() {
     const dispatch = useDispatch();
-    const {
-        _openid,
-        is_super,
-        listType,
-        force_rerender,
-        pageSize,
-        currentPage,
-        searchValue,
-    } = useSelector((state: IReducers) => ({
+    const { _openid, listType, force_rerender } = useSelector((state: IReducers) => ({
         _openid: state.user._openid,
         authority: state.user.authority,
         listType: state.user.listType,
-        is_super: state.user.is_super,
         force_rerender: state.user.force_rerender,
-        pageSize: state.patients.pageSize,
-        currentPage: state.patients.currentPage,
-        searchValue: state.patients.searchValue,
     }));
 
     // 到底是数据库没下载，还是数据本身就是空
@@ -74,26 +58,14 @@ export default function List() {
         new Map()
     );
     const [searchText, setSearchText] = useState('');
-    const [searchUtil, setSearchUtil] = useState({ curr: 1, clicked: false });
-
-    // 在查询list时必须是全部数据，因为统计页面可能停留在某年，但查询必须修正过来
-    useEffect(() => {
-        Taro.cloud.callFunction({
-            name: 'getStatistic',
-            data: { year: '所有' },
-            success: res => {
-                console.log('getStatistic', res);
-                dispatch(patient_total(res.result as Statistic));
-            },
-            fail: console.error,
-        });
-    }, [force_rerender, currentPage, listType]);
+    const [currPage, setCurrPage] = useState<number>(1);
+    const [searchValue, setSearchValue] = useState('');
 
     useEffect(() => {
         console.log('fetch patients with searchValue', searchValue);
         Taro.cloud.callFunction({
             name: 'getPatients',
-            data: { offset: (currentPage - 1) * pageSize, size: pageSize, listType, searchValue },
+            data: { offset: (currPage - 1) * pageSize, size: pageSize, listType, searchValue },
             success: (res: any) => {
                 console.log('getPatients', res);
                 setPatients(res.result.found as Array<IPatient>);
@@ -102,19 +74,17 @@ export default function List() {
                 setLoaded(true);
             },
         });
-    }, [listType, searchValue, currentPage, _openid, force_rerender]);
+    }, [listType, searchValue, currPage, _openid, force_rerender]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 
-    const onSearch = () => {
-        dispatch(patient_searchvalue(searchText));
-    };
+    const onSearch = useCallback(() => setSearchValue(searchText), [searchText, setSearchValue]);
 
     const onChange = useCallback(
         (v: string) => {
             setSearchText(v);
             if (v === '') {
-                dispatch(patient_searchvalue(''));
+                setSearchValue('');
             }
         },
         [setSearchText]
@@ -122,11 +92,7 @@ export default function List() {
 
     const onPageChange = ({ type, current }) => {
         console.log('onPageChange', type, current);
-        if (!searchUtil.clicked) {
-            dispatch(patient_current(current));
-        } else {
-            setSearchUtil({ ...searchUtil, curr: current });
-        }
+        setCurrPage(current);
     };
 
     // 删除滑动控制
@@ -159,12 +125,6 @@ export default function List() {
             });
     };
 
-    const filtered = searchUtil.clicked
-        ? patients.slice((searchUtil.curr - 1) * pageSize, searchUtil.curr * pageSize)
-        : patients;
-
-    console.log('filtered', filtered);
-
     return (
         <View>
             <AtSearchBar
@@ -177,11 +137,11 @@ export default function List() {
             />
             {loaded === false ? (
                 <Loading />
-            ) : filtered.length === 0 ? (
+            ) : patients.length === 0 ? (
                 '目前数据为空'
             ) : (
                 <AtList>
-                    {filtered.map((item, index) => (
+                    {patients.map((item, index) => (
                         <AtSwipeAction
                             key={index}
                             onOpened={() => setOpenIndex(index)}
@@ -194,8 +154,10 @@ export default function List() {
                             <AtListItem
                                 title={`${index +
                                     1 +
-                                    ((searchUtil.clicked ? searchUtil.curr : currentPage) - 1) * // 依据是否点击search来确定currentPage
-                                        pageSize}: ${item.hospId}-${item.name}: ${pateintRecords.get(item._id) || 0}/${dayjs().diff(
+                                    (currPage - 1) * // 依据是否点击search来确定currentPage
+                                        pageSize}: ${item.hospId}-${
+                                    item.name
+                                }: ${pateintRecords.get(item._id) || 0}/${dayjs().diff(
                                     dayjs(item.enrolltime),
                                     'day'
                                 )}`}
@@ -223,7 +185,7 @@ export default function List() {
                 <AtPagination
                     total={total} // 需要设置是否按了搜索按钮
                     pageSize={pageSize}
-                    current={currentPage}
+                    current={currPage}
                     onPageChange={onPageChange}
                 />
             </View>
@@ -266,5 +228,5 @@ List.options = {
 };
 
 List.config = {
-    navigationBarTitleText: '病人列表',
+    navigationBarTitleText: '对象列表',
 };
