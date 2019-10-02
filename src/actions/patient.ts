@@ -1,4 +1,9 @@
-import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
+import {
+    PATIENT_INDEX,
+    PATIENT_TOTAL,
+    PATIENT_CURRENT,
+    PATIENT_SEARCHVALUE,
+} from '../constants/patient';
 import { IAction } from './base';
 import { Statistic } from '../reducers/patient';
 
@@ -37,5 +42,12 @@ export function patient_current(currentPage: number) {
     return {
         type: PATIENT_CURRENT,
         payload: { currentPage },
+    };
+}
+
+export function patient_searchvalue(searchValue: string) {
+    return {
+        type: PATIENT_SEARCHVALUE,
+        payload: { searchValue },
     };
 }

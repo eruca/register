@@ -1,6 +1,11 @@
 import dayjs from 'dayjs';
 
-import { PATIENT_INDEX, PATIENT_TOTAL, PATIENT_CURRENT } from '../constants/patient';
+import {
+    PATIENT_INDEX,
+    PATIENT_TOTAL,
+    PATIENT_CURRENT,
+    PATIENT_SEARCHVALUE,
+} from '../constants/patient';
 import { IAction } from '../actions/base';
 
 export interface IPatient {
@@ -78,6 +83,7 @@ export interface IPatientState extends Statistic {
 
     currentPage: number;
     pageSize: number;
+    searchValue: string;
 }
 
 const INIT_STATE: IPatientState = {
@@ -89,6 +95,7 @@ const INIT_STATE: IPatientState = {
 
     currentPage: 1,
     pageSize: 20, // 20
+    searchValue: '',
 
     total: 0,
     groupTotal: 0,
@@ -125,6 +132,12 @@ export default function patients(state = INIT_STATE, action: IAction): IPatientS
             return {
                 ...state,
                 currentPage: action.payload.currentPage,
+            };
+
+        case PATIENT_SEARCHVALUE:
+            return {
+                ...state,
+                searchValue: action.payload.searchValue,
             };
 
         default:

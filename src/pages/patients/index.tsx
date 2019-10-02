@@ -17,7 +17,13 @@ import dayjs from 'dayjs';
 
 import Loading from '../../components/Loading';
 import { IPatient, Statistic } from '../../reducers/patient';
-import { deselect, select, patient_current, patient_total } from '../../actions/patient';
+import {
+    deselect,
+    select,
+    patient_current,
+    patient_total,
+    patient_searchvalue,
+} from '../../actions/patient';
 import db from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
@@ -46,23 +52,27 @@ export default function List() {
         is_super,
         listType,
         force_rerender,
-        mytotal,
         pageSize,
         currentPage,
+        searchValue,
     } = useSelector((state: IReducers) => ({
         _openid: state.user._openid,
         authority: state.user.authority,
         listType: state.user.listType,
         is_super: state.user.is_super,
         force_rerender: state.user.force_rerender,
-        mytotal: state.patients.meTotal,
         pageSize: state.patients.pageSize,
         currentPage: state.patients.currentPage,
+        searchValue: state.patients.searchValue,
     }));
 
     // 到底是数据库没下载，还是数据本身就是空
     const [loaded, setLoaded] = useState<boolean>(false);
+    const [total, setTotal] = useState<number>(0);
     const [patients, setPatients] = useState<Array<IPatient>>([]);
+    const [pateintRecords, setPatientRecords] = useState<Map<string | undefined, number>>(
+        new Map()
+    );
     const [searchText, setSearchText] = useState('');
     const [searchUtil, setSearchUtil] = useState({ curr: 1, clicked: false });
 
@@ -80,47 +90,31 @@ export default function List() {
     }, [force_rerender, currentPage, listType]);
 
     useEffect(() => {
-        // 如果是搜索，就直接使用onSearch找到所有数据
-        if (!searchUtil.clicked) {
-            console.log('fetch patients list');
-            Taro.cloud.callFunction({
-                name: 'getPatients',
-                data: { offset: (currentPage - 1) * pageSize, size: pageSize, listType },
-                success: (res: any) => {
-                    console.log('getPatients', res);
-                    setPatients(res.result.found as Array<IPatient>);
-                    setLoaded(true);
-                },
-            });
-        }
-    }, [searchUtil.clicked, force_rerender, setPatients, _openid, currentPage, pageSize, listType]);
+        console.log('fetch patients with searchValue', searchValue);
+        Taro.cloud.callFunction({
+            name: 'getPatients',
+            data: { offset: (currentPage - 1) * pageSize, size: pageSize, listType, searchValue },
+            success: (res: any) => {
+                console.log('getPatients', res);
+                setPatients(res.result.found as Array<IPatient>);
+                setTotal(res.result.total as number);
+                setPatientRecords(new Map(res.result.list.map(({ _id, num }) => [_id, num])));
+                setLoaded(true);
+            },
+        });
+    }, [listType, searchValue, currentPage, _openid, force_rerender]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 
-    // todo : 需要在全局搜索
     const onSearch = () => {
-        if (searchText !== '') {
-            Taro.cloud.callFunction({
-                name: 'onSearch',
-                data: {
-                    searchText: !is_super && searchText.substring(0, 3) === 'r:+' ? '' : searchText,
-                },
-                success(res) {
-                    console.log('e', (res.result as any).event, 'found', (res.result as any).found);
-                    // 按了搜索之后
-                    setSearchUtil({ ...searchUtil, clicked: true });
-                    setPatients((res.result as any).found as Array<IPatient>);
-                },
-                fail: console.error,
-            });
-        }
+        dispatch(patient_searchvalue(searchText));
     };
 
     const onChange = useCallback(
         (v: string) => {
             setSearchText(v);
             if (v === '') {
-                setSearchUtil({ ...searchUtil, clicked: false });
+                dispatch(patient_searchvalue(''));
             }
         },
         [setSearchText]
@@ -177,7 +171,7 @@ export default function List() {
                 showActionButton
                 actionName="搜索"
                 value={searchText}
-                placeholder="输入病案号+姓名/r:0"
+                placeholder="姓名"
                 onChange={onChange}
                 onActionClick={onSearch}
             />
@@ -195,15 +189,16 @@ export default function List() {
                             options={options}
                             onClick={onActionClick}
                             onClosed={onClosed}
+                            disabled={item._openid !== _openid}
                         >
                             <AtListItem
                                 title={`${index +
                                     1 +
                                     ((searchUtil.clicked ? searchUtil.curr : currentPage) - 1) * // 依据是否点击search来确定currentPage
-                                        pageSize}: ${item.hospId}-${item.name}: ${dayjs().diff(
+                                        pageSize}: ${item.hospId}-${item.name}: ${pateintRecords.get(item._id) || 0}/${dayjs().diff(
                                     dayjs(item.enrolltime),
                                     'day'
-                                )}天`}
+                                )}`}
                                 extraText={`${item.stayoficu ? '✔️' : ''}`}
                                 onClick={() => {
                                     dispatch(
@@ -226,9 +221,9 @@ export default function List() {
             )}
             <View style="margin:20rpx 0">
                 <AtPagination
-                    total={!searchUtil.clicked ? mytotal : patients.length} // 需要设置是否按了搜索按钮
+                    total={total} // 需要设置是否按了搜索按钮
                     pageSize={pageSize}
-                    current={!searchUtil.clicked ? currentPage : searchUtil.curr}
+                    current={currentPage}
                     onPageChange={onPageChange}
                 />
             </View>
