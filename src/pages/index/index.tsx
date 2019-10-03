@@ -1,11 +1,22 @@
-import Taro from '@tarojs/taro';
-import { View, Picker } from '@tarojs/components';
-import { AtList, AtListItem } from 'taro-ui';
+import Taro, { useCallback, useState } from '@tarojs/taro';
+import { View, Picker, Text, Button } from '@tarojs/components';
+import {
+    AtList,
+    AtListItem,
+    AtForm,
+    AtInput,
+    AtModal,
+    AtModalHeader,
+    AtMessage,
+    AtModalContent,
+    AtModalAction,
+    AtButton,
+} from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 
 import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
-import { Authority } from '../../reducers/user';
+import { isRoot, isUnknown, IUserState } from '../../reducers/user';
 import { userSync, syncHospDeptCocodes } from '../../actions/user';
 import { usersCollection } from '../../utils/db';
 import FormField from '../../components/FormField';
@@ -30,14 +41,44 @@ export default function Index() {
         });
     };
 
-    const onChange = e => {
-        dispatch(
-            syncHospDeptCocodes(user.hosp, user.dept, user.cocodes, parseInt(e.detail.value, 10))
-        );
+    const [isOpen, setOpen] = useState(false);
+    const [inviteCodeSender, setInviteCodeSender] = useState('');
+    const [inviteCode, setInviteCode] = useState('');
+
+    const onModalClick = () => {
+        Taro.cloud.callFunction({
+            name: 'onAuth',
+            data: { invitor: inviteCodeSender, code: inviteCode },
+            success: res => {
+                console.log('onAuth', res);
+                setOpen(false);
+
+                if (res.result.success === true) {
+                    Taro.cloud.callFunction({
+                        name: 'getContext',
+                        success(res) {
+                            console.log('getContext', res);
+                            dispatch(userSync((res.result as any)['record'] as IUserState));
+                        },
+                        fail: console.error,
+                    });
+                } else {
+                    Taro.atMessage({ message: res.result.error || '操作失败', type: 'error' });
+                }
+            },
+            fail: console.error,
+        });
+    };
+
+    const onModalClose = () => {
+        setOpen(false);
+        setInviteCodeSender('');
+        setInviteCode('');
     };
 
     return (
         <View>
+            <AtMessage />
             <Head {...user} cb={cb} />
             <View style={{ margin: '10PX' }}>
                 <AtList>
@@ -53,16 +94,61 @@ export default function Index() {
                     <View style={{ marginLeft: '-5PX' }}>
                         <Picker
                             mode="selector"
-                            range={listTypes.slice(0, user.authority === Authority.Root ? 3 : 2)}
+                            range={listTypes.slice(
+                                0,
+                                isUnknown(user.authority) ? 1 : isRoot(user.authority) ? 3 : 2
+                            )}
                             value={user.listType}
-                            onChange={onChange}
+                            onChange={useCallback(
+                                e => {
+                                    dispatch(
+                                        syncHospDeptCocodes(
+                                            user.hosp,
+                                            user.dept,
+                                            user.cocodes,
+                                            parseInt(e.detail.value, 10)
+                                        )
+                                    );
+                                },
+                                [syncHospDeptCocodes, user.hosp, user.dept, user.cocodes]
+                            )}
                         >
                             <FormField name="查看范围" value={listTypes[user.listType]} />
                         </Picker>
                     </View>
+                    {isUnknown(user.authority) && (
+                        <AtListItem title="申请加入" onClick={() => setOpen(true)} arrow="right" />
+                    )}
                     <AtListItem title="关于" note="微信号:nickwill" />
                 </AtList>
             </View>
+            {isUnknown(user.authority) && (
+                <AtModal isOpened={isOpen}>
+                    <AtModalHeader>
+                        <Text style="color:skyblue">申请加入</Text>
+                    </AtModalHeader>
+                    <AtModalContent>
+                        <AtInput
+                            name="inviteCodeSender"
+                            title="邀请者:"
+                            value={inviteCodeSender}
+                            type="number"
+                            onChange={v => setInviteCodeSender(v)}
+                        />
+                        <AtInput
+                            name="inviteCode"
+                            type="number"
+                            title="邀请码:"
+                            value={inviteCode}
+                            onChange={v => setInviteCode(v)}
+                        />
+                    </AtModalContent>
+                    <AtModalAction>
+                        <Button onClick={onModalClose}>取消</Button>{' '}
+                        <Button onClick={onModalClick}>确定</Button>
+                    </AtModalAction>
+                </AtModal>
+            )}
         </View>
     );
 }

@@ -7,6 +7,7 @@ import { AtForm, AtInput, AtSwitch, AtButton, AtMessage, AtIcon, AtFloatLayout }
 import { zeroRecord, IRecord } from '../../reducers/records';
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
+import { isCrew } from '../../reducers/user';
 import { nasalFeedTubeTypes, AGIs, convertToLocal, convertToIRecord, equal } from './config';
 import { validate } from './validator';
 import { recordsCollection } from '../../utils/db';
@@ -15,10 +16,11 @@ import EnteralNutritionTolerance from '../../components/EnteralNutritionToleranc
 
 export default function Form() {
     const dispatch = useDispatch();
-    const { record_id, patient_id, _openid, enrolltime, force_rerender } = useSelector(
+    const { record_id, patient_id, _openid, auth, enrolltime, force_rerender } = useSelector(
         (state: IReducers) => ({
             record_id: state.records.record_id,
             force_rerender: state.user.force_rerender,
+            auth: state.user.authority,
             _openid: state.user._openid,
             ...state.patients,
         })
@@ -29,9 +31,10 @@ export default function Form() {
 
     const [finalRecord, setFinalRecord] = useState(convertToLocal(zeroRecord(patient_id)));
     const [record, setRecord] = useState(convertToLocal(zeroRecord(patient_id)));
+
     useEffect(() => {
         console.log('ask for database: record_id:', record_id);
-        if (record_id) {
+        if (isCrew(auth) && record_id) {
             const promise = recordsCollection.doc(record_id).get();
             if (promise) {
                 promise.then(res => {
@@ -41,7 +44,7 @@ export default function Form() {
                 });
             }
         }
-    }, [record_id, setRecord, force_rerender]);
+    }, [record_id, auth, setRecord, force_rerender]);
     console.log(`${patient_id}. record`, record);
 
     const onSubmit = () => {
@@ -50,25 +53,28 @@ export default function Form() {
             Taro.atMessage({ message, type: 'error' });
             return;
         }
-        if (record_id === '') {
-            recordsCollection.add({
-                data: convertToIRecord(record),
-                success: function() {
-                    Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                    dispatch(forceRerender());
-                },
-                fail: console.error,
-            });
-        } else {
-            console.log('modify');
-            recordsCollection.doc(record_id).set({
-                data: convertToIRecord(record, false),
-                success: function() {
-                    Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                    dispatch(forceRerender());
-                },
-                fail: console.error,
-            });
+
+        if (isCrew(auth)) {
+            if (record_id === '') {
+                recordsCollection.add({
+                    data: convertToIRecord(record),
+                    success: function() {
+                        Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                        dispatch(forceRerender());
+                    },
+                    fail: console.error,
+                });
+            } else {
+                console.log('modify');
+                recordsCollection.doc(record_id).set({
+                    data: convertToIRecord(record, false),
+                    success: function() {
+                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                        dispatch(forceRerender());
+                    },
+                    fail: console.error,
+                });
+            }
         }
     };
 

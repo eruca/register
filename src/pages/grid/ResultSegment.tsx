@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
 import { IPatient, zeroPatient } from '../../reducers/patient';
+import { isCrew } from '../../reducers/user';
 import { forceRerender } from '../../actions/user';
 import { patientsCollection } from '../../utils/db';
 import { LocalPatient, convertToLocal, convertToPatient } from '../patient/config';
@@ -20,9 +21,10 @@ const selectors = [
 
 export default function ResultSegment() {
     const dispatch = useDispatch();
-    const { patient_id, user_openid, patient_openid, force_rerender } = useSelector(
+    const { patient_id, user_openid, patient_openid, auth, force_rerender } = useSelector(
         (state: IReducers) => ({
             patient_id: state.patients.patient_id,
+            auth: state.user.authority,
             user_openid: state.user._openid,
             patient_openid: state.patients._openid,
             force_rerender: state.user.force_rerender,
@@ -33,7 +35,7 @@ export default function ResultSegment() {
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
 
     useEffect(() => {
-        if (patient_id) {
+        if (isCrew(auth) && patient_id) {
             const promise = patientsCollection.doc(patient_id).get();
             if (promise) {
                 console.log('patient_id', patient_id);
@@ -43,7 +45,7 @@ export default function ResultSegment() {
                 });
             }
         }
-    }, [patient_id, force_rerender, setPatient, setFinalPatient]);
+    }, [patient_id, auth, force_rerender, setPatient, setFinalPatient]);
 
     console.log('patient_id', patient_id);
     console.table(patient);
@@ -62,15 +64,17 @@ export default function ResultSegment() {
             return;
         }
 
-        patientsCollection.doc(patient_id).set({
-            data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
-            success: function(res) {
-                console.log('result after change', res.data);
-                dispatch(forceRerender());
-                Taro.atMessage({ message: '更新结局成功', type: 'success' });
-            },
-            fail: console.error,
-        });
+        if (isCrew(auth)) {
+            patientsCollection.doc(patient_id).set({
+                data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
+                success: function(res) {
+                    console.log('result after change', res.data);
+                    dispatch(forceRerender());
+                    Taro.atMessage({ message: '更新结局成功', type: 'success' });
+                },
+                fail: console.error,
+            });
+        }
     };
 
     return (

@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
 import { deselect, select } from '../../actions/patient';
+import { isCrew } from '../../reducers/user';
 import db from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
@@ -44,12 +45,14 @@ const pageSize = 20;
 
 export default function List() {
     const dispatch = useDispatch();
-    const { _openid, listType, force_rerender } = useSelector((state: IReducers) => ({
-        _openid: state.user._openid,
-        authority: state.user.authority,
-        listType: state.user.listType,
-        force_rerender: state.user.force_rerender,
-    }));
+    const { _openid, listType, force_rerender, authority: auth } = useSelector(
+        (state: IReducers) => ({
+            _openid: state.user._openid,
+            authority: state.user.authority,
+            listType: state.user.listType,
+            force_rerender: state.user.force_rerender,
+        })
+    );
 
     // 到底是数据库没下载，还是数据本身就是空
     const [loaded, setLoaded] = useState<boolean>(false);
@@ -66,20 +69,22 @@ export default function List() {
     const [searchValue, setSearchValue] = useState('');
 
     useEffect(() => {
-        console.log('fetch patients with searchValue', searchValue);
-        Taro.cloud.callFunction({
-            name: 'getPatients',
-            data: { offset: (currPage - 1) * pageSize, size: pageSize, listType, searchValue },
-            success: (res: any) => {
-                console.log('getPatients', res);
-                setPatients(res.result.found as Array<IPatient>);
-                setTotal(res.result.total as number);
-                setPatientRecords(new Map(res.result.list.map(({ _id, num }) => [_id, num])));
-                setOffset(res.result.offset);
-                setLoaded(true);
-            },
-        });
-    }, [listType, searchValue, currPage, _openid, force_rerender]);
+        if (isCrew(auth)) {
+            console.log('fetch patients with searchValue', searchValue);
+            Taro.cloud.callFunction({
+                name: 'getPatients',
+                data: { offset: (currPage - 1) * pageSize, size: pageSize, listType, searchValue },
+                success: (res: any) => {
+                    console.log('getPatients', res);
+                    setPatients(res.result.found as Array<IPatient>);
+                    setTotal(res.result.total as number);
+                    setPatientRecords(new Map(res.result.list.map(({ _id, num }) => [_id, num])));
+                    setOffset(res.result.offset);
+                    setLoaded(true);
+                },
+            });
+        }
+    }, [listType, searchValue, auth, currPage, _openid, force_rerender]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 
@@ -118,17 +123,19 @@ export default function List() {
     };
     console.log('openIndex', openIndex);
     const onDelete = () => {
-        db.collection('patients')
-            .doc(patients[openIndex]._id || '')
-            .remove({
-                success: ({ stats }) => {
-                    console.log('e', stats);
-                    dispatch(forceRerender());
-                    onClosed();
-                    setModelOpened(false);
-                },
-                fail: console.error,
-            });
+        if (isCrew(auth)) {
+            db.collection('patients')
+                .doc(patients[openIndex]._id || '')
+                .remove({
+                    success: ({ stats }) => {
+                        console.log('e', stats);
+                        dispatch(forceRerender());
+                        onClosed();
+                        setModelOpened(false);
+                    },
+                    fail: console.error,
+                });
+        }
     };
 
     return (
@@ -142,7 +149,7 @@ export default function List() {
                 onChange={onChange}
                 onActionClick={onSearch}
             />
-            {loaded === false ? (
+            {isCrew(auth) && loaded === false ? (
                 <Loading />
             ) : patients.length === 0 ? (
                 '目前数据为空'

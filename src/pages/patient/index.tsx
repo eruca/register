@@ -10,6 +10,7 @@ import Loading from '../../components/Loading';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
 import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
+import { isCrew } from '../../reducers/user';
 import { forceRerender } from '../../actions/user';
 import { selector, LocalPatient, convertToLocal, convertToPatient, equal } from './config';
 import { validate } from './validator';
@@ -17,10 +18,11 @@ import './index.scss';
 
 export default function Patient() {
     const dispatch = useDispatch();
-    const { patient_id, _openid, force_rerender } = useSelector((state: IReducers) => ({
+    const { patient_id, _openid, auth, force_rerender } = useSelector((state: IReducers) => ({
         ...state.patients,
         _openid: state.user._openid,
         force_rerender: state.user.force_rerender,
+        auth: state.user.authority,
     }));
 
     // 作为从数据库下载下来的数据
@@ -31,7 +33,7 @@ export default function Patient() {
 
     // 如果patient_id已被选择，就从数据库获取该patient数据
     useEffect(() => {
-        if (patient_id !== '') {
+        if (isCrew(auth) && patient_id !== '') {
             const promise = patientsCollection.doc(patient_id).get();
             if (promise) {
                 promise.then(res => {
@@ -40,7 +42,7 @@ export default function Patient() {
                 });
             }
         }
-    }, [patient_id, force_rerender, setPatient, setFinalPatient]);
+    }, [patient_id, auth, force_rerender, setPatient, setFinalPatient]);
     console.log('patient =>', patient, 'patient_id', patient_id);
 
     const onSubmit = () => {
@@ -50,28 +52,30 @@ export default function Patient() {
             return;
         }
 
-        if (patient_id === '') {
-            patientsCollection.add({
-                data: convertToPatient(patient),
-                success: function() {
-                    Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                    // 添加成功，则再次从数据库获取统计信息
-                    dispatch(forceRerender());
-                    setTimeout(() => Taro.navigateBack(), 1000);
-                },
-                fail: console.error,
-            });
-        } else {
-            patientsCollection.doc(patient_id).set({
-                data: convertToPatient(patient, false),
-                success: function() {
-                    Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                    // 修改成功，则再次从数据库获取统计信息
-                    dispatch(forceRerender());
-                    setTimeout(() => Taro.navigateBack(), 1000);
-                },
-                fail: console.error,
-            });
+        if (isCrew(auth)) {
+            if (patient_id === '') {
+                patientsCollection.add({
+                    data: convertToPatient(patient),
+                    success: function() {
+                        Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                        // 添加成功，则再次从数据库获取统计信息
+                        dispatch(forceRerender());
+                        setTimeout(() => Taro.navigateBack(), 1000);
+                    },
+                    fail: console.error,
+                });
+            } else {
+                patientsCollection.doc(patient_id).set({
+                    data: convertToPatient(patient, false),
+                    success: function() {
+                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                        // 修改成功，则再次从数据库获取统计信息
+                        dispatch(forceRerender());
+                        setTimeout(() => Taro.navigateBack(), 1000);
+                    },
+                    fail: console.error,
+                });
+            }
         }
     };
 

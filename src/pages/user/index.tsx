@@ -1,12 +1,12 @@
-import Taro, { useState } from '@tarojs/taro';
+import Taro, { useState, useCallback, useEffect } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components';
 import { AtForm, AtInput, AtButton, AtMessage, AtTextarea } from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 
 import { IReducers } from '../../reducers';
-import { Authority } from '../../reducers/user';
+import { isAdmin, IUserState } from '../../reducers/user';
 import { usersCollection } from '../../utils/db';
-import { syncHospDeptCocodes, forceRerender } from '../../actions/user';
+import { syncHospDeptCocodes, userSync, forceRerender } from '../../actions/user';
 
 type EqualType = {
     hosp: string;
@@ -29,10 +29,22 @@ export default function User() {
         authority,
         invite_code, // 不可改变
         listType,
+        force_rerender,
     } = useSelector((state: IReducers) => state.user);
     const [dept, setDept] = useState(defaultDept);
     const [hosp, setHosp] = useState(defaultHosp);
     const [cocodes, setCocodes] = useState(defaultCocodes);
+
+    useEffect(() => {
+        Taro.cloud.callFunction({
+            name: 'getContext',
+            success(res) {
+                console.log('getContext', res);
+                dispatch(userSync((res.result as any)['record'] as IUserState));
+            },
+            fail: console.error,
+        });
+    }, [force_rerender]);
 
     const onSubmit = () => {
         console.log('dept', dept, 'hosp', hosp, 'cocodes', cocodes);
@@ -64,7 +76,7 @@ export default function User() {
                     value={dept}
                     onChange={(e: string) => setDept(e)}
                 />
-                {authority >= Authority.Crew && (
+                {isAdmin(authority) && (
                     <AtInput
                         title="邀请码:"
                         name="invite_code"
@@ -102,24 +114,31 @@ export default function User() {
                     </View>
                 </View>
 
-                <AtButton
-                    type="primary"
-                    formType="submit"
-                    disabled={equal(
-                        {
-                            hosp: defaultHosp,
-                            dept: defaultDept,
-                            cocodes: defaultCocodes,
-                        },
-                        {
-                            hosp,
-                            dept,
-                            cocodes,
-                        }
-                    )}
-                >
-                    修改
-                </AtButton>
+                <View style="margin:5PX 15PX">
+                    <AtButton
+                        type="primary"
+                        formType="submit"
+                        disabled={equal(
+                            {
+                                hosp: defaultHosp,
+                                dept: defaultDept,
+                                cocodes: defaultCocodes,
+                            },
+                            {
+                                hosp,
+                                dept,
+                                cocodes,
+                            }
+                        )}
+                    >
+                        修改
+                    </AtButton>
+                </View>
+                <View style="margin:5PX 15PX">
+                    <AtButton onClick={useCallback(() => dispatch(forceRerender()), [])}>
+                        更新
+                    </AtButton>
+                </View>
             </AtForm>
         </View>
     );

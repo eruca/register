@@ -6,14 +6,16 @@ import { AtButton, AtGrid, AtDivider } from 'taro-ui';
 
 import { selectRecord, deselectRecord } from '../../actions/records';
 import { IReducers } from '../../reducers';
+import { isCrew } from '../../reducers/user';
 import { recordsCollection } from '../../utils/db';
 import { IRecord } from '../../reducers/records';
 
 export default function RecordSegment() {
     const dispatch = useDispatch();
-    const { patient_id, _openid, user_openid, enrolltime, force_rerender } = useSelector(
+    const { patient_id, _openid, user_openid, enrolltime, auth,force_rerender } = useSelector(
         (state: IReducers) => ({
             ...state.patients,
+            auth: state.user.authority,
             user_openid: state.user._openid,
             force_rerender: state.user.force_rerender,
         })
@@ -25,13 +27,15 @@ export default function RecordSegment() {
 
     const [patientRecords, setPatientRecords] = useState<Array<IRecord>>([]);
     useEffect(() => {
-        console.log('ask for records, dependent one', force_rerender);
-        recordsCollection
-            .where({ patientid: patient_id })
-            .orderBy('recordtime', 'asc')
-            .get()
-            .then(res => setPatientRecords(res.data as Array<IRecord>));
-    }, [patient_id, setPatientRecords, force_rerender]);
+        if (isCrew(auth)) {
+            console.log('ask for records, dependent one', force_rerender);
+            recordsCollection
+                .where({ patientid: patient_id })
+                .orderBy('recordtime', 'asc')
+                .get()
+                .then(res => setPatientRecords(res.data as Array<IRecord>));
+        }
+    }, [patient_id, auth, setPatientRecords, force_rerender]);
 
     console.log('patientRecords ->', patientRecords);
     const gridValue =

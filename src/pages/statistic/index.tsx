@@ -6,6 +6,7 @@ import { AtCard, AtButton } from 'taro-ui';
 import { selector } from '../patient/config';
 import { forceRerender } from '../../actions/user';
 import { IReducers } from '../../reducers';
+import { isCrew } from '../../reducers/user';
 
 interface Statistic {
     total: number;
@@ -55,19 +56,24 @@ export default function Result() {
     const [stat, setStat] = useState<Statistic>(zeroStatistic());
 
     useEffect(() => {
-        Taro.cloud.callFunction({
-            name: 'getYears',
-            success(res) {
-                console.log('getYears', res);
-                const tmp = (res as any).result.years.list.map(year => year._id);
-                tmp.sort();
-                setYears([...origin, ...tmp]);
-            },
-            fail: console.error,
-        });
-    }, [setYears, user.force_rerender]);
+        if (isCrew(user.authority)) {
+            Taro.cloud.callFunction({
+                name: 'getYears',
+                success(res) {
+                    console.log('getYears', res);
+                    const tmp = (res as any).result.years.list.map(year => year._id);
+                    tmp.sort();
+                    setYears([...origin, ...tmp]);
+                },
+                fail: console.error,
+            });
+        }
+    }, [setYears, user.authority, user.force_rerender]);
 
     useEffect(() => {
+        if (!isCrew(user.authority)) {
+            return;
+        }
         Taro.cloud.callFunction({
             name: 'getStatistic',
             data: { year: years[selected] },
@@ -132,7 +138,7 @@ export default function Result() {
             },
             fail: console.error,
         });
-    }, [years[selected], user.force_rerender]);
+    }, [years[selected], user.authority, user.force_rerender]);
 
     console.log('selected', selected, years[selected]);
     return (

@@ -8,9 +8,26 @@ import {
 
 // Authority 代表权限系统
 export enum Authority {
+    Unknown,
     Crew,
     Admin,
     Root,
+}
+
+export function isUnknown(auth: Authority): boolean {
+    return auth === Authority.Unknown;
+}
+
+export function isCrew(auth: Authority): boolean {
+    return auth >= Authority.Crew;
+}
+
+export function isAdmin(auth: Authority): boolean {
+    return auth >= Authority.Admin;
+}
+
+export function isRoot(auth: Authority): boolean {
+    return auth >= Authority.Root;
 }
 
 export enum ListType {
