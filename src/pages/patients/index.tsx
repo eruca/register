@@ -11,6 +11,7 @@ import {
     AtModalAction,
     AtModalContent,
     AtModalHeader,
+    AtMessage,
 } from 'taro-ui';
 import { useDispatch, useSelector } from '@tarojs/redux';
 import dayjs from 'dayjs';
@@ -54,6 +55,9 @@ export default function List() {
     const [loaded, setLoaded] = useState<boolean>(false);
     const [total, setTotal] = useState<number>(0);
     const [patients, setPatients] = useState<Array<IPatient>>([]);
+    // 按下页，如果没有offset接收服务器返回，会提早改为下一页的序号
+    // 设置后，就会和返回的数据同步
+    const [offset, setOffset] = useState<number>(0);
     const [pateintRecords, setPatientRecords] = useState<Map<string | undefined, number>>(
         new Map()
     );
@@ -71,6 +75,7 @@ export default function List() {
                 setPatients(res.result.found as Array<IPatient>);
                 setTotal(res.result.total as number);
                 setPatientRecords(new Map(res.result.list.map(({ _id, num }) => [_id, num])));
+                setOffset(res.result.offset);
                 setLoaded(true);
             },
         });
@@ -93,6 +98,7 @@ export default function List() {
     const onPageChange = ({ type, current }) => {
         console.log('onPageChange', type, current);
         setCurrPage(current);
+        Taro.atMessage({ message: '准备下一页，请稍等', type: 'info', duration: 1000 });
     };
 
     // 删除滑动控制
@@ -127,6 +133,7 @@ export default function List() {
 
     return (
         <View>
+            <AtMessage />
             <AtSearchBar
                 showActionButton
                 actionName="搜索"
@@ -152,10 +159,7 @@ export default function List() {
                             disabled={item._openid !== _openid}
                         >
                             <AtListItem
-                                title={`${index +
-                                    1 +
-                                    (currPage - 1) * // 依据是否点击search来确定currentPage
-                                        pageSize}: ${item.hospId}-${
+                                title={`${index + 1 + offset}: ${item.hospId}-${
                                     item.name
                                 }: ${pateintRecords.get(item._id) || 0}/${dayjs().diff(
                                     dayjs(item.enrolltime),
