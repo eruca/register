@@ -76,7 +76,7 @@ const INIT_STATE: IUserState = {
     is_super: false,
     cocode: '',
     cocodes: '',
-    authority: Authority.Crew,
+    authority: Authority.Unknown,
     force_rerender: 0,
     listType: ListType.Mine,
 };

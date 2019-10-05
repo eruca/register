@@ -3,14 +3,12 @@ import { View, Picker, Text, Button } from '@tarojs/components';
 import {
     AtList,
     AtListItem,
-    AtForm,
     AtInput,
     AtModal,
     AtModalHeader,
     AtMessage,
     AtModalContent,
     AtModalAction,
-    AtButton,
 } from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 
@@ -45,13 +43,20 @@ export default function Index() {
     const [inviteCodeSender, setInviteCodeSender] = useState('');
     const [inviteCode, setInviteCode] = useState('');
 
-    const onModalClick = () => {
+    const onModalClick = useCallback(() => {
+        Taro.atMessage({ message: '正在申请加入, 请稍等...', type: 'info' });
+
         Taro.cloud.callFunction({
             name: 'onAuth',
-            data: { invitor: inviteCodeSender, code: inviteCode },
+            data: { invitor: inviteCodeSender, code: inviteCode, nickname: user.nickName },
             success: res => {
                 console.log('onAuth', res);
                 setOpen(false);
+                Taro.atMessage({
+                    message: '加入成功, 正在更新数据, 请稍等...',
+                    type: 'success',
+                    duration: 1500,
+                });
 
                 if (res.result.success === true) {
                     Taro.cloud.callFunction({
@@ -68,13 +73,13 @@ export default function Index() {
             },
             fail: console.error,
         });
-    };
+    }, [inviteCode, inviteCodeSender, setOpen, dispatch, userSync]);
 
-    const onModalClose = () => {
+    const onModalClose = useCallback(() => {
         setOpen(false);
         setInviteCodeSender('');
         setInviteCode('');
-    };
+    }, [setOpen, setInviteCodeSender, setInviteCodeSender]);
 
     return (
         <View>
@@ -113,7 +118,7 @@ export default function Index() {
                                 [syncHospDeptCocodes, user.hosp, user.dept, user.cocodes]
                             )}
                         >
-                            <FormField name="查看范围" value={listTypes[user.listType]} />
+                            <FormField name="范围 " value={listTypes[user.listType]} />
                         </Picker>
                     </View>
                     {isUnknown(user.authority) && (
@@ -122,6 +127,7 @@ export default function Index() {
                     <AtListItem title="关于" note="微信号:nickwill" />
                 </AtList>
             </View>
+
             {isUnknown(user.authority) && (
                 <AtModal isOpened={isOpen}>
                     <AtModalHeader>
@@ -131,7 +137,9 @@ export default function Index() {
                         <AtInput
                             name="inviteCodeSender"
                             title="邀请者:"
+                            placeholder="邀请者协作码"
                             value={inviteCodeSender}
+                            clear
                             type="number"
                             onChange={v => setInviteCodeSender(v)}
                         />
@@ -139,6 +147,8 @@ export default function Index() {
                             name="inviteCode"
                             type="number"
                             title="邀请码:"
+                            placeholder="邀请者邀请码"
+                            clear
                             value={inviteCode}
                             onChange={v => setInviteCode(v)}
                         />

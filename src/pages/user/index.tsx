@@ -1,4 +1,4 @@
-import Taro, { useState, useCallback, useEffect } from '@tarojs/taro';
+import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components';
 import { AtForm, AtInput, AtButton, AtMessage, AtTextarea } from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
@@ -46,6 +46,23 @@ export default function User() {
         });
     }, [force_rerender]);
 
+    const ResetInviteCode = useCallback(() => {
+        if (authority >= 2) {
+            console.log('reset invite code');
+            usersCollection.doc(_id).get({
+                success(res) {
+                    console.log('Reset invite code', res);
+                    if ((res.data as IUserState).invite_code === invite_code) {
+                        Taro.atMessage({ message: '你的邀请码尚未更新', type: 'info' });
+                    } else {
+                        Taro.atMessage({ message: '更新邀请码成功', type: 'success' });
+                        dispatch(userSync(res.data as IUserState));
+                    }
+                },
+            });
+        }
+    }, [authority, _id, invite_code, userSync]);
+
     const onSubmit = () => {
         console.log('dept', dept, 'hosp', hosp, 'cocodes', cocodes);
         usersCollection.doc(_id).update({
@@ -76,6 +93,13 @@ export default function User() {
                     value={dept}
                     onChange={(e: string) => setDept(e)}
                 />
+                <AtInput
+                    title="协作码:"
+                    name="cocode"
+                    value={cocode ? cocode : '013236'}
+                    disabled={true}
+                    onChange={() => {}}
+                />
                 {isAdmin(authority) && (
                     <AtInput
                         title="邀请码:"
@@ -85,13 +109,6 @@ export default function User() {
                         onChange={() => {}}
                     />
                 )}
-                <AtInput
-                    title="协作码:"
-                    name="cocode"
-                    value={cocode ? cocode : '013236'}
-                    disabled={true}
-                    onChange={() => {}}
-                />
                 <View className="at-row" style={{ margin: '15PX 0 5PX 16PX' }}>
                     <View className="at-col">
                         协作人员:
@@ -134,11 +151,14 @@ export default function User() {
                         修改
                     </AtButton>
                 </View>
-                <View style="margin:5PX 15PX">
-                    <AtButton onClick={useCallback(() => dispatch(forceRerender()), [])}>
-                        更新
-                    </AtButton>
-                </View>
+
+                {isAdmin(authority) && (
+                    <View style="margin:5PX 15PX">
+                        <AtButton type="secondary" onClick={ResetInviteCode}>
+                            更新邀请码
+                        </AtButton>
+                    </View>
+                )}
             </AtForm>
         </View>
     );
