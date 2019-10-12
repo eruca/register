@@ -28,7 +28,6 @@ export default function User() {
         cocodes: defaultCocodes, // 可编辑
         authority,
         invite_code, // 不可改变
-        listType,
         force_rerender,
     } = useSelector((state: IReducers) => state.user);
     const [dept, setDept] = useState(defaultDept);
@@ -70,7 +69,7 @@ export default function User() {
             success(res) {
                 console.log('success', res);
                 Taro.atMessage({ message: '修改成功', type: 'success' });
-                dispatch(syncHospDeptCocodes(hosp, dept, cocodes, listType));
+                dispatch(syncHospDeptCocodes(hosp, dept, cocodes));
                 dispatch(forceRerender());
             },
             fail: console.error,

@@ -45,14 +45,14 @@ const pageSize = 20;
 
 export default function List() {
     const dispatch = useDispatch();
-    const { _openid, listType, force_rerender, authority: auth } = useSelector(
-        (state: IReducers) => ({
-            _openid: state.user._openid,
-            authority: state.user.authority,
-            listType: state.user.listType,
-            force_rerender: state.user.force_rerender,
-        })
-    );
+    const {
+        _openid,
+        listType,
+        timeOption,
+        resultOption,
+        force_rerender,
+        authority: auth,
+    } = useSelector((state: IReducers) => state.user);
 
     // 到底是数据库没下载，还是数据本身就是空
     const [loaded, setLoaded] = useState<boolean>(false);
@@ -73,7 +73,14 @@ export default function List() {
             console.log('fetch patients with searchValue', searchValue);
             Taro.cloud.callFunction({
                 name: 'getPatients',
-                data: { offset: (currPage - 1) * pageSize, size: pageSize, listType, searchValue },
+                data: {
+                    offset: (currPage - 1) * pageSize,
+                    size: pageSize,
+                    listType,
+                    searchValue,
+                    timeOption,
+                    resultOption,
+                },
                 success: (res: any) => {
                     console.log('getPatients', res);
                     setPatients(res.result.found as Array<IPatient>);
@@ -84,7 +91,7 @@ export default function List() {
                 },
             });
         }
-    }, [listType, searchValue, auth, currPage, _openid, force_rerender]);
+    }, [listType, timeOption, resultOption, searchValue, auth, currPage, _openid, force_rerender]);
 
     console.log('patients ->', patients, 'pageSize', pageSize);
 

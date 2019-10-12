@@ -1,5 +1,5 @@
 import Taro, { useCallback, useState } from '@tarojs/taro';
-import { View, Picker, Text, Button } from '@tarojs/components';
+import { View, Text, Button } from '@tarojs/components';
 import {
     AtList,
     AtListItem,
@@ -14,12 +14,9 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 
 import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
-import { isRoot, isUnknown, IUserState } from '../../reducers/user';
-import { userSync, syncHospDeptCocodes } from '../../actions/user';
+import { isUnknown, IUserState } from '../../reducers/user';
+import { userSync } from '../../actions/user';
 import { usersCollection } from '../../utils/db';
-import FormField from '../../components/FormField';
-
-const listTypes = ['我的', '本组', '所有'];
 
 export default function Index() {
     const dispatch = useDispatch();
@@ -88,7 +85,7 @@ export default function Index() {
             <View style={{ margin: '10PX' }}>
                 <AtList>
                     <AtListItem
-                        title="修改个人信息"
+                        title="个人信息"
                         arrow="right"
                         onClick={() =>
                             Taro.navigateTo({
@@ -96,35 +93,15 @@ export default function Index() {
                             })
                         }
                     />
-                    <View style={{ marginLeft: '-5PX' }}>
-                        <Picker
-                            mode="selector"
-                            range={listTypes.slice(
-                                0,
-                                isUnknown(user.authority) ? 1 : isRoot(user.authority) ? 3 : 2
-                            )}
-                            value={user.listType}
-                            onChange={useCallback(
-                                e => {
-                                    dispatch(
-                                        syncHospDeptCocodes(
-                                            user.hosp,
-                                            user.dept,
-                                            user.cocodes,
-                                            parseInt(e.detail.value, 10)
-                                        )
-                                    );
-                                },
-                                [syncHospDeptCocodes, user.hosp, user.dept, user.cocodes]
-                            )}
-                        >
-                            <FormField name="范围 " value={listTypes[user.listType]} />
-                        </Picker>
-                    </View>
+                    <AtListItem
+                        title="查看设置"
+                        arrow="right"
+                        onClick={() => Taro.navigateTo({ url: '/pages/viewset/index' })}
+                    />
                     {isUnknown(user.authority) && (
                         <AtListItem title="申请加入" onClick={() => setOpen(true)} arrow="right" />
                     )}
-                    <AtListItem title="关于" note="微信号:nickwill" />
+                    <AtListItem title="关于" note="微信号: nickwill" />
                 </AtList>
             </View>
 

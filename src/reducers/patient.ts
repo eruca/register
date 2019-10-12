@@ -58,7 +58,7 @@ export function zeroPatient(): IPatient {
 export interface IPatientState {
     patient_id: string;
     _openid: string;
-    hospId: string;
+    hospId: string; // 选择患者的信息，方便后面获取不用再调数据库
     name: string;
     enrolltime: string;
 }

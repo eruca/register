@@ -4,6 +4,7 @@ import {
     USER_OPENID,
     USER_HOSP_DEPT_COCODES,
     USER_FORCE_RERENDER,
+    USER_SYNC_VIEWSET,
 } from '../constants/user';
 
 // Authority 代表权限系统
@@ -59,6 +60,8 @@ export interface IUser {
 export interface IUserState extends IUser {
     force_rerender: number;
     listType: ListType;
+    timeOption: number;
+    resultOption: number;
 }
 
 const INIT_STATE: IUserState = {
@@ -79,6 +82,8 @@ const INIT_STATE: IUserState = {
     authority: Authority.Unknown,
     force_rerender: 0,
     listType: ListType.Mine,
+    timeOption: 0,
+    resultOption: 0,
 };
 
 export default function user(state = INIT_STATE, action: IAction): IUserState {
@@ -95,6 +100,12 @@ export default function user(state = INIT_STATE, action: IAction): IUserState {
             };
 
         case USER_HOSP_DEPT_COCODES:
+            return {
+                ...state,
+                ...action.payload,
+            };
+
+        case USER_SYNC_VIEWSET:
             return {
                 ...state,
                 ...action.payload,

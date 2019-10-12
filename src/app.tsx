@@ -33,6 +33,7 @@ class App extends Component {
             'pages/patients/index',
             'pages/record/index',
             'pages/user/index',
+            'pages/viewset/index',
         ],
 
         tabBar: {
