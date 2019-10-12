@@ -30,7 +30,7 @@ const config: Map<string, ConfigType> = [
     {
         key: 'serumTransferrin',
         message: '转铁蛋白0-10',
-        validator: validateNumber(v => v > 0 && v <= 10),
+        validator: validateNumber(v => v === -1 || (v > 0 && v <= 10)),
     },
     {
         key: 'lymphocyteCount',
