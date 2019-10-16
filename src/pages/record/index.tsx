@@ -199,7 +199,7 @@ export default function Form() {
                 <AtInput
                     name="serumTransfferin"
                     title="转铁蛋白(g):"
-                    placeholder="30-60"
+                    placeholder="1-10"
                     type="digit"
                     value={
                         record.serumTransferrin === '0' && record_id === ''
@@ -214,7 +214,7 @@ export default function Form() {
                 <AtInput
                     name="lymphocyteCount"
                     title="淋巴细胞计数(10^9/L):"
-                    placeholder="0-100"
+                    placeholder="0.8-4"
                     type="digit"
                     value={
                         record.lymphocyteCount === '0' && record_id === ''
@@ -229,7 +229,7 @@ export default function Form() {
                 <AtInput
                     name="hemoglobin"
                     title="血红蛋白(g/l):"
-                    placeholder="90-200"
+                    placeholder="90-160"
                     type="number"
                     value={record.hemoglobin === '0' && record_id === '' ? '' : record.hemoglobin}
                     onChange={useCallback(v => setRecord({ ...record, hemoglobin: v as string }), [
