@@ -1,10 +1,11 @@
 import { IAction } from '../actions/base';
 import {
     USER_SYNC,
-    USER_OPENID,
+    // USER_OPENID,
     USER_HOSP_DEPT_COCODES,
     USER_FORCE_RERENDER,
     USER_SYNC_VIEWSET,
+    USER_CONNECT_RESULT,
 } from '../constants/user';
 
 // Authority 代表权限系统
@@ -62,6 +63,7 @@ export interface IUserState extends IUser {
     listType: ListType;
     timeOption: number;
     resultOption: number;
+    first_connected_result: number; // 0代表未建立，1代表获取用户成功2.代表没有该用户
 }
 
 const INIT_STATE: IUserState = {
@@ -84,6 +86,7 @@ const INIT_STATE: IUserState = {
     listType: ListType.Mine,
     timeOption: 0,
     resultOption: 0,
+    first_connected_result: 0,
 };
 
 export default function user(state = INIT_STATE, action: IAction): IUserState {
@@ -93,10 +96,10 @@ export default function user(state = INIT_STATE, action: IAction): IUserState {
                 ...state,
                 ...action.payload,
             };
-        case USER_OPENID:
+        case USER_CONNECT_RESULT:
             return {
                 ...state,
-                _openid: action.payload.openid,
+                first_connected_result: action.payload.first_connected_result,
             };
 
         case USER_HOSP_DEPT_COCODES:

@@ -1,4 +1,4 @@
-import Taro, { useCallback, useState } from '@tarojs/taro';
+import Taro, { useCallback, useState, useEffect } from '@tarojs/taro';
 import { View, Text, Button } from '@tarojs/components';
 import {
     AtList,
@@ -15,7 +15,7 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
 import { isUnknown, IUserState } from '../../reducers/user';
-import { userSync } from '../../actions/user';
+import { userSync, syncConnectResult } from '../../actions/user';
 import { usersCollection } from '../../utils/db';
 
 export default function Index() {
@@ -60,7 +60,10 @@ export default function Index() {
                         name: 'getContext',
                         success(res) {
                             console.log('getContext', res);
-                            dispatch(userSync((res.result as any)['record'] as IUserState));
+                            dispatch(syncConnectResult(res.result['result']));
+                            if (res.result.record) {
+                                dispatch(userSync((res.result as any)['record'] as IUserState));
+                            }
                         },
                         fail: console.error,
                     });
@@ -70,13 +73,22 @@ export default function Index() {
             },
             fail: console.error,
         });
-    }, [inviteCode, inviteCodeSender, setOpen, dispatch, userSync]);
+    }, [inviteCode, inviteCodeSender, setOpen]);
 
     const onModalClose = useCallback(() => {
         setOpen(false);
         setInviteCodeSender('');
         setInviteCode('');
     }, [setOpen, setInviteCodeSender, setInviteCodeSender]);
+
+    useEffect(() => {
+        if (user.first_connected_result === 0) {
+            Taro.atMessage({
+                message: '如果已授权，自动登录中，否则注意网络情况',
+                type: 'info',
+            });
+        }
+    }, []);
 
     return (
         <View>

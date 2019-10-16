@@ -1,9 +1,9 @@
 import {
     USER_SYNC,
-    USER_OPENID,
     USER_HOSP_DEPT_COCODES,
     USER_FORCE_RERENDER,
     USER_SYNC_VIEWSET,
+    USER_CONNECT_RESULT,
 } from '../constants/user';
 import { IAction } from './base';
 import { IUserState, ListType } from '../reducers/user';
@@ -15,10 +15,10 @@ export function userSync(user: IUserState): IAction {
     };
 }
 
-export function syncOpenid(openid: string): IAction {
+export function syncConnectResult(result: 1 | 2): IAction {
     return {
-        type: USER_OPENID,
-        payload: { openid },
+        type: USER_CONNECT_RESULT,
+        payload: { first_connected_result: result },
     };
 }
 

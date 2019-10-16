@@ -5,7 +5,7 @@ import { Provider } from '@tarojs/redux';
 import Index from './pages/index';
 import configStore from './store';
 import './app.scss';
-import { userSync } from './actions/user';
+import { userSync, syncConnectResult } from './actions/user';
 import { IUserState } from './reducers/user';
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -81,7 +81,10 @@ class App extends Component {
                 name: 'getContext',
                 success(res) {
                     console.log('getContext', res);
-                    store.dispatch(userSync((res.result as any)['record'] as IUserState));
+                    store.dispatch(syncConnectResult(res.result['result']));
+                    if (res.result.record) {
+                        store.dispatch(userSync((res.result as any)['record'] as IUserState));
+                    }
                 },
                 fail: console.error,
             });
