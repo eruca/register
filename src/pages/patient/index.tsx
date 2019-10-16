@@ -118,7 +118,7 @@ export default function Patient() {
                     name="age"
                     title="年龄(岁):"
                     type="number"
-                    placeholder="1-139"
+                    placeholder="16-139"
                     value={patient.age === '0' && patient_id === '' ? '' : patient.age}
                     onChange={useCallback(
                         (v: string) => setPatient({ ...patient, age: v ? v : '0' }),
