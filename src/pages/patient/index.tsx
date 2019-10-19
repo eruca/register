@@ -315,7 +315,7 @@ export default function Patient() {
             </AtForm>
             <AtFloatLayout
                 isOpened={!!floatLay}
-                title="营养风险筛查NRS2002"
+                title={floatLay === 1 ? '营养风险筛查NRS2002' : '耐受性评分'}
                 onClose={() => setFloatLay(0)}
             >
                 {floatLay === 1 && <NRS2002 />}
