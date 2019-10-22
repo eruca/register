@@ -84,12 +84,14 @@ export default function User() {
                     title="医院:"
                     name="hosp"
                     value={hosp}
+                    placeholder="你的医院"
                     onChange={(e: string) => setHosp(e)}
                 />
                 <AtInput
                     title="科室:"
                     name="dept"
                     value={dept}
+                    placeholder="你的科室"
                     onChange={(e: string) => setDept(e)}
                 />
                 <AtInput
