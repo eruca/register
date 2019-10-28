@@ -81,7 +81,7 @@ class App extends Component {
                 name: 'getContext',
                 success(res) {
                     console.log('getContext', res);
-                    store.dispatch(syncConnectResult(res.result['result']));
+                    store.dispatch(syncConnectResult(res.result['result'])); // result.result 代表first_connected_result
                     if (res.result.record) {
                         store.dispatch(userSync((res.result as any)['record'] as IUserState));
                     }

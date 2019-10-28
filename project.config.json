@@ -1,17 +1,17 @@
 {
-    "miniprogramRoot": "dist/",
-    "cloudfunctionRoot": "functions",
-    "projectname": "register",
-    "description": "register",
-    "appid": "wx32adfff16a79ffdc",
-    "setting": {
-        "urlCheck": true,
-        "es6": false,
-        "postcss": false,
-        "minified": false
-    },
-    "compileType": "miniprogram",
-    "simulatorType": "wechat",
-    "simulatorPluginLibVersion": {},
-    "condition": {}
+	"miniprogramRoot": "client/dist/",
+	"cloudfunctionRoot": "cloud/",
+	"projectname": "register",
+	"description": "register",
+	"appid": "wx32adfff16a79ffdc",
+	"setting": {
+		"urlCheck": true,
+		"es6": false,
+		"postcss": false,
+		"minified": false
+	},
+	"compileType": "miniprogram",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {}
 }

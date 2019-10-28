@@ -31,6 +31,7 @@ export default function Index() {
             data: es,
             success(e) {
                 console.log('success', e);
+                dispatch(syncConnectResult(1));
             },
             fail: console.error,
         });

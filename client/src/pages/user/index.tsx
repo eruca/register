@@ -97,7 +97,7 @@ export default function User() {
                 <AtInput
                     title="协作码:"
                     name="cocode"
-                    value={cocode ? cocode : '013236'}
+                    value={cocode ? cocode : ''}
                     disabled={true}
                     onChange={() => {}}
                 />
