@@ -1,7 +1,7 @@
 import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { useDispatch, useSelector } from '@tarojs/redux';
-import { AtCard, AtButton } from 'taro-ui';
+import { AtCard, AtButton, AtMessage } from 'taro-ui';
 
 import { selector } from '../patient/config';
 import { forceRerender } from '../../actions/user';
@@ -143,6 +143,7 @@ export default function Result() {
     console.log('selected', selected, years[selected]);
     return (
         <View>
+            <AtMessage />
             <Picker
                 mode="selector"
                 range={years}
@@ -232,7 +233,10 @@ export default function Result() {
             <View style={{ margin: '5PX 14PX' }}>
                 <AtButton
                     type="secondary"
-                    onClick={useCallback(() => dispatch(forceRerender()), [])}
+                    onClick={useCallback(() => {
+                        dispatch(forceRerender());
+                        Taro.atMessage({ message: '已刷新', type: 'success' });
+                    }, [])}
                 >
                     刷新
                 </AtButton>
