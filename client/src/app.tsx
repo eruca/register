@@ -34,6 +34,7 @@ class App extends Component {
             'pages/record/index',
             'pages/user/index',
             'pages/viewset/index',
+            'pages/assists/index',
         ],
 
         tabBar: {
@@ -49,6 +50,12 @@ class App extends Component {
                     text: '统计',
                     iconPath: './assets/summary.png',
                     selectedIconPath: './assets/summary_selected.png',
+                },
+                {
+                    pagePath: 'pages/assists/index',
+                    text: '工具箱',
+                    iconPath: './assets/assist.png',
+                    selectedIconPath: './assets/assist_selected.png',
                 },
                 {
                     pagePath: 'pages/index/index',
