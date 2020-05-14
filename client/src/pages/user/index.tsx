@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 
 import { IReducers } from '../../reducers';
 import { isAdmin, IUserState } from '../../reducers/user';
-import { usersCollection } from '../../utils/db';
 import { syncHospDeptCocodes, userSync, forceRerender } from '../../actions/user';
 
 type EqualType = {
@@ -48,32 +47,40 @@ export default function User() {
     const ResetInviteCode = useCallback(() => {
         if (authority >= 2) {
             console.log('reset invite code');
-            usersCollection.doc(_id).get({
-                success(res) {
-                    console.log('Reset invite code', res);
-                    if ((res.data as IUserState).invite_code === invite_code) {
-                        Taro.atMessage({ message: '你的邀请码尚未更新', type: 'info' });
-                    } else {
-                        Taro.atMessage({ message: '更新邀请码成功', type: 'success' });
-                        dispatch(userSync(res.data as IUserState));
-                    }
-                },
-            });
+            Taro.cloud
+                .database()
+                .collection('users')
+                .doc(_id)
+                .get({
+                    success(res) {
+                        console.log('Reset invite code', res);
+                        if ((res.data as IUserState).invite_code === invite_code) {
+                            Taro.atMessage({ message: '你的邀请码尚未更新', type: 'info' });
+                        } else {
+                            Taro.atMessage({ message: '更新邀请码成功', type: 'success' });
+                            dispatch(userSync(res.data as IUserState));
+                        }
+                    },
+                });
         }
     }, [authority, _id, invite_code, userSync]);
 
     const onSubmit = () => {
         console.log('dept', dept, 'hosp', hosp, 'cocodes', cocodes);
-        usersCollection.doc(_id).update({
-            data: { dept, hosp, cocodes },
-            success(res) {
-                console.log('success', res);
-                Taro.atMessage({ message: '修改成功', type: 'success' });
-                dispatch(syncHospDeptCocodes(hosp, dept, cocodes));
-                dispatch(forceRerender());
-            },
-            fail: console.error,
-        });
+        Taro.cloud
+            .database()
+            .collection('users')
+            .doc(_id)
+            .update({
+                data: { dept, hosp, cocodes },
+                success(res) {
+                    console.log('success', res);
+                    Taro.atMessage({ message: '修改成功', type: 'success' });
+                    dispatch(syncHospDeptCocodes(hosp, dept, cocodes));
+                    dispatch(forceRerender());
+                },
+                fail: console.error,
+            });
     };
 
     return (
@@ -114,7 +121,6 @@ export default function User() {
                     <View className="at-col">
                         协作人员:
                         <Text style={{ fontSize: '0.6em', color: '#CCCCCC' }}>
-                            {' '}
                             协作码#备注 以逗号分隔
                         </Text>
                     </View>
@@ -125,9 +131,7 @@ export default function User() {
                         <AtTextarea
                             value={cocodes}
                             placeholder="090909#张三,091111#李四"
-                            onChange={e => {
-                                setCocodes((e.target as any).value.replace(/，/, ','));
-                            }}
+                            onChange={(value) => setCocodes(value.replace(/，/, ','))}
                         />
                     </View>
                 </View>

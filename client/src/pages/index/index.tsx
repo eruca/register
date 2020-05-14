@@ -1,4 +1,4 @@
-import Taro, { useCallback, useState, useEffect } from '@tarojs/taro';
+import Taro, { useCallback, useState, useEffect, SetStateAction, Dispatch } from '@tarojs/taro';
 import { View, Text, Button } from '@tarojs/components';
 import {
     AtList,
@@ -16,6 +16,15 @@ import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
 import { isUnknown } from '../../reducers/user';
 import { onAuthSuccess } from '../../cloudfunc';
+
+// onChange 统一使用该函数
+const onChange = (fn: Dispatch<SetStateAction<string>>) => (v: number | string) => {
+    if (typeof v === 'number') {
+        fn(v.toString());
+    } else {
+        fn(v);
+    }
+};
 
 export default function Index() {
     const dispatch = useDispatch();
@@ -93,7 +102,7 @@ export default function Index() {
                             value={inviteCodeSender}
                             clear
                             type="number"
-                            onChange={(v) => setInviteCodeSender(v)}
+                            onChange={onChange(setInviteCodeSender)}
                         />
                         <AtInput
                             name="inviteCode"
@@ -102,7 +111,7 @@ export default function Index() {
                             placeholder="邀请者邀请码"
                             clear
                             value={inviteCode}
-                            onChange={(v) => setInviteCode(v)}
+                            onChange={onChange(setInviteCode)}
                         />
                     </AtModalContent>
                     <AtModalAction>
