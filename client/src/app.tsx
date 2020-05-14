@@ -5,8 +5,7 @@ import { Provider } from '@tarojs/redux';
 import Index from './pages/index';
 import configStore from './store';
 import './app.scss';
-import { userSync, syncConnectResult } from './actions/user';
-import { IUserState } from './reducers/user';
+import { getContextSuccess } from './cloudfunc';
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -86,13 +85,7 @@ class App extends Component {
             Taro.cloud.init({ traceUser: true });
             Taro.cloud.callFunction({
                 name: 'getContext',
-                success(res) {
-                    console.log('getContext', res);
-                    store.dispatch(syncConnectResult(res.result['result'])); // result.result 代表first_connected_result
-                    if (res.result.record) {
-                        store.dispatch(userSync((res.result as any)['record'] as IUserState));
-                    }
-                },
+                success: getContextSuccess(store.dispatch),
                 fail: console.error,
             });
         }

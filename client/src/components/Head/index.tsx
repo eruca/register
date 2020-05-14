@@ -1,20 +1,19 @@
 import Taro from '@tarojs/taro';
 import { View, Button } from '@tarojs/components';
 import { AtAvatar } from 'taro-ui';
-import { IUserState } from '../../reducers/user';
+import { useDispatch } from '@tarojs/redux';
 
-export interface IProps extends IUserState {
-    cb: (user: IUserState) => void;
-}
+import { IUserState } from '../../reducers/user';
+import { authorizeSuccess } from '../../cloudfunc';
 
 export default function Head({
     avatarUrl,
     nickName,
     hosp,
     dept,
-    cb,
     first_connected_result,
-}: IProps) {
+}: IUserState) {
+    const dispatch = useDispatch();
     return (
         <View style="margin:20rpx">
             <View style="display:flex;flex-direction:row">
@@ -32,7 +31,7 @@ export default function Head({
                         <Button
                             className="btn"
                             openType="getUserInfo"
-                            onGetUserInfo={e => cb(e.detail.userInfo as IUserState)}
+                            onGetUserInfo={authorizeSuccess(dispatch)}
                             type="primary"
                             lang="zh_CN"
                         >

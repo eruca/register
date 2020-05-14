@@ -14,28 +14,14 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 
 import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
-import { isUnknown, IUserState } from '../../reducers/user';
-import { userSync, syncConnectResult } from '../../actions/user';
-import { usersCollection } from '../../utils/db';
+import { isUnknown } from '../../reducers/user';
+import { onAuthSuccess } from '../../cloudfunc';
 
 export default function Index() {
     const dispatch = useDispatch();
     const { user } = useSelector((state: IReducers) => ({
         user: state.user,
     }));
-
-    const cb = es => {
-        console.log('cb =>', es);
-        dispatch(userSync(es));
-        usersCollection.add({
-            data: es,
-            success(e) {
-                console.log('success', e);
-                dispatch(syncConnectResult(1));
-            },
-            fail: console.error,
-        });
-    };
 
     const [isOpen, setOpen] = useState(false);
     const [inviteCodeSender, setInviteCodeSender] = useState('');
@@ -47,31 +33,7 @@ export default function Index() {
         Taro.cloud.callFunction({
             name: 'onAuth',
             data: { invitor: inviteCodeSender, code: inviteCode, nickname: user.nickName },
-            success: res => {
-                console.log('onAuth', res);
-                setOpen(false);
-                Taro.atMessage({
-                    message: '加入成功, 正在更新数据, 请稍等...',
-                    type: 'success',
-                    duration: 1500,
-                });
-
-                if (res.result.success === true) {
-                    Taro.cloud.callFunction({
-                        name: 'getContext',
-                        success(res) {
-                            console.log('getContext', res);
-                            dispatch(syncConnectResult(res.result['result']));
-                            if (res.result.record) {
-                                dispatch(userSync((res.result as any)['record'] as IUserState));
-                            }
-                        },
-                        fail: console.error,
-                    });
-                } else {
-                    Taro.atMessage({ message: res.result.error || '操作失败', type: 'error' });
-                }
-            },
+            success: onAuthSuccess(dispatch, setOpen),
             fail: console.error,
         });
     }, [inviteCode, inviteCodeSender, setOpen]);
@@ -94,7 +56,7 @@ export default function Index() {
     return (
         <View>
             <AtMessage />
-            <Head {...user} cb={cb} />
+            <Head {...user} />
             <View style={{ margin: '10PX' }}>
                 <AtList>
                     <AtListItem
@@ -131,7 +93,7 @@ export default function Index() {
                             value={inviteCodeSender}
                             clear
                             type="number"
-                            onChange={v => setInviteCodeSender(v)}
+                            onChange={(v) => setInviteCodeSender(v)}
                         />
                         <AtInput
                             name="inviteCode"
@@ -140,7 +102,7 @@ export default function Index() {
                             placeholder="邀请者邀请码"
                             clear
                             value={inviteCode}
-                            onChange={v => setInviteCode(v)}
+                            onChange={(v) => setInviteCode(v)}
                         />
                     </AtModalContent>
                     <AtModalAction>

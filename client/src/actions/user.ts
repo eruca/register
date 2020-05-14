@@ -15,6 +15,7 @@ export function userSync(user: IUserState): IAction {
     };
 }
 
+// result 1: 代表已存在的客户 2 代表 不存在
 export function syncConnectResult(result: 1 | 2): IAction {
     return {
         type: USER_CONNECT_RESULT,

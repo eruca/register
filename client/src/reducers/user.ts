@@ -54,7 +54,7 @@ export interface IUser {
 
     invite_code?: string; // 邀请码
     cocode: string; // 协作码
-    cocodes: string;
+    cocodes: string; // Todo 这个是什么用的？
     authority: Authority;
 }
 
@@ -82,11 +82,13 @@ const INIT_STATE: IUserState = {
     cocode: '',
     cocodes: '',
     authority: Authority.Unknown,
+    first_connected_result: 0,
+    // 以上会从getContext来填充
+
     force_rerender: 0,
     listType: ListType.Mine,
     timeOption: 0,
     resultOption: 0,
-    first_connected_result: 0,
 };
 
 export default function user(state = INIT_STATE, action: IAction): IUserState {
