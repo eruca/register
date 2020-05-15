@@ -10,7 +10,6 @@ import { IReducers } from '../../reducers';
 import { isCrew } from '../../reducers/user';
 import { nasalFeedTubeTypes, AGIs, convertToLocal, convertToIRecord, equal } from './config';
 import { validate } from './validator';
-import { recordsCollection } from '../../utils/db';
 import { forceRerender } from '../../actions/user';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
 
@@ -35,14 +34,17 @@ export default function Form() {
     useEffect(() => {
         console.log('ask for database: record_id:', record_id);
         if (isCrew(auth) && record_id) {
-            const promise = recordsCollection.doc(record_id).get();
-            if (promise) {
-                promise.then(res => {
-                    console.log('get data from database', res.data);
-                    setRecord(convertToLocal(res.data as IRecord));
-                    setFinalRecord(convertToLocal(res.data as IRecord));
+            Taro.cloud
+                .database()
+                .collection('records')
+                .doc(record_id)
+                .get({
+                    success: (res) => {
+                        console.log('get data from database', res.data);
+                        setRecord(convertToLocal(res.data as IRecord));
+                        setFinalRecord(convertToLocal(res.data as IRecord));
+                    },
                 });
-            }
         }
     }, [record_id, auth, setRecord, force_rerender]);
     console.log(`${patient_id}. record`, record);
@@ -56,24 +58,31 @@ export default function Form() {
 
         if (isCrew(auth)) {
             if (record_id === '') {
-                recordsCollection.add({
-                    data: convertToIRecord(record),
-                    success: function() {
-                        Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                        dispatch(forceRerender());
-                    },
-                    fail: console.error,
-                });
+                Taro.cloud
+                    .database()
+                    .collection('records')
+                    .add({
+                        data: convertToIRecord(record),
+                        success: function () {
+                            Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                            dispatch(forceRerender());
+                        },
+                        fail: console.error,
+                    });
             } else {
                 console.log('modify');
-                recordsCollection.doc(record_id).set({
-                    data: convertToIRecord(record, false),
-                    success: function() {
-                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                        dispatch(forceRerender());
-                    },
-                    fail: console.error,
-                });
+                Taro.cloud
+                    .database()
+                    .collection('records')
+                    .doc(record_id)
+                    .set({
+                        data: convertToIRecord(record, false),
+                        success: function () {
+                            Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                            dispatch(forceRerender());
+                        },
+                        fail: console.error,
+                    });
             }
         }
     };
@@ -88,7 +97,7 @@ export default function Form() {
                             mode="date"
                             value={record.recordtime}
                             onChange={useCallback(
-                                v => setRecord({ ...record, recordtime: v.detail.value }),
+                                (v) => setRecord({ ...record, recordtime: v.detail.value }),
                                 [record, setRecord]
                             )}
                         >
@@ -122,7 +131,7 @@ export default function Form() {
                     value={record.nasalFeedTubeType}
                     range={nasalFeedTubeTypes}
                     onChange={useCallback(
-                        v => setRecord({ ...record, nasalFeedTubeType: v.detail.value }),
+                        (v) => setRecord({ ...record, nasalFeedTubeType: v.detail.value }),
                         [record, setRecord]
                     )}
                 >
@@ -170,7 +179,7 @@ export default function Form() {
                         record.totalProtein === '0' && record_id === '' ? '' : record.totalProtein
                     }
                     onChange={useCallback(
-                        v => setRecord({ ...record, totalProtein: v as string }),
+                        (v) => setRecord({ ...record, totalProtein: v as string }),
                         [record, setRecord]
                     )}
                 />
@@ -180,10 +189,10 @@ export default function Form() {
                     placeholder="170-420"
                     type="digit"
                     value={record.prealbumin === '0' && record_id === '' ? '' : record.prealbumin}
-                    onChange={useCallback(v => setRecord({ ...record, prealbumin: v as string }), [
-                        record,
-                        setRecord,
-                    ])}
+                    onChange={useCallback(
+                        (v) => setRecord({ ...record, prealbumin: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="albumin"
@@ -191,7 +200,7 @@ export default function Form() {
                     placeholder="30-50"
                     type="digit"
                     value={record.albumin === '0' && record_id === '' ? '' : record.albumin}
-                    onChange={useCallback(v => setRecord({ ...record, albumin: v as string }), [
+                    onChange={useCallback((v) => setRecord({ ...record, albumin: v as string }), [
                         record,
                         setRecord,
                     ])}
@@ -207,7 +216,7 @@ export default function Form() {
                             : record.serumTransferrin
                     }
                     onChange={useCallback(
-                        v => setRecord({ ...record, serumTransferrin: v as string }),
+                        (v) => setRecord({ ...record, serumTransferrin: v as string }),
                         [record, setRecord]
                     )}
                 />
@@ -222,7 +231,7 @@ export default function Form() {
                             : record.lymphocyteCount
                     }
                     onChange={useCallback(
-                        v => setRecord({ ...record, lymphocyteCount: v as string }),
+                        (v) => setRecord({ ...record, lymphocyteCount: v as string }),
                         [record, setRecord]
                     )}
                 />
@@ -232,10 +241,10 @@ export default function Form() {
                     placeholder="90-160"
                     type="number"
                     value={record.hemoglobin === '0' && record_id === '' ? '' : record.hemoglobin}
-                    onChange={useCallback(v => setRecord({ ...record, hemoglobin: v as string }), [
-                        record,
-                        setRecord,
-                    ])}
+                    onChange={useCallback(
+                        (v) => setRecord({ ...record, hemoglobin: v as string }),
+                        [record, setRecord]
+                    )}
                 />
                 <AtInput
                     name="fastingGlucose"
@@ -248,7 +257,7 @@ export default function Form() {
                             : record.fastingGlucose
                     }
                     onChange={useCallback(
-                        v => setRecord({ ...record, fastingGlucose: v as string }),
+                        (v) => setRecord({ ...record, fastingGlucose: v as string }),
                         [record, setRecord]
                     )}
                 />
@@ -263,7 +272,7 @@ export default function Form() {
                             : record.gastricRetention
                     }
                     onChange={useCallback(
-                        v => setRecord({ ...record, gastricRetention: v as string }),
+                        (v) => setRecord({ ...record, gastricRetention: v as string }),
                         [record, setRecord]
                     )}
                 />
@@ -278,14 +287,14 @@ export default function Form() {
                             : record.injectionOfAlbumin
                     }
                     onChange={useCallback(
-                        v => setRecord({ ...record, injectionOfAlbumin: v as string }),
+                        (v) => setRecord({ ...record, injectionOfAlbumin: v as string }),
                         [record, setRecord]
                     )}
                 />
                 <AtSwitch
                     title="误吸"
                     checked={record.misinhalation}
-                    onChange={useCallback(v => setRecord({ ...record, misinhalation: v }), [
+                    onChange={useCallback((v) => setRecord({ ...record, misinhalation: v }), [
                         record,
                         setRecord,
                     ])}
@@ -293,7 +302,7 @@ export default function Form() {
                 <AtSwitch
                     title="腹泻"
                     checked={record.diarrhea}
-                    onChange={useCallback(v => setRecord({ ...record, diarrhea: v }), [
+                    onChange={useCallback((v) => setRecord({ ...record, diarrhea: v }), [
                         record,
                         setRecord,
                     ])}
@@ -302,7 +311,7 @@ export default function Form() {
                     title="消化道出血"
                     checked={record.gastrointestinalHemorrhage}
                     onChange={useCallback(
-                        v => setRecord({ ...record, gastrointestinalHemorrhage: v }),
+                        (v) => setRecord({ ...record, gastrointestinalHemorrhage: v }),
                         [record, setRecord]
                     )}
                 />
@@ -310,10 +319,10 @@ export default function Form() {
                     mode="selector"
                     value={record.agiIndex}
                     range={AGIs}
-                    onChange={useCallback(v => setRecord({ ...record, agiIndex: v.detail.value }), [
-                        record,
-                        setRecord,
-                    ])}
+                    onChange={useCallback(
+                        (v) => setRecord({ ...record, agiIndex: v.detail.value }),
+                        [record, setRecord]
+                    )}
                 >
                     <FormField name="AGI 评级" value={AGIs[record.agiIndex]} />
                 </Picker>

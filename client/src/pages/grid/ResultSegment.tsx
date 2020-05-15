@@ -8,7 +8,6 @@ import { IReducers } from '../../reducers';
 import { IPatient, zeroPatient } from '../../reducers/patient';
 import { isCrew } from '../../reducers/user';
 import { forceRerender } from '../../actions/user';
-import { patientsCollection } from '../../utils/db';
 import { LocalPatient, convertToLocal, convertToPatient } from '../patient/config';
 import { validateResult } from './validator';
 
@@ -36,14 +35,17 @@ export default function ResultSegment() {
 
     useEffect(() => {
         if (isCrew(auth) && patient_id) {
-            const promise = patientsCollection.doc(patient_id).get();
-            if (promise) {
-                console.log('patient_id', patient_id);
-                promise.then(res => {
-                    setPatient(convertToLocal(res.data as IPatient));
-                    setFinalPatient(convertToLocal(res.data as IPatient));
+            Taro.cloud
+                .database()
+                .collection('patients')
+                .doc(patient_id)
+                .get({
+                    success: (res) => {
+                        setPatient(convertToLocal(res.data as IPatient));
+                        setFinalPatient(convertToLocal(res.data as IPatient));
+                    },
+                    fail:console.error
                 });
-            }
         }
     }, [patient_id, auth, force_rerender, setPatient, setFinalPatient]);
 
@@ -65,15 +67,19 @@ export default function ResultSegment() {
         }
 
         if (isCrew(auth)) {
-            patientsCollection.doc(patient_id).set({
-                data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
-                success: function(res) {
-                    console.log('result after change', res.data);
-                    dispatch(forceRerender());
-                    Taro.atMessage({ message: '更新结局成功', type: 'success' });
-                },
-                fail: console.error,
-            });
+            Taro.cloud
+                .database()
+                .collection('patients')
+                .doc(patient_id)
+                .set({
+                    data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
+                    success: function (res) {
+                        console.log('result after change', res);
+                        dispatch(forceRerender());
+                        Taro.atMessage({ message: '更新结局成功', type: 'success' });
+                    },
+                    fail: console.error,
+                });
         }
     };
 
@@ -110,7 +116,8 @@ export default function ResultSegment() {
                     range={selectors}
                     value={patient.resultIndex}
                     onChange={useCallback(
-                        e => setPatient({ ...patient, resultIndex: parseInt(e.detail.value, 10) }),
+                        (e) =>
+                            setPatient({ ...patient, resultIndex: parseInt(e.detail.value, 10) }),
                         [patient, setPatient]
                     )}
                     disabled={patient_openid !== user_openid}
@@ -120,7 +127,7 @@ export default function ResultSegment() {
                 <AtSwitch
                     title="出院时是否存活"
                     checked={patient.isAliveDischarge}
-                    onChange={useCallback(v => setPatient({ ...patient, isAliveDischarge: v }), [
+                    onChange={useCallback((v) => setPatient({ ...patient, isAliveDischarge: v }), [
                         setPatient,
                         patient,
                     ])}

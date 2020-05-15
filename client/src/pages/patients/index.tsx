@@ -4,7 +4,6 @@ import {
     AtList,
     AtListItem,
     AtSearchBar,
-    AtFab,
     AtPagination,
     AtSwipeAction,
     AtModal,
@@ -12,6 +11,7 @@ import {
     AtModalContent,
     AtModalHeader,
     AtMessage,
+    AtButton,
 } from 'taro-ui';
 import { useDispatch, useSelector } from '@tarojs/redux';
 import dayjs from 'dayjs';
@@ -20,7 +20,6 @@ import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
 import { deselect, select } from '../../actions/patient';
 import { isCrew } from '../../reducers/user';
-import db from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
 
@@ -118,7 +117,7 @@ export default function List() {
     const onClosed = () => setOpenIndex(-1);
 
     const [isModalOpened, setModelOpened] = useState<boolean>(false);
-    const onActionClick = e => {
+    const onActionClick = (e) => {
         switch (e.text) {
             case '取消':
                 onClosed();
@@ -131,7 +130,9 @@ export default function List() {
     console.log('openIndex', openIndex);
     const onDelete = () => {
         if (isCrew(auth)) {
-            db.collection('patients')
+            Taro.cloud
+                .database()
+                .collection('patients')
                 .doc(patients[openIndex]._id || '')
                 .remove({
                     success: ({ stats }) => {
@@ -148,68 +149,72 @@ export default function List() {
     return (
         <View>
             <AtMessage />
-            <AtSearchBar
-                showActionButton
-                actionName="搜索"
-                value={searchText}
-                placeholder="姓名"
-                onChange={onChange}
-                onActionClick={onSearch}
-            />
-            {isCrew(auth) && loaded === false ? (
-                <Loading />
-            ) : patients.length === 0 ? (
-                '目前数据为空'
-            ) : (
-                <AtList>
-                    {patients.map((item, index) => (
-                        <AtSwipeAction
-                            key={index}
-                            onOpened={() => setOpenIndex(index)}
-                            isOpened={openIndex === index}
-                            options={options}
-                            onClick={onActionClick}
-                            onClosed={onClosed}
-                            disabled={item._openid !== _openid}
-                        >
-                            <AtListItem
-                                title={`${index + 1 + offset}: ${item.hospId}-${
-                                    item.name
-                                }: ${pateintRecords.get(item._id) || 0}/${dayjs().diff(
-                                    dayjs(item.enrolltime),
-                                    'day'
-                                )}`}
-                                extraText={`${item.stayoficu ? '✔️' : ''}`}
-                                onClick={() => {
-                                    dispatch(
-                                        select(
-                                            item._id || '',
-                                            item._openid || '',
-                                            item.hospId,
-                                            item.name,
-                                            item.enrolltime
-                                        )
-                                    );
-                                    Taro.navigateTo({
-                                        url: `/pages/patient/index`,
-                                    });
-                                }}
-                            />
-                        </AtSwipeAction>
-                    ))}
-                </AtList>
-            )}
-            <View style="margin:20rpx 0">
-                <AtPagination
-                    total={total} // 需要设置是否按了搜索按钮
-                    pageSize={pageSize}
-                    current={currPage}
-                    onPageChange={onPageChange}
+            <View style="flex-grow:1">
+                <AtSearchBar
+                    showActionButton
+                    actionName="搜索"
+                    value={searchText}
+                    placeholder="姓名"
+                    onChange={onChange}
+                    onActionClick={onSearch}
                 />
+                {isCrew(auth) && loaded === false ? (
+                    <Loading />
+                ) : patients.length === 0 ? (
+                    '目前数据为空'
+                ) : (
+                    <AtList>
+                        {patients.map((item, index) => (
+                            <AtSwipeAction
+                                key={index}
+                                onOpened={() => setOpenIndex(index)}
+                                isOpened={openIndex === index}
+                                options={options}
+                                onClick={onActionClick}
+                                onClosed={onClosed}
+                                disabled={item._openid !== _openid}
+                            >
+                                <AtListItem
+                                    title={`${index + 1 + offset}: ${item.name}: ${
+                                        pateintRecords.get(item._id) || 0
+                                    }/${dayjs().diff(dayjs(item.enrolltime), 'day')}`}
+                                    extraText={`${item.stayoficu ? '✔️' : ''}`}
+                                    iconInfo={
+                                        item.stayoficu > 0
+                                            ? { size: 25, color: '#4DA167', value: 'check-circle' }
+                                            : { size: 25, color: '#D65108', value: 'edit' }
+                                    }
+                                    onClick={() => {
+                                        dispatch(
+                                            select(
+                                                item._id || '',
+                                                item._openid || '',
+                                                item.hospId,
+                                                item.name,
+                                                item.enrolltime
+                                            )
+                                        );
+                                        Taro.navigateTo({
+                                            url: `/pages/patient/index`,
+                                        });
+                                    }}
+                                />
+                            </AtSwipeAction>
+                        ))}
+                    </AtList>
+                )}
+                <View style="margin:20rpx 0">
+                    <AtPagination
+                        total={total} // 需要设置是否按了搜索按钮
+                        pageSize={pageSize}
+                        current={currPage}
+                        onPageChange={onPageChange}
+                    />
+                </View>
             </View>
-            <View className="fab-button-right">
-                <AtFab
-                    size="small"
+            <View style={{ margin: '5PX 14PX' }}>
+                <AtButton
+                    type="secondary"
                     onClick={useCallback(() => {
                         dispatch(deselect());
                         Taro.navigateTo({
@@ -217,8 +222,8 @@ export default function List() {
                         });
                     }, [dispatch])}
                 >
-                    <Text className="at-fab__icon at-icon at-icon-add" />
-                </AtFab>
+                    新增
+                </AtButton>
             </View>
             <AtModal isOpened={isModalOpened}>
                 <AtModalHeader>

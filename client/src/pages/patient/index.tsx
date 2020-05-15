@@ -8,7 +8,6 @@ import FormField from '../../components/FormField';
 import NRS2002 from '../../components/NRS2002';
 import Loading from '../../components/Loading';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
-import { patientsCollection } from '../../utils/db';
 import { IReducers } from '../../reducers';
 import { isCrew } from '../../reducers/user';
 import { forceRerender } from '../../actions/user';
@@ -34,13 +33,17 @@ export default function Patient() {
     // 如果patient_id已被选择，就从数据库获取该patient数据
     useEffect(() => {
         if (isCrew(auth) && patient_id !== '') {
-            const promise = patientsCollection.doc(patient_id).get();
-            if (promise) {
-                promise.then(res => {
-                    setPatient(convertToLocal(res.data as IPatient));
-                    setFinalPatient(convertToLocal(res.data as IPatient));
+            Taro.cloud
+                .database()
+                .collection('patients')
+                .doc(patient_id)
+                .get({
+                    success: (res) => {
+                        setPatient(convertToLocal(res.data as IPatient));
+                        setFinalPatient(convertToLocal(res.data as IPatient));
+                    },
+                    fail: console.error,
                 });
-            }
         }
     }, [patient_id, auth, force_rerender, setPatient, setFinalPatient]);
     console.log('patient =>', patient, 'patient_id', patient_id);
@@ -56,7 +59,7 @@ export default function Patient() {
             if (patient_id === '') {
                 patientsCollection.add({
                     data: convertToPatient(patient),
-                    success: function() {
+                    success: function () {
                         Taro.atMessage({ message: '添加记录成功', type: 'success' });
                         // 添加成功，则再次从数据库获取统计信息
                         dispatch(forceRerender());
@@ -67,7 +70,7 @@ export default function Patient() {
             } else {
                 patientsCollection.doc(patient_id).set({
                     data: convertToPatient(patient, false),
-                    success: function() {
+                    success: function () {
                         Taro.atMessage({ message: '修改记录成功', type: 'success' });
                         // 修改成功，则再次从数据库获取统计信息
                         dispatch(forceRerender());
@@ -109,7 +112,7 @@ export default function Patient() {
                 <AtSwitch
                     title={`性别(${patient.isMale ? '男' : '女'}): `}
                     checked={patient.isMale}
-                    onChange={useCallback(v => setPatient({ ...patient, isMale: v }), [
+                    onChange={useCallback((v) => setPatient({ ...patient, isMale: v }), [
                         patient,
                         setPatient,
                     ])}
@@ -140,7 +143,7 @@ export default function Patient() {
                     mode="date"
                     value={patient.admittime}
                     onChange={useCallback(
-                        e => setPatient({ ...patient, admittime: e.detail.value }),
+                        (e) => setPatient({ ...patient, admittime: e.detail.value }),
                         [patient, setPatient]
                     )}
                 >
@@ -150,7 +153,7 @@ export default function Patient() {
                     mode="date"
                     value={patient.enrolltime}
                     onChange={useCallback(
-                        e => setPatient({ ...patient, enrolltime: e.detail.value }),
+                        (e) => setPatient({ ...patient, enrolltime: e.detail.value }),
                         [patient, setPatient]
                     )}
                 >
@@ -183,7 +186,7 @@ export default function Patient() {
                     range={selector}
                     value={patient.diagnoseIndex}
                     onChange={useCallback(
-                        e =>
+                        (e) =>
                             setPatient({ ...patient, diagnoseIndex: parseInt(e.detail.value, 10) }),
                         [patient, setPatient]
                     )}
@@ -193,7 +196,7 @@ export default function Patient() {
                 <AtSwitch
                     title="需要升压药"
                     checked={patient.needVesopressor}
-                    onChange={useCallback(v => setPatient({ ...patient, needVesopressor: v }), [
+                    onChange={useCallback((v) => setPatient({ ...patient, needVesopressor: v }), [
                         patient,
                         setPatient,
                     ])}
@@ -201,7 +204,7 @@ export default function Patient() {
                 <AtSwitch
                     title="需要机械通气"
                     checked={patient.needVentilation}
-                    onChange={useCallback(v => setPatient({ ...patient, needVentilation: v }), [
+                    onChange={useCallback((v) => setPatient({ ...patient, needVentilation: v }), [
                         patient,
                         setPatient,
                     ])}
@@ -209,7 +212,7 @@ export default function Patient() {
                 <AtSwitch
                     title="使用短肽"
                     checked={patient.useSmallPeptide}
-                    onChange={useCallback(v => setPatient({ ...patient, useSmallPeptide: v }), [
+                    onChange={useCallback((v) => setPatient({ ...patient, useSmallPeptide: v }), [
                         patient,
                         setPatient,
                     ])}
