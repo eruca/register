@@ -50,6 +50,7 @@ export interface IUser {
     province: string;
     hosp: string;
     dept: string;
+    name: string;
     is_super: boolean;
 
     invite_code?: string; // 邀请码
@@ -75,6 +76,7 @@ const INIT_STATE: IUserState = {
     gender: 0,
     language: 'zh_CN',
     nickName: '',
+    name:'',
     province: '',
     hosp: '',
     dept: '',

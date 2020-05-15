@@ -9,11 +9,12 @@ import { authorizeSuccess } from '../../cloudfunc';
 export default function Head({
     avatarUrl,
     nickName,
-    hosp,
+    hosp = '',
     dept,
     first_connected_result,
 }: IUserState) {
     const dispatch = useDispatch();
+
     return (
         <View style="margin:20rpx">
             <View style="display:flex;flex-direction:row">
@@ -23,7 +24,7 @@ export default function Head({
                 <View style="width:100%;margin:auto;padding-left:20rpx;">
                     <View>{nickName}</View>
                     <View style="font-size:0.6em;color:#AAAAAA;">
-                        {hosp} - {dept}
+                        {hosp.split('-')[0]} - {dept}
                     </View>
                 </View>
                 {first_connected_result === 2 && (

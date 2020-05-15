@@ -30,10 +30,15 @@ export function syncViewSet(listType: ListType, timeOption: number, resultOption
     };
 }
 
-export function syncHospDeptCocodes(hosp: string, dept: string, cocodes: string): IAction {
+export function syncHospDeptCocodes(
+    name: string,
+    hosp: string,
+    dept: string,
+    cocodes: string
+): IAction {
     return {
         type: USER_HOSP_DEPT_COCODES,
-        payload: { hosp, dept, cocodes },
+        payload: { name, hosp, dept, cocodes },
     };
 }
 

@@ -8,13 +8,19 @@ import { isAdmin, IUserState } from '../../reducers/user';
 import { syncHospDeptCocodes, userSync, forceRerender } from '../../actions/user';
 
 type EqualType = {
+    name: string;
     hosp: string;
     dept: string;
     cocodes: string;
 };
 
 function equal(lhs: EqualType, rhs: EqualType): boolean {
-    return lhs.hosp === rhs.hosp && lhs.dept === rhs.dept && lhs.cocodes === rhs.cocodes;
+    return (
+        lhs.hosp === rhs.hosp &&
+        lhs.dept === rhs.dept &&
+        lhs.cocodes === rhs.cocodes &&
+        lhs.name === rhs.name
+    );
 }
 
 export default function User() {
@@ -23,6 +29,7 @@ export default function User() {
         _id,
         dept: defaultDept,
         hosp: defaultHosp,
+        name: defaultName,
         cocode, // 不可改变，只能从服务器获取
         cocodes: defaultCocodes, // 可编辑
         authority,
@@ -31,6 +38,7 @@ export default function User() {
     } = useSelector((state: IReducers) => state.user);
     const [dept, setDept] = useState(defaultDept);
     const [hosp, setHosp] = useState(defaultHosp);
+    const [name, setName] = useState(defaultName);
     const [cocodes, setCocodes] = useState(defaultCocodes);
 
     useEffect(() => {
@@ -72,11 +80,11 @@ export default function User() {
             .collection('users')
             .doc(_id)
             .update({
-                data: { dept, hosp, cocodes },
+                data: { dept, hosp, cocodes, name },
                 success(res) {
                     console.log('success', res);
                     Taro.atMessage({ message: '修改成功', type: 'success' });
-                    dispatch(syncHospDeptCocodes(hosp, dept, cocodes));
+                    dispatch(syncHospDeptCocodes(name, hosp, dept, cocodes));
                     dispatch(forceRerender());
                 },
                 fail: console.error,
@@ -100,6 +108,13 @@ export default function User() {
                     value={dept}
                     placeholder="你的科室"
                     onChange={(e: string) => setDept(e)}
+                />
+                <AtInput
+                    title="名字:"
+                    name="name"
+                    value={name}
+                    placeholder={'你的名字'}
+                    onChange={(e: string) => setName(e)}
                 />
                 <AtInput
                     title="协作码:"
@@ -142,11 +157,13 @@ export default function User() {
                         formType="submit"
                         disabled={equal(
                             {
+                                name: defaultName,
                                 hosp: defaultHosp,
                                 dept: defaultDept,
                                 cocodes: defaultCocodes,
                             },
                             {
+                                name,
                                 hosp,
                                 dept,
                                 cocodes,
