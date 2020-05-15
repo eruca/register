@@ -81,20 +81,25 @@ export default function List() {
                     timeOption,
                     resultOption,
                 },
-                success: (res: any) => {
-                    console.log('getPatients', res);
-                    setPatients(res.result.found as Array<IPatient>);
-                    setTotal(res.result.total as number);
-                    setPatientRecords(new Map(res.result.list.map(({ _id, num }) => [_id, num])));
+                success: ({ result, errMsg }: Taro.cloud.CallFunctionResult) => {
+                    console.log('getPatients', result, 'errMsg', errMsg);
+                    if (!result) {
+                        console.warn('getPatients 没有获取数据');
+                        return;
+                    }
+
+                    setPatients(result['found'] as Array<IPatient>);
+                    setTotal(result['total'] as number);
+                    setPatientRecords(new Map(result['list'].map(({ _id, num }) => [_id, num])));
                     setOpenidNames(
                         new Map(
-                            Object.keys(res['result']['openid_nicknames']).map((k) => [
+                            Object.keys(result['openid_nicknames']).map((k) => [
                                 k,
-                                res['result']['openid_nicknames'][k],
+                                result['openid_nicknames'][k],
                             ])
                         )
                     );
-                    setOffset(res.result.offset);
+                    setOffset(result['offset'] as number);
                     setLoaded(true);
                 },
             });
@@ -187,7 +192,13 @@ export default function List() {
                                     title={`${index + 1 + offset}: ${item.name}: ${
                                         pateintRecords.get(item._id) || 0
                                     }/${dayjs().diff(dayjs(item.enrolltime), 'day')}`}
-                                    extraText={openidNames.get(item._openid || '')}
+                                    extraText={
+                                        item._openid !== _openid
+                                            ? decorate_extratext(
+                                                  openidNames.get(item._openid || '')
+                                              )
+                                            : '我'
+                                    }
                                     iconInfo={
                                         item.stayoficu > 0
                                             ? { size: 25, color: '#4DA167', value: 'check-circle' }
@@ -262,3 +273,21 @@ List.options = {
 List.config = {
     navigationBarTitleText: '对象列表',
 };
+
+// 怎么把监视者的医院和名字显示出来，最多六个字符
+function decorate_extratext(line: string | undefined): string {
+    if (line === undefined) {
+        return '';
+    }
+    const [names, hosps] = line.split(',');
+    const [name1, name2] = names.split('-');
+    const name = name1 ? name1 : name2;
+    const parts = hosps.split('-');
+    if (parts.length === 1) {
+        if (hosps) {
+            return name + ':' + hosps;
+        }
+        return name;
+    }
+    return name + ':' + parts[1];
+}

@@ -133,23 +133,23 @@ exports.main = async (event, context) => {
             break;
     }
 
-    // 监督功能
+    // 监督功能，所有查询到文档的作者Set
     const set = new Set(result.found.map((it) => it._openid));
 
     const { data: cocodes_array } = await db.collection('cocodes').get();
     const map = new Map(); // _openid => cocode, cocode => invitor
-    const nicknameMap = new Map(); // cocode => nickname
+    const code_openid = new Map(); // cocode => _open_id
     cocodes_array.forEach((item) => {
         if (!map.get(item._openid)) {
             map.set(item._openid, item.cocode); // _openid => cocode的映射
-            nicknameMap.set(item.cocode, item.nickname); // cocode => nickname
+            code_openid.set(item.cocode, item._openid); // cocode => _open_id
         }
         if (item.invitor) {
             map.set(item.cocode, item.invitor); // cocode => invitor
         }
     });
 
-    const openid_nicknames = {};
+    const openid_openid = new Map();
     // 查询者的cocode
     const queryer_cocode = map.get(wxContext.OPENID);
 
@@ -159,12 +159,38 @@ exports.main = async (event, context) => {
             const tmpcode = map.get(_openid_cocode);
             // 如果_openid_cocode 没有就直接写作者名字，如果是查询者邀请者，就写他直接邀请的
             if (!tmpcode || tmpcode === queryer_cocode) {
-                openid_nicknames[_openid] = nicknameMap.get(_openid_cocode);
+                // openid_nicknames[_openid] = nicknameMap.get(_openid_cocode);
+                openid_openid.set(_openid, code_openid.get(_openid_cocode)); // 作者_openid 对于监督者 _openid
                 break;
             }
             _openid_cocode = tmpcode;
         }
     });
+
+    // 将监视者的_openid => user
+    const { data: supervisors } = await db
+        .collection('users')
+        .where({
+            _openid: _.in(Array.from(openid_openid.values())),
+        })
+        .get();
+
+    console.log('supervisors', supervisors);
+    // 监督者_openid => nickname[-name]
+    const supervisor_openid_name = supervisors.reduce((accu, curr) => {
+        accu.set(curr._openid, (curr.name || '') + '-' + curr.nickName + ',' + (curr.hosp || ''));
+        return accu;
+    }, new Map());
+
+    console.log('supervisor_openid_name', supervisor_openid_name);
+ 
+    const openid_nicknames = {};
+    for ([key, value] of openid_openid.entries()) {
+        console.log('key', key, 'value', value);
+        openid_nicknames[key] = supervisor_openid_name.get(value);
+    }
+
+    console.log('openid_nicknames', openid_nicknames);
 
     // 开始收集record数量
     const patient_ids = result.found.map((it) => it._id);
@@ -184,7 +210,7 @@ exports.main = async (event, context) => {
         list,
         ...result,
         offset,
-        openid_nicknames
+        openid_nicknames,
     };
 };
 
