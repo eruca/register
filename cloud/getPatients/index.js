@@ -32,44 +32,35 @@ exports.main = async (event, context) => {
                   }),
               };
 
-    let result;
+    let final_filter;
     switch (listType) {
         // 获取自己的数据
         case 0:
-            result = await getData(
-                col,
-                {
-                    _openid: wxContext.OPENID,
-                    ...filter,
-                    enrolltime:
-                        timeOption === 0
-                            ? undefined
-                            : timeOption === 2
-                            ? _.lt(deadline)
-                            : _.gte(deadline),
-                    stayoficu: resultOption === 0 ? undefined : resultOption === 1 ? 0 : _.gt(0),
-                },
-                offset,
-                size
-            );
+            final_filter = {
+                _openid: wxContext.OPENID,
+                ...filter,
+                enrolltime:
+                    timeOption === 0
+                        ? undefined
+                        : timeOption === 2
+                        ? _.lt(deadline)
+                        : _.gte(deadline),
+                stayoficu: resultOption === 0 ? undefined : resultOption === 1 ? 0 : _.gt(0),
+            };
             break;
         // 获取全部数据
         case 2:
-            result = await getData(
-                col,
-                {
-                    ...filter,
-                    enrolltime:
-                        timeOption === 0
-                            ? undefined
-                            : timeOption === 2
-                            ? _.lt(deadline)
-                            : _.gte(deadline),
-                    stayoficu: resultOption === 0 ? undefined : resultOption === 1 ? 0 : _.gt(0),
-                },
-                offset,
-                size
-            );
+            final_filter = {
+                ...filter,
+                enrolltime:
+                    timeOption === 0
+                        ? undefined
+                        : timeOption === 2
+                        ? _.lt(deadline)
+                        : _.gte(deadline),
+                stayoficu: resultOption === 0 ? undefined : resultOption === 1 ? 0 : _.gt(0),
+            };
+
             break;
 
         // 获取组内数据
@@ -82,7 +73,13 @@ exports.main = async (event, context) => {
                         _openid: wxContext.OPENID,
                     })
                     .get()) || {};
-            const { cocode, cocodes } = data[0];
+            const { cocodes } = data[0];
+
+            const { data: data1 } = await db
+                .collection('cocodes')
+                .where({ _openid: wxContext.OPENID })
+                .get();
+            const { cocode } = data1[0];
 
             // 获取所有的cocodes
             const groupCocodes = [cocode, ...cocodes.split(',').map((v) => v.trim().split('#')[0])];
@@ -90,7 +87,7 @@ exports.main = async (event, context) => {
 
             let skip = 0;
             let tmpSize = 100;
-            while (1) {
+            while (true) {
                 const result = await db
                     .collection('cocodes')
                     .where({
@@ -114,84 +111,24 @@ exports.main = async (event, context) => {
                 skip += tmpSize;
             }
 
-            result = await getData(
-                col,
-                {
-                    _openid: _.in(group_openid),
-                    ...filter,
-                    enrolltime:
-                        timeOption === 0
-                            ? undefined
-                            : timeOption === 2
-                            ? _.lt(deadline)
-                            : _.gte(deadline),
-                    stayoficu: resultOption === 0 ? undefined : resultOption === 1 ? 0 : _.gt(0),
-                },
-                offset,
-                size
-            );
+            final_filter = {
+                _openid: _.in(group_openid),
+                ...filter,
+                enrolltime:
+                    timeOption === 0
+                        ? undefined
+                        : timeOption === 2
+                        ? _.lt(deadline)
+                        : _.gte(deadline),
+                stayoficu: resultOption === 0 ? undefined : resultOption === 1 ? 0 : _.gt(0),
+            };
+
             break;
     }
 
-    // 监督功能，所有查询到文档的作者Set
-    const set = new Set(result.found.map((it) => it._openid));
+    const result = await getData(col, final_filter, offset, size);
 
-    const { data: cocodes_array } = await db.collection('cocodes').get();
-    const map = new Map(); // _openid => cocode, cocode => invitor
-    const code_openid = new Map(); // cocode => _open_id
-    cocodes_array.forEach((item) => {
-        if (!map.get(item._openid)) {
-            map.set(item._openid, item.cocode); // _openid => cocode的映射
-            code_openid.set(item.cocode, item._openid); // cocode => _open_id
-        }
-        if (item.invitor) {
-            map.set(item.cocode, item.invitor); // cocode => invitor
-        }
-    });
-
-    const openid_openid = new Map();
-    // 查询者的cocode
-    const queryer_cocode = map.get(wxContext.OPENID);
-
-    set.forEach((_openid) => {
-        let _openid_cocode = map.get(_openid);
-        while (true) {
-            const tmpcode = map.get(_openid_cocode);
-            // 如果_openid_cocode 没有就直接写作者名字，如果是查询者邀请者，就写他直接邀请的
-            if (!tmpcode || tmpcode === queryer_cocode) {
-                // openid_nicknames[_openid] = nicknameMap.get(_openid_cocode);
-                openid_openid.set(_openid, code_openid.get(_openid_cocode)); // 作者_openid 对于监督者 _openid
-                break;
-            }
-            _openid_cocode = tmpcode;
-        }
-    });
-
-    // 将监视者的_openid => user
-    const { data: supervisors } = await db
-        .collection('users')
-        .where({
-            _openid: _.in(Array.from(openid_openid.values())),
-        })
-        .get();
-
-    console.log('supervisors', supervisors);
-    // 监督者_openid => nickname[-name]
-    const supervisor_openid_name = supervisors.reduce((accu, curr) => {
-        accu.set(curr._openid, (curr.name || '') + '-' + curr.nickName + ',' + (curr.hosp || ''));
-        return accu;
-    }, new Map());
-
-    console.log('supervisor_openid_name', supervisor_openid_name);
- 
-    const openid_nicknames = {};
-    for ([key, value] of openid_openid.entries()) {
-        console.log('key', key, 'value', value);
-        openid_nicknames[key] = supervisor_openid_name.get(value);
-    }
-
-    console.log('openid_nicknames', openid_nicknames);
-
+    const openid_nicknames = await getSupervisorInfo(result.found, wxContext.OPENID);
     // 开始收集record数量
     const patient_ids = result.found.map((it) => it._id);
     console.log('patient_ids', patient_ids);
@@ -213,6 +150,83 @@ exports.main = async (event, context) => {
         openid_nicknames,
     };
 };
+
+async function getSupervisorInfo(found, OPENID) {
+    // 监督功能，所有查询到文档的作者Set
+    const set = new Set(found.map((it) => it._openid));
+
+    const map = new Map(); // _openid => cocode, cocode => invitor
+    const code_openid = new Map(); // cocode => _open_id
+
+    const { data: cocodes_array } = await db.collection('cocodes').get();
+    // 如果cocodes数据集为空，直接返回
+    if (cocodes_array.length === 0) {
+        return {};
+    }
+
+    cocodes_array.forEach((item) => {
+        if (!map.get(item._openid)) {
+            // 所有使用者的 _openid 与 cocode对应起来
+            map.set(item._openid, item.cocode);
+            // 所有使用者 cocode 与 _openid 对应起来
+            code_openid.set(item.cocode, item._openid);
+        }
+
+        if (item.invitor) {
+            // 如果存在邀请者，则将使用者 指向 邀请者
+            // 因为 cocode => '666666'
+            // _openid => 'xxxxxx',两者的key不一样，所以都放在map里
+            map.set(item.cocode, item.invitor);
+        }
+    });
+
+    const openid_openid = new Map();
+    // 查询者的cocode
+    const queryer_cocode = map.get(OPENID);
+
+    set.forEach((_openid) => {
+        // 将该记录的作者_openid拿过来找他的invitor,就是向上寻找他的邀请者
+        let _openid_cocode = map.get(_openid);
+        while (true) {
+            const tmpcode = map.get(_openid_cocode);
+            // 如果没有邀请者就直接写作者名字
+            // 如果有邀请者 == 自己，就写他直接邀请的
+            // 比如 我 (邀请)=> 1 => 2 => 3，如果3写了该记录，那么就会写1
+            if (!tmpcode || tmpcode === queryer_cocode) {
+                // 将该记录的作者 => 查询者最近邀请者的_openid
+                openid_openid.set(_openid, code_openid.get(_openid_cocode));
+                break;
+            }
+            _openid_cocode = tmpcode;
+        }
+    });
+
+    // 将监视者的_openid => user
+    const { data: supervisors } = await db
+        .collection('users')
+        .where({
+            _openid: _.in(Array.from(openid_openid.values())),
+        })
+        .get();
+
+    console.log('supervisors', supervisors);
+    // 监督者_openid => 名字 + 医院
+    const supervisor_openid_name = supervisors.reduce((accu, curr) => {
+        accu.set(curr._openid, (curr.name || '') + '-' + curr.nickName + ',' + (curr.hosp || ''));
+        return accu;
+    }, new Map());
+
+    console.log('supervisor_openid_name', supervisor_openid_name);
+
+    const openid_nicknames = {};
+    for (const [key, value] of openid_openid.entries()) {
+        openid_nicknames[key] = supervisor_openid_name.get(value);
+    }
+
+    console.log('openid_nicknames', openid_nicknames);
+
+    return openid_nicknames;
+}
 
 async function getData(col, filter, offset, size) {
     console.log('filter', filter, 'offset', offset, 'size', size);
