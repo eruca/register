@@ -69,3 +69,6 @@ export const onAuthSuccess = (
         Taro.atMessage({ message: errMsg || '操作失败', type: 'error' });
     }
 };
+
+
+// export const getPatientsSuccess = 

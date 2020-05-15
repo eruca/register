@@ -63,6 +63,7 @@ export default function List() {
     const [pateintRecords, setPatientRecords] = useState<Map<string | undefined, number>>(
         new Map()
     );
+    const [openidNames, setOpenidNames] = useState<Map<string, string>>(new Map());
     const [searchText, setSearchText] = useState('');
     const [currPage, setCurrPage] = useState<number>(1);
     const [searchValue, setSearchValue] = useState('');
@@ -85,6 +86,14 @@ export default function List() {
                     setPatients(res.result.found as Array<IPatient>);
                     setTotal(res.result.total as number);
                     setPatientRecords(new Map(res.result.list.map(({ _id, num }) => [_id, num])));
+                    setOpenidNames(
+                        new Map(
+                            Object.keys(res['result']['openid_nicknames']).map((k) => [
+                                k,
+                                res['result']['openid_nicknames'][k],
+                            ])
+                        )
+                    );
                     setOffset(res.result.offset);
                     setLoaded(true);
                 },
@@ -178,7 +187,7 @@ export default function List() {
                                     title={`${index + 1 + offset}: ${item.name}: ${
                                         pateintRecords.get(item._id) || 0
                                     }/${dayjs().diff(dayjs(item.enrolltime), 'day')}`}
-                                    extraText={`${item.stayoficu ? '✔️' : ''}`}
+                                    extraText={openidNames.get(item._openid || '')}
                                     iconInfo={
                                         item.stayoficu > 0
                                             ? { size: 25, color: '#4DA167', value: 'check-circle' }
