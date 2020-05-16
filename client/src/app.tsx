@@ -36,7 +36,8 @@ class App extends Component {
             'pages/assists/index',
             'pages/scores/gcs/index',
             'pages/scores/apache2/index',
-            'pages/scores/qsofa/index'
+            'pages/scores/qsofa/index',
+            'pages/scores/sofa/index',
         ],
 
         tabBar: {
