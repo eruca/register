@@ -131,7 +131,14 @@ export default function Form() {
                     value={record.nasalFeedTubeType}
                     range={nasalFeedTubeTypes}
                     onChange={useCallback(
-                        (v) => setRecord({ ...record, nasalFeedTubeType: v.detail.value }),
+                        (v) =>
+                            setRecord({
+                                ...record,
+                                nasalFeedTubeType:
+                                    typeof v.detail.value === 'number'
+                                        ? v.detail.value
+                                        : parseInt(v.detail.value, 10),
+                            }),
                         [record, setRecord]
                     )}
                 >
@@ -320,7 +327,14 @@ export default function Form() {
                     value={record.agiIndex}
                     range={AGIs}
                     onChange={useCallback(
-                        (v) => setRecord({ ...record, agiIndex: v.detail.value }),
+                        (v) =>
+                            setRecord({
+                                ...record,
+                                agiIndex:
+                                    typeof v.detail.value === 'number'
+                                        ? v.detail.value
+                                        : parseInt(v.detail.value, 10),
+                            }),
                         [record, setRecord]
                     )}
                 >

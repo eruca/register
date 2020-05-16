@@ -34,6 +34,8 @@ class App extends Component {
             'pages/user/index',
             'pages/viewset/index',
             'pages/assists/index',
+            'pages/scores/gcs/index',
+            'pages/scores/apache2/index',
         ],
 
         tabBar: {
