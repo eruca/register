@@ -32,13 +32,14 @@ export function syncViewSet(listType: ListType, timeOption: number, resultOption
 
 export function syncHospDeptCocodes(
     name: string,
+    mail: string,
     hosp: string,
     dept: string,
     cocodes: string
 ): IAction {
     return {
         type: USER_HOSP_DEPT_COCODES,
-        payload: { name, hosp, dept, cocodes },
+        payload: { name, mail, hosp, dept, cocodes },
     };
 }
 

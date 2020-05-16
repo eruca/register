@@ -52,6 +52,7 @@ export interface IUser {
     dept: string;
     name: string;
     is_super: boolean;
+    mail: string;
 
     invite_code?: string; // 邀请码
     cocode: string; // 协作码
@@ -76,7 +77,7 @@ const INIT_STATE: IUserState = {
     gender: 0,
     language: 'zh_CN',
     nickName: '',
-    name:'',
+    name: '',
     province: '',
     hosp: '',
     dept: '',
@@ -85,6 +86,7 @@ const INIT_STATE: IUserState = {
     cocodes: '',
     authority: Authority.Unknown,
     first_connected_result: 0,
+    mail:'',
     // 以上会从getContext来填充
 
     force_rerender: 0,

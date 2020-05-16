@@ -11,15 +11,22 @@ type EqualType = {
     name: string;
     hosp: string;
     dept: string;
+    mail: string;
     cocodes: string;
 };
 
-function equal(lhs: EqualType, rhs: EqualType): boolean {
+// email正则
+const mail_regexp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+
+// 禁止更新
+function disableUpdate(lhs: EqualType, rhs: EqualType): boolean {
     return (
-        lhs.hosp === rhs.hosp &&
-        lhs.dept === rhs.dept &&
-        lhs.cocodes === rhs.cocodes &&
-        lhs.name === rhs.name
+        (lhs.hosp === rhs.hosp &&
+            lhs.dept === rhs.dept &&
+            lhs.cocodes === rhs.cocodes &&
+            lhs.name === rhs.name &&
+            lhs.mail === rhs.mail) ||
+        !mail_regexp.test(rhs.mail)
     );
 }
 
@@ -30,6 +37,7 @@ export default function User() {
         dept: defaultDept,
         hosp: defaultHosp,
         name: defaultName,
+        mail: defaultMail,
         cocode, // 不可改变，只能从服务器获取
         cocodes: defaultCocodes, // 可编辑
         authority,
@@ -39,6 +47,7 @@ export default function User() {
     const [dept, setDept] = useState(defaultDept);
     const [hosp, setHosp] = useState(defaultHosp);
     const [name, setName] = useState(defaultName);
+    const [mail, setMail] = useState(defaultMail);
     const [cocodes, setCocodes] = useState(defaultCocodes);
 
     useEffect(() => {
@@ -80,11 +89,11 @@ export default function User() {
             .collection('users')
             .doc(_id)
             .update({
-                data: { dept, hosp, cocodes, name },
+                data: { dept, hosp, cocodes, name, mail },
                 success(res) {
                     console.log('success', res);
                     Taro.atMessage({ message: '修改成功', type: 'success' });
-                    dispatch(syncHospDeptCocodes(name, hosp, dept, cocodes));
+                    dispatch(syncHospDeptCocodes(name, mail, hosp, dept, cocodes));
                     dispatch(forceRerender());
                 },
                 fail: console.error,
@@ -95,6 +104,13 @@ export default function User() {
         <View>
             <AtMessage />
             <AtForm onSubmit={onSubmit}>
+                <AtInput
+                    title="名字:"
+                    name="name"
+                    value={name}
+                    placeholder={'你的名字'}
+                    onChange={(e: string) => setName(e)}
+                />
                 <AtInput
                     title="医院:"
                     name="hosp"
@@ -110,11 +126,20 @@ export default function User() {
                     onChange={(e: string) => setDept(e)}
                 />
                 <AtInput
-                    title="名字:"
-                    name="name"
-                    value={name}
-                    placeholder={'你的名字'}
-                    onChange={(e: string) => setName(e)}
+                    title="邮箱"
+                    type="text"
+                    name="mail"
+                    value={mail}
+                    placeholder="你的邮箱，接受数据用"
+                    onChange={(e: string) => setMail(e)}
+                    onBlur={(e) => {
+                        if (!mail_regexp.test(mail)) {
+                            Taro.atMessage({
+                                message: '邮箱密码格式错误,示例:81233890@qq.com',
+                                type: 'error',
+                            });
+                        }
+                    }}
                 />
                 <AtInput
                     title="协作码:"
@@ -155,11 +180,12 @@ export default function User() {
                     <AtButton
                         type="primary"
                         formType="submit"
-                        disabled={equal(
+                        disabled={disableUpdate(
                             {
                                 name: defaultName,
                                 hosp: defaultHosp,
                                 dept: defaultDept,
+                                mail: defaultMail,
                                 cocodes: defaultCocodes,
                             },
                             {
@@ -167,6 +193,7 @@ export default function User() {
                                 hosp,
                                 dept,
                                 cocodes,
+                                mail,
                             }
                         )}
                     >
