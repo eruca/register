@@ -114,7 +114,7 @@ export default function Apache2() {
         const parts = (e as string).split('/');
         if (parts.length === 1) {
             if (!isDigit.test(parts[0])) {
-                Taro.atMessage({ message: '请输入血压值1', type: 'error' });
+                Taro.atMessage({ message: '请输入血压值', type: 'error' });
             } else if (parseInt(parts[0], 10) > 30) {
                 setBp(e + '/');
                 setBpCharCnt(e.length + 1);
