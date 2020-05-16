@@ -42,40 +42,11 @@ exports.main = async (event, context) => {
         };
     }
 
-    const { total } = await cloud
-        .database()
-        .collection('patients')
-        .where({ _openid: wxContext.OPENID })
-        .count();
+    const patients = await getData(wxContext.OPENID, 'patients');
+    const records = await getData(wxContext.OPENID, 'records');
 
-    let data;
-    if (total <= LIMIT) {
-        const result = await cloud
-            .database()
-            .collection('patients')
-            .where({ _openid: wxContext.OPENID })
-            .get();
-        console.log('result:', result);
-
-        data = result.data;
-    } else {
-        const array = [];
-        let skip = 0;
-        while (array.length < total) {
-            const { data } = await cloud
-                .database()
-                .collection('patients')
-                .where({ _openid: wxContext.OPENID })
-                .skip(skip)
-                .limit(LIMIT)
-                .get();
-            array.push(...data);
-            skip += LIMIT;
-        }
-        data = array;
-    }
-
-    const datastring = JSON.stringify(data);
+    const patients_string = JSON.stringify(patients);
+    const records_string = JSON.stringify(records);
 
     mail = {
         from: ' 来自项目 <81233890@qq.com>',
@@ -85,8 +56,12 @@ exports.main = async (event, context) => {
             '数据在附件里, 可以将数据使用https://json-csv.com/进行转换为excel文件, 有问题可以邮件或微信沟通!!!',
         attachments: [
             {
-                filename: '数据.json',
-                content: datastring,
+                filename: 'patient.json',
+                content: patients_string,
+            },
+            {
+                filename: 'records.json',
+                content: records_string,
             },
         ],
     };
@@ -106,3 +81,31 @@ exports.main = async (event, context) => {
         msg: '发送邮件失败，请再次确认邮箱写正确，再请联系管理员',
     };
 };
+
+// 获取病人的信息
+async function getData(_openid, collection) {
+    const { total } = await cloud.database().collection(collection).where({ _openid }).count();
+
+    if (total <= LIMIT) {
+        const result = await cloud.database().collection(collection).where({ _openid }).get();
+        console.log('result:', result);
+
+        return result.data;
+    }
+
+    const array = [];
+    let skip = 0;
+    while (array.length < total) {
+        const { data } = await cloud
+            .database()
+            .collection(collection)
+            .where({ _openid })
+            .skip(skip)
+            .limit(LIMIT)
+            .get();
+        array.push(...data);
+        skip += LIMIT;
+    }
+
+    return array;
+}
