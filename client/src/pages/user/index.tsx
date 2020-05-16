@@ -126,7 +126,7 @@ export default function User() {
                     onChange={(e: string) => setDept(e)}
                 />
                 <AtInput
-                    title="邮箱"
+                    title="邮箱:"
                     type="text"
                     name="mail"
                     value={mail}
