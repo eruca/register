@@ -27,6 +27,7 @@ export default function Viewset() {
 
     const onDownload = () => {
         setIsActionSheetOpen(false);
+        Taro.atMessage({ message: '正在处理, 请稍等...', type: 'info', duration: 1500 });
 
         Taro.cloud.callFunction({
             name: 'onDownload',
