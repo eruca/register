@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from '@tarojs/redux';
 import { IReducers } from '../../reducers';
 import { isAdmin, IUserState } from '../../reducers/user';
 import { syncHospDeptCocodes, userSync, forceRerender } from '../../actions/user';
+import { getContextSuccess } from '../../cloudfunc';
 
 type EqualType = {
     name: string;
@@ -53,10 +54,7 @@ export default function User() {
     useEffect(() => {
         Taro.cloud.callFunction({
             name: 'getContext',
-            success(res) {
-                console.log('getContext', res);
-                dispatch(userSync((res.result as any)['record'] as IUserState));
-            },
+            success: getContextSuccess(dispatch),
             fail: console.error,
         });
     }, [force_rerender]);
