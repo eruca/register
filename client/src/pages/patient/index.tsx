@@ -57,27 +57,34 @@ export default function Patient() {
 
         if (isCrew(auth)) {
             if (patient_id === '') {
-                patientsCollection.add({
-                    data: convertToPatient(patient),
-                    success: function () {
-                        Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                        // 添加成功，则再次从数据库获取统计信息
-                        dispatch(forceRerender());
-                        setTimeout(() => Taro.navigateBack(), 1000);
-                    },
-                    fail: console.error,
-                });
+                Taro.cloud
+                    .database()
+                    .collection('patients')
+                    .add({
+                        data: convertToPatient(patient),
+                        success: function () {
+                            Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                            // 添加成功，则再次从数据库获取统计信息
+                            dispatch(forceRerender());
+                            setTimeout(() => Taro.navigateBack(), 1000);
+                        },
+                        fail: console.error,
+                    });
             } else {
-                patientsCollection.doc(patient_id).set({
-                    data: convertToPatient(patient, false),
-                    success: function () {
-                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                        // 修改成功，则再次从数据库获取统计信息
-                        dispatch(forceRerender());
-                        setTimeout(() => Taro.navigateBack(), 1000);
-                    },
-                    fail: console.error,
-                });
+                Taro.cloud
+                    .database()
+                    .collection('patients')
+                    .doc(patient_id)
+                    .set({
+                        data: convertToPatient(patient, false),
+                        success: function () {
+                            Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                            // 修改成功，则再次从数据库获取统计信息
+                            dispatch(forceRerender());
+                            setTimeout(() => Taro.navigateBack(), 1000);
+                        },
+                        fail: console.error,
+                    });
             }
         }
     };
@@ -187,7 +194,13 @@ export default function Patient() {
                     value={patient.diagnoseIndex}
                     onChange={useCallback(
                         (e) =>
-                            setPatient({ ...patient, diagnoseIndex: parseInt(e.detail.value, 10) }),
+                            setPatient({
+                                ...patient,
+                                diagnoseIndex:
+                                    typeof e.detail.value === 'number'
+                                        ? e.detail.value
+                                        : parseInt(e.detail.value, 10),
+                            }),
                         [patient, setPatient]
                     )}
                 >
