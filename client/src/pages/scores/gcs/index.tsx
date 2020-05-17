@@ -4,15 +4,15 @@ import { AtListItem, AtList, AtRadio, AtNoticebar } from 'taro-ui';
 
 export default function GCS() {
     const [eyeValue, setEyeValue] = useState(4);
-    const [eyeBarOpen, setEyeBarOpen] = useState(true);
+    const [eyeBarOpen, setEyeBarOpen] = useState(false);
     const [voiceValue, setVoiceValue] = useState(5);
-    const [voiceBarOpen, setVoiceBarOpen] = useState(true);
+    const [voiceBarOpen, setVoiceBarOpen] = useState(false);
     const [actionValue, setActionValue] = useState(6);
-    const [actionBarOpen, setActionBarOpen] = useState(true);
+    const [actionBarOpen, setActionBarOpen] = useState(false);
 
     return (
         <View>
-            <AtNoticebar>{`${eyeValue} + ${voiceValue} + ${actionValue} = ${
+            <AtNoticebar>{`GCS: ${eyeValue} + ${voiceValue} + ${actionValue} = ${
                 eyeValue + voiceValue + actionValue
             }`}</AtNoticebar>
             <AtList>

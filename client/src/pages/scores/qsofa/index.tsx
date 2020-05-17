@@ -9,7 +9,7 @@ export default function Qsofa() {
 
     return (
         <View>
-            <AtNoticebar>{`${gcs ? 1 : 0} + ${respiratory_rate ? 1 : 0} + ${systolicBP ? 1 : 0} = ${
+            <AtNoticebar>{`qSOFA: ${gcs ? 1 : 0} + ${respiratory_rate ? 1 : 0} + ${systolicBP ? 1 : 0} = ${
                 Number(gcs) + Number(respiratory_rate) + Number(systolicBP)
             }`}</AtNoticebar>
             <AtList>
