@@ -7,10 +7,14 @@ const ecof = 7.50062;
 
 export default function Sofa() {
     const [weight, setWeight] = useState(0);
+
+    // 呼吸系统
+    const [respBarOpen, setRespBarOpen] = useState<boolean>(false);
     const [pO2, setPO2] = useState(0);
     const [pO2UnitIndex, setpO2UnitIndex] = useState<0 | 1>(0);
     const [fio2, setFio2] = useState(21);
     const [respSupport, setRespSupport] = useState(false);
+
     const [platelets, setPletelets] = useState(0);
     const [gcs, setGCS] = useState(15);
     // 胆红素
@@ -131,66 +135,87 @@ export default function Sofa() {
                 )}
             </AtNoticebar>
             <AtList>
-                <AtInput
-                    name="weight"
-                    title="体重"
-                    type="digit"
-                    placeholder="请输入体重（kg)"
-                    value={weight ? weight.toString() : ''}
-                    onChange={(v: string) => setWeight(parseFloat(v))}
-                    onBlur={() =>
-                        weight > 200 && Taro.atMessage({ message: '体重错误', type: 'error' })
-                    }
+                <View
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginLeft: '10PX',
+                    }}
                 >
-                    <View style={{ marginRight: '10PX' }}>kg</View>
-                </AtInput>
-                <AtInput
-                    clear={true}
-                    name="po2"
-                    title="PO2"
-                    type="digit"
-                    placeholder="氧分压"
-                    value={pO2 ? pO2.toString() : ''}
-                    onChange={(v: string) => setPO2(parseFloat(v))}
-                >
-                    <View
-                        style={{ fontSize: '25', color: '#79A4FA' }}
-                        onClick={() => {
-                            if (pO2UnitIndex === 0) {
-                                setPO2(pO2 / ecof);
-                            } else {
-                                setPO2(pO2 * ecof);
-                            }
-                            setpO2UnitIndex(pO2UnitIndex === 0 ? 1 : 0);
-                        }}
+                    <AtIcon size="25" color="#cc3399" value="settings" />
+                    <AtInput
+                        name="weight"
+                        title="体重"
+                        type="digit"
+                        placeholder="请输入体重（kg)"
+                        value={weight ? weight.toString() : ''}
+                        onChange={(v: string) => setWeight(parseFloat(v))}
+                        onBlur={() =>
+                            weight > 200 && Taro.atMessage({ message: '体重错误', type: 'error' })
+                        }
                     >
-                        {pO2Unit[pO2UnitIndex]}
-                        <View
-                            className="at-icon at-icon-repeat-play"
-                            style={{ fontSize: '1.3em' }}
+                        <View style={{ marginRight: '10PX' }}>kg</View>
+                    </AtInput>
+                </View>
+                <AtListItem
+                    title={`呼吸系统: ${pO2 > 0 ? respScores : '❌'}`}
+                    isSwitch={true}
+                    switchIsCheck={respBarOpen}
+                    onSwitchChange={() => setRespBarOpen(!respBarOpen)}
+                    iconInfo={{ size: 25, color: '#79A4FA', value: 'lightning-bolt' }}
+                />
+                {respBarOpen && (
+                    <View>
+                        <AtInput
+                            clear={true}
+                            name="po2"
+                            title="PO2"
+                            type="digit"
+                            placeholder="氧分压"
+                            value={pO2 ? pO2.toString() : ''}
+                            onChange={(v: string) => setPO2(parseFloat(v))}
+                        >
+                            <View
+                                style={{ fontSize: '25', color: '#79A4FA' }}
+                                onClick={() => {
+                                    if (pO2UnitIndex === 0) {
+                                        setPO2(pO2 / ecof);
+                                    } else {
+                                        setPO2(pO2 * ecof);
+                                    }
+                                    setpO2UnitIndex(pO2UnitIndex === 0 ? 1 : 0);
+                                }}
+                            >
+                                {pO2Unit[pO2UnitIndex]}
+                                <View
+                                    className="at-icon at-icon-repeat-play"
+                                    style={{ fontSize: '1.3em' }}
+                                />
+                            </View>
+                        </AtInput>
+                        <AtInput
+                            name="fio2"
+                            title="FiO2"
+                            type="number"
+                            placeholder="吸氧浓度"
+                            value={fio2 ? fio2.toString() : ''}
+                            onChange={(v: string) => setFio2(v ? parseInt(v, 10) : 0)}
+                            onBlur={() =>
+                                (fio2 > 100 || fio2 < 21) &&
+                                Taro.atMessage({ message: '吸氧浓度错误', type: 'error' })
+                            }
+                        >
+                            <View style={{ marginRight: '10PX' }}>%</View>
+                        </AtInput>
+                        <AtListItem
+                            title="呼吸支持"
+                            isSwitch={true}
+                            switchIsCheck={respSupport}
+                            onSwitchChange={() => setRespSupport(!respSupport)}
                         />
                     </View>
-                </AtInput>
-                <AtInput
-                    name="fio2"
-                    title="FiO2"
-                    type="number"
-                    placeholder="吸氧浓度"
-                    value={fio2 ? fio2.toString() : ''}
-                    onChange={(v: string) => setFio2(v ? parseInt(v, 10) : 0)}
-                    onBlur={() =>
-                        (fio2 > 100 || fio2 < 21) &&
-                        Taro.atMessage({ message: '吸氧浓度错误', type: 'error' })
-                    }
-                >
-                    <View style={{ marginRight: '10PX' }}>%</View>
-                </AtInput>
-                <AtListItem
-                    title="呼吸支持"
-                    isSwitch={true}
-                    switchIsCheck={respSupport}
-                    onSwitchChange={() => setRespSupport(!respSupport)}
-                />
+                )}
                 <View
                     style={{
                         display: 'flex',
@@ -236,7 +261,7 @@ export default function Sofa() {
                     </AtInput>
                 </View>
                 <AtListItem
-                    title={`胆红素 mg/dl(μmol/L): ${bilirubin}`}
+                    title={`胆红素: ${bilirubin}`}
                     isSwitch={true}
                     switchIsCheck={bilirubinBarOpen}
                     onSwitchChange={() => setBilirubinBarOpen(!bilirubinBarOpen)}
@@ -245,18 +270,18 @@ export default function Sofa() {
                 {bilirubinBarOpen && (
                     <AtRadio
                         options={[
-                            { label: '<1.2(<20) => 0', value: 0 },
-                            { label: '1.2-1.9(20-30) => 1', value: 1 },
-                            { label: '2.0-5.9(33-101) => 2', value: 2 },
-                            { label: '6.0-11.9(102-204) => 3', value: 3 },
-                            { label: '≥12.0(>204) => 4', value: 4 },
+                            { label: '➊ <1.2mg/dl(<20μmol/L) 单位下同', value: 0 },
+                            { label: '➋ 1.2-1.9(20-30)', value: 1 },
+                            { label: '➌ 2.0-5.9(33-101)', value: 2 },
+                            { label: '➍ 6.0-11.9(102-204)', value: 3 },
+                            { label: '➎ ≥12.0(>204)', value: 4 },
                         ]}
                         value={bilirubin}
                         onClick={(v) => setBilirubin(v)}
                     />
                 )}
                 <AtListItem
-                    title={`肌酐 mg/dl(μmol/L): ${creatinine}`}
+                    title={`肌酐: ${creatinine}`}
                     isSwitch={true}
                     switchIsCheck={creatinieBarOpen}
                     onSwitchChange={() => setCreatinineBarOpen(!creatinieBarOpen)}
@@ -265,11 +290,11 @@ export default function Sofa() {
                 {creatinieBarOpen && (
                     <AtRadio
                         options={[
-                            { label: '<1.2(<110) => 0', value: 0 },
-                            { label: '1.2-1.9(110-170) => 1', value: 1 },
-                            { label: '2.0-3.4(171-299) => 2', value: 2 },
-                            { label: '3.5-4.9(300-440) 或 24小时尿量<500ml => 3', value: 3 },
-                            { label: '≥12.0(>204) 或 24小时尿量<200ml => 4', value: 4 },
+                            { label: '➊ <1.2mg/dl(<110μmol/L) 单位下同', value: 0 },
+                            { label: '➋ 1.2-1.9(110-170)', value: 1 },
+                            { label: '➌ 2.0-3.4(171-299)', value: 2 },
+                            { label: '➍ 3.5-4.9(300-440) 或 24小时尿量<500ml', value: 3 },
+                            { label: '➎ ≥12.0(>204) 或 24小时尿量<200ml', value: 4 },
                         ]}
                         value={creatinine}
                         onClick={(v) => setCreatinine(v)}
