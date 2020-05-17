@@ -1,0 +1,14 @@
+.gridcontainer {
+    display: grid;
+    grid-template-columns: auto 1fr 2fr 2fr;
+    grid-template-rows: auto fr fr fr 1fr;
+    grid-gap: 2rpx;
+    font-size: 0.7em;
+}
+
+.odd {
+    background-color: 'lightblue';
+}
+.even {
+    background-color: '#EEEEEE';
+}

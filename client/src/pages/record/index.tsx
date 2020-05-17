@@ -322,26 +322,51 @@ export default function Form() {
                         [record, setRecord]
                     )}
                 />
-                <Picker
-                    mode="selector"
-                    value={record.agiIndex}
-                    range={AGIs}
-                    onChange={useCallback(
-                        (v) =>
-                            setRecord({
-                                ...record,
-                                agiIndex:
-                                    typeof v.detail.value === 'number'
-                                        ? v.detail.value
-                                        : parseInt(v.detail.value, 10),
-                            }),
-                        [record, setRecord]
-                    )}
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
                 >
-                    <FormField name="AGI 评级" value={AGIs[record.agiIndex]} />
-                </Picker>
-                <View className="at-row at-row__align--center">
-                    <View className="at-col at-col-10">
+                    <Picker
+                        mode="selector"
+                        range={AGIs}
+                        style={{ flexGrow: 1 }}
+                        value={record.agiIndex}
+                        onChange={useCallback(
+                            (v) =>
+                                setRecord({
+                                    ...record,
+                                    agiIndex:
+                                        typeof v.detail.value === 'number'
+                                            ? v.detail.value
+                                            : parseInt(v.detail.value, 10),
+                                }),
+                            [record, setRecord]
+                        )}
+                    >
+                        <FormField name="AGI 评级" value={AGIs[record.agiIndex]} />
+                    </Picker>
+                    <View style={{ marginRight: '18PX' }}>
+                        <AtIcon
+                            value="external-link"
+                            size="25"
+                            color="#79A4FA"
+                            onClick={() => Taro.navigateTo({ url: '/pages/assess/agi/index' })}
+                        />
+                    </View>
+                </View>
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
                         <AtInput
                             name="enteralNutritionToleranceScore"
                             title="耐受性评分:"
@@ -359,7 +384,7 @@ export default function Form() {
                             )}
                         />
                     </View>
-                    <View className="at-col at-col-2" style={{ marginRight: '5PX' }}>
+                    <View style={{ marginRight: '18PX' }}>
                         <AtIcon
                             value="help"
                             size="30"
@@ -389,10 +414,6 @@ export default function Form() {
         </View>
     );
 }
-
-Form.options = {
-    addGlobalClass: true,
-};
 
 Form.config = {
     navigationBarTitleText: '记录',

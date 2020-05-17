@@ -25,12 +25,12 @@ export default function Assists() {
             <AtList>
                 <AtListItem
                     title="评分说明"
-                    iconInfo={{ size: 25, color: '#79A4FA', value: 'settings' }}
+                    iconInfo={{ size: 25, color: '#79A4FA', value: 'loading-2' }}
                 />
                 <AtGrid
                     mode="rect"
                     onClick={onClick2}
-                    data={[{ value: '耐受性评分' }, { value: 'NRS2002' }]}
+                    data={[{ value: '耐受性评分' }, { value: 'NRS2002' }, { value: 'AGI' }]}
                 />
             </AtList>
         </View>
@@ -68,9 +68,9 @@ const onClick2 = (item: object, index: number) => {
         case 1:
             Taro.navigateTo({ url: '/pages/assess/nrs2002/index' });
             break;
-        // case 2:
-        //     Taro.navigateTo({ url: '/pages/scores/sofa/index' });
-        //     break;
+        case 2:
+            Taro.navigateTo({ url: '/pages/assess/agi/index' });
+            break;
         // case 3:
         //     Taro.navigateTo({ url: '/pages/scores/qsofa/index' });
         //     break;

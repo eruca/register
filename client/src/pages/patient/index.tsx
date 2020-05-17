@@ -230,30 +230,77 @@ export default function Patient() {
                         setPatient,
                     ])}
                 />
-                <AtInput
-                    name="apache2"
-                    title="Apache II:"
-                    type="number"
-                    placeholder="0-71"
-                    value={patient.apache2 === '0' && patient_id === '' ? '' : patient.apache2}
-                    onChange={useCallback(
-                        (v: string) => setPatient({ ...patient, apache2: v ? v : '0' }),
-                        [patient, setPatient]
-                    )}
-                />
-                <AtInput
-                    name="agi"
-                    title="AGI:"
-                    type="number"
-                    placeholder="0-4"
-                    value={patient.agi === '0' && patient_id === '' ? '' : patient.agi}
-                    onChange={useCallback(
-                        (v: string) => setPatient({ ...patient, agi: v ? v : '0' }),
-                        [patient, setPatient]
-                    )}
-                />
-                <View className="at-row at-row__align--center">
-                    <View className="at-col at-col-10">
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
+                        <AtInput
+                            name="apache2"
+                            title="Apache II:"
+                            type="number"
+                            placeholder="0-71"
+                            value={
+                                patient.apache2 === '0' && patient_id === '' ? '' : patient.apache2
+                            }
+                            onChange={useCallback(
+                                (v: string) => setPatient({ ...patient, apache2: v ? v : '0' }),
+                                [patient, setPatient]
+                            )}
+                        />
+                    </View>
+                    <View style={{ marginRight: '18PX' }}>
+                        <AtIcon
+                            value="external-link"
+                            size="25"
+                            color="#79A4FA"
+                            onClick={() => Taro.navigateTo({ url: '/pages/scores/apache2/index' })}
+                        />
+                    </View>
+                </View>
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
+                        <AtInput
+                            name="agi"
+                            title="AGI:"
+                            type="number"
+                            placeholder="0-4"
+                            value={patient.agi === '0' && patient_id === '' ? '' : patient.agi}
+                            onChange={useCallback(
+                                (v: string) => setPatient({ ...patient, agi: v ? v : '0' }),
+                                [patient, setPatient]
+                            )}
+                        />
+                    </View>
+                    <View style={{ marginRight: '18PX' }}>
+                        <AtIcon
+                            value="external-link"
+                            size="25"
+                            color="#79A4FA"
+                            onClick={() => Taro.navigateTo({ url: '/pages/assess/agi/index' })}
+                        />
+                    </View>
+                </View>
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
                         <AtInput
                             name="nrs2002"
                             title="NRS2002:"
@@ -268,7 +315,7 @@ export default function Patient() {
                             )}
                         />
                     </View>
-                    <View className="at-col at-col-2" style={{ marginRight: '5PX' }}>
+                    <View style={{ marginRight: '15PX' }}>
                         <AtIcon
                             value="help"
                             size="30"
@@ -277,8 +324,15 @@ export default function Patient() {
                         />
                     </View>
                 </View>
-                <View className="at-row at-row__align--center">
-                    <View className="at-col at-col-10">
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
                         <AtInput
                             name="enteralNutritionToleranceScore"
                             title="耐受性评分:"
@@ -299,7 +353,7 @@ export default function Patient() {
                             )}
                         />
                     </View>
-                    <View className="at-col at-col-2" style={{ marginRight: '5PX' }}>
+                    <View style={{ marginRight: '15PX' }}>
                         <AtIcon
                             value="help"
                             size="30"
@@ -343,8 +397,4 @@ export default function Patient() {
 
 Patient.config = {
     navigationBarTitleText: '登记病人',
-};
-
-Patient.options = {
-    addGlobalClass: true,
 };

@@ -41,6 +41,7 @@ class App extends Component {
             'pages/scores/bmi/index',
             'pages/assess/nrs2002/index',
             'pages/assess/entolerance/index',
+            'pages/assess/agi/index',
         ],
 
         tabBar: {
