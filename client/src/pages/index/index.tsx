@@ -16,6 +16,7 @@ import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
 import { isUnknown } from '../../reducers/user';
 import { onAuthSuccess } from '../../cloudfunc';
+import { version } from '../../version';
 
 // onChange 统一使用该函数
 const onChange = (fn: Dispatch<SetStateAction<string>>) => (v: number | string) => {
@@ -85,7 +86,7 @@ export default function Index() {
                     {isUnknown(user.authority) && (
                         <AtListItem title="申请加入" onClick={() => setOpen(true)} arrow="right" />
                     )}
-                    <AtListItem title="关于" note="微信号: nickwill" />
+                    <AtListItem title="关于" note={`版本:${version}`} />
                 </AtList>
             </View>
 
