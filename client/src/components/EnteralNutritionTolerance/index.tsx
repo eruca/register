@@ -1,76 +1,107 @@
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
 
-export default function EnteralNutritionTolerance() {
+const color = 'lightblue';
+
+export default function ENT() {
     return (
         <View>
             <View className="at-row at-row__align--center at-row__justify--center">
-                <View className="at-col at-col-2">评价内容</View>
-                <View className="at-col at-col__offset-4">计分内容</View>
+                <View
+                    className="at-col at-col-8"
+                    style={{ display: 'flex', justifyContent: 'center' }}
+                >
+                    评价内容
+                </View>
+                <View className="at-col" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    计分内容
+                </View>
             </View>
             <View className="at-row at-row__align--center at-row__justify--center">
-                <View className="at-col at-col-2">分值</View>
-                <View className="at-col at-col-2">0</View>
-                <View className="at-col at-col-2">1</View>
-                <View className="at-col at-col-3">2</View>
-                <View className="at-col at-col-3">5</View>
+                <View className="at-col at-col-3">腹胀/腹痛</View>
+                <View className="at-col at-col-4">恶心/呕吐</View>
+                <View className="at-col at-col-4">腹泻</View>
+                <View className="at-col at-col-1">分值</View>
             </View>
-            <View className="at-row at-row--wrap" style={{ fontSize: '0.7em' }}>
-                <View className="at-col at-col-2">腹胀/腹痛</View>
-                <View className="at-col at-col-2">无</View>
-                <View className="at-col at-col-2 at-row at-row--wrap">
-                    <View className="at-col at-col-6">轻度腹胀</View>
-                    <View className="at-col at-col-6">无腹痛</View>
+            <View
+                className="at-row at-row--wrap"
+                style={{ fontSize: '0.7em', backgroundColor: color }}
+            >
+                <View className="at-col at-col-3">无</View>
+                <View className="at-col at-col-4 at-row at-row--wrap">
+                    <View className="at-col">无</View>
+                    <View className="at-col">持续胃肠减压无症状</View>
                 </View>
-                <View className="at-col at-col-3 at-row at-row--wrap">
-                    <View className="at-col at-col-6">明显腹胀</View>
-                    <View className="at-col at-col-6">腹痛自行缓解</View>
-                    <View className="at-col at-col-6">腹内压15~20mmHg</View>
-                </View>
-                <View className="at-col at-col-3 at-row at-row--wrap">
-                    <View className="at-col at-col-6">严重腹胀</View>
-                    <View className="at-col at-col-6">腹痛不能自行缓解</View>
-                    <View className="at-col at-col-6">腹内压>20mmHg</View>
+                <View className="at-col at-col-4">无</View>
+                <View className="at-col at-col-1" style={{ color: 'red' }}>
+                    0
                 </View>
             </View>
-            <View className="at-row at-row--wrap" style={{ fontSize: '0.7em' }}>
-                <View className="at-col at-col-2">恶心/呕吐</View>
-                <View className="at-col at-col-2 at-row at-row--wrap">
-                    <View className="at-col at-col-6">无/持续胃肠</View>
-                    <View className="at-col at-col-6">减压无症状</View>
+            <View
+                className="at-row at-row--wrap"
+                style={{ fontSize: '0.7em', backgroundColor: '#EEEEEE' }}
+            >
+                <View className="at-col at-col-3">轻度腹胀无腹痛</View>
+                <View className="at-col at-col-4">恶心无呕吐</View>
+                <View className="at-col at-col-4 at-row at-row--wrap">
+                    <View className="at-col">稀便3-5次/天</View>
+                    <View className="at-col">量小于500ml</View>
                 </View>
-                <View className="at-col at-col-2 at-row at-row--wrap">
-                    <View className="at-col at-col-6">恶心</View>
-                    <View className="at-col at-col-6">但无呕吐</View>
-                </View>
-                <View className="at-col at-col-3 at-row at-row--wrap">
-                    <View className="at-col at-col-6">恶心呕吐</View>
-                    <View className="at-col at-col-6">(不需胃肠减压)</View>
-                    <View className="at-col at-col-6">GRV>250ml</View>
-                </View>
-                <View className="at-col at-col-3 at-row at-row--wrap">
-                    <View className="at-col at-col-6">呕吐且需胃肠</View>
-                    <View className="at-col at-col-6">减压或GRV>500ml/l</View>
+                <View className="at-col at-col-1" style={{ color: 'red' }}>
+                    1
                 </View>
             </View>
-            <View className="at-row at-row--wrap" style={{ fontSize: '0.7em' }}>
-                <View className="at-col at-col-2">腹泻</View>
-                <View className="at-col at-col-2">无</View>
-                <View className="at-col at-col-2 at-row at-row--wrap">
-                    <View className="at-col at-col-6">稀便3-5/d</View>
-                    <View className="at-col at-col-6">{'且量<500ml'}</View>
-                </View>
+            <View
+                className="at-row at-row--wrap"
+                style={{ fontSize: '0.7em', backgroundColor: color }}
+            >
                 <View className="at-col at-col-3 at-row at-row--wrap">
-                    <View className="at-col at-col-6">稀便≥5/d</View>
-                    <View className="at-col at-col-6">且量500~1500ml</View>
+                    <View className="at-col">明显腹胀或腹</View>
+                    <View className="at-col">痛能自行缓解</View>
+                    <View className="at-col">或腹内压15-</View>
+                    <View className="at-col">20mmHg</View>
                 </View>
+                <View className="at-col at-col-4 at-row at-row--wrap">
+                    <View className="at-col">恶心呕吐(不需胃</View>
+                    <View className="at-col">{'肠减压)或250ml'}</View>
+                    <View className="at-col">{'<GRV<500ml'}</View>
+                </View>
+                <View className="at-col at-col-4 at-row at-row--wrap">
+                    <View className="at-col">稀便>5/d</View>
+                    <View className="at-col">且量500-1500ml</View>
+                </View>
+                <View className="at-col at-col-1" style={{ color: 'red' }}>
+                    2
+                </View>
+            </View>
+            <View
+                className="at-row at-row--wrap"
+                style={{ fontSize: '0.7em', backgroundColor: '#EEEEEE' }}
+            >
                 <View className="at-col at-col-3 at-row at-row--wrap">
-                    <View className="at-col at-col-6">稀便≥5/d</View>
-                    <View className="at-col at-col-6">且量≥1500ml</View>
+                    <View className="at-col">严重腹胀或腹</View>
+                    <View className="at-col">痛不能自行缓</View>
+                    <View className="at-col">解或腹内压</View>
+                    <View className="at-col">>20mmHg</View>
+                </View>
+                <View className="at-col at-col-4 at-row at-row--wrap">
+                    <View className="at-col">呕吐且需胃肠减压</View>
+                    <View className="at-col">{'或>500ml'}</View>
+                </View>
+                <View className="at-col at-col-4 at-row at-row--wrap">
+                    <View className="at-col">稀便>5/d</View>
+                    <View className="at-col">且量>1500ml</View>
+                </View>
+                <View className="at-col at-col-1" style={{ color: 'red' }}>
+                    5
                 </View>
             </View>
             <View>
-                <View>说明</View>
+                <View style={{ color: '#FF9900', marginTop: '10PX' }}>说明:</View>
+                <View style={{ fontSize: '0.7em', color: '#CCCCCC' }}>
+                    <View>GRV: 胃残余量</View>
+                    以上标准计算总分，初始行肠内营养，每4-6h评估一次，根据评分结果进行EN输注调整
+                </View>
                 <View>
                     <View style={{ color: 'red' }}>0~2分</View>
                     继续肠内营养，增加或维持原速度，对症治疗
@@ -88,6 +119,6 @@ export default function EnteralNutritionTolerance() {
     );
 }
 
-EnteralNutritionTolerance.options = {
+ENT.options = {
     addGlobalClass: true,
 };

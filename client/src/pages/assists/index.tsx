@@ -19,8 +19,20 @@ export default function Assists() {
                     { value: 'APACHE Ⅱ' },
                     { value: 'SOFA' },
                     { value: 'qSOFA' },
+                    { value: '体重指数(BMI)' },
                 ]}
             />
+            <AtList>
+                <AtListItem
+                    title="评分说明"
+                    iconInfo={{ size: 25, color: '#79A4FA', value: 'settings' }}
+                />
+                <AtGrid
+                    mode="rect"
+                    onClick={onClick2}
+                    data={[{ value: '耐受性评分' }, { value: 'NRS2002' }]}
+                />
+            </AtList>
         </View>
     );
 }
@@ -40,6 +52,28 @@ const onClick = (item: object, index: number) => {
         case 3:
             Taro.navigateTo({ url: '/pages/scores/qsofa/index' });
             break;
+        case 4:
+            Taro.navigateTo({ url: '/pages/scores/bmi/index' });
+            break;
+        default:
+    }
+};
+
+const onClick2 = (item: object, index: number) => {
+    console.log('item', item, 'index', index);
+    switch (index) {
+        case 0:
+            Taro.navigateTo({ url: '/pages/assess/entolerance/index' });
+            break;
+        case 1:
+            Taro.navigateTo({ url: '/pages/assess/nrs2002/index' });
+            break;
+        // case 2:
+        //     Taro.navigateTo({ url: '/pages/scores/sofa/index' });
+        //     break;
+        // case 3:
+        //     Taro.navigateTo({ url: '/pages/scores/qsofa/index' });
+        //     break;
         default:
     }
 };

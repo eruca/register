@@ -38,6 +38,9 @@ class App extends Component {
             'pages/scores/apache2/index',
             'pages/scores/qsofa/index',
             'pages/scores/sofa/index',
+            'pages/scores/bmi/index',
+            'pages/assess/nrs2002/index',
+            'pages/assess/entolerance/index',
         ],
 
         tabBar: {
