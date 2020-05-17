@@ -175,6 +175,10 @@ export default function Sofa() {
                             placeholder="氧分压"
                             value={pO2 ? pO2.toString() : ''}
                             onChange={(v: string) => setPO2(parseFloat(v))}
+                            onBlur={() =>
+                                pO2 > 700 &&
+                                Taro.atMessage({ message: '氧分压过高', type: 'error' })
+                            }
                         >
                             <View
                                 style={{ fontSize: '25', color: '#79A4FA' }}
@@ -232,6 +236,10 @@ export default function Sofa() {
                         placeholder="血小板计数"
                         value={platelets ? platelets.toString() : ''}
                         onChange={(v: string) => setPletelets(v ? parseInt(v, 10) : 0)}
+                        onBlur={() =>
+                            platelets > 1000 &&
+                            Taro.atMessage({ message: '血小板填写错误', type: 'error' })
+                        }
                     >
                         <View style={{ marginRight: '10PX' }}>×10³/µL</View>
                     </AtInput>
@@ -592,10 +600,14 @@ function getBloodDynamicScore(
     // 没有使用血管活性药物
     const mapScore = map70 ? 1 : 0;
 
-    // 使用血管活性药物
-
     // 多巴酚丁胺得分
     const dobutamineScore = DOBUTamine ? 2 : 0;
+
+    // 使用血管活性药物
+    if ((useDOPamine || useEPINEPHrine || useNorEPINEPHrine) && weight === 0) {
+        Taro.atMessage({ message: '体重缺失', type: 'error' });
+        return 0;
+    }
     // 多巴胺得分 溶剂/速度 * 60
     let dopamineScore = getDopamineScore(
         weight,
