@@ -116,11 +116,14 @@ export default function Sofa() {
         EPINEPHrineVelocity
     );
 
+    console.log('gcs', gcs);
+
     return (
         <View>
             <AtMessage />
             <AtNoticebar>
                 {genNoticeBar(
+                    fio2,
                     pO2,
                     platelets,
                     weight,
@@ -260,10 +263,12 @@ export default function Sofa() {
                         placeholder="GCS评分"
                         value={gcs ? gcs.toString() : ''}
                         onChange={(v: string) => setGCS(v ? parseInt(v, 10) : 0)}
-                        onBlur={() =>
-                            (gcs < 3 || gcs > 15) &&
-                            Taro.atMessage({ message: 'gcs输入错误', type: 'error' })
-                        }
+                        onBlur={() => {
+                            if (gcs < 3 || gcs > 15) {
+                                Taro.atMessage({ message: 'gcs输入错误', type: 'error' });
+                                setGCS(0);
+                            }
+                        }}
                     >
                         <View style={{ marginRight: '10PX' }}>分</View>
                     </AtInput>
@@ -330,9 +335,9 @@ export default function Sofa() {
                             onSwitchChange={() => setDOBUTamine(!DOBUTamine)}
                         />
                         <AtListItem
-                            title={`多巴胺: ${dopamineScores[1].toFixed(2)}ug/kg/min->${
-                                dopamineScores[0]
-                            }`}
+                            title={`多巴胺: ${
+                                weight ? dopamineScores[1].toFixed(2) : '体重'
+                            }ug/kg/min->${dopamineScores[0]}`}
                             isSwitch={true}
                             switchIsCheck={useDOPamine}
                             onSwitchChange={() => setUseDOPamine(!useDOPamine)}
@@ -376,9 +381,9 @@ export default function Sofa() {
                             </View>
                         )}
                         <AtListItem
-                            title={`去甲肾上腺素: ${noreepinephrineScores[1].toFixed(
-                                2
-                            )}ug/kg/min->${noreepinephrineScores[0]}`}
+                            title={`去甲肾上腺素: ${
+                                weight ? noreepinephrineScores[1].toFixed(2) : '体重'
+                            }ug/kg/min->${noreepinephrineScores[0]}`}
                             isSwitch={true}
                             switchIsCheck={useNorEPINEPHrine}
                             onSwitchChange={() => setUseNorEPINEPHrine(!useNorEPINEPHrine)}
@@ -430,9 +435,9 @@ export default function Sofa() {
                             </View>
                         )}
                         <AtListItem
-                            title={`肾上腺素: ${epinephrineScores[1].toFixed(2)}ug/kg/min->${
-                                epinephrineScores[0]
-                            }`}
+                            title={`肾上腺素: ${
+                                weight ? epinephrineScores[1].toFixed(2) : '体重'
+                            }ug/kg/min->${epinephrineScores[0]}`}
                             isSwitch={true}
                             switchIsCheck={useEPINEPHrine}
                             onSwitchChange={() => setUseEPINEPHrine(!useEPINEPHrine)}
@@ -674,6 +679,7 @@ function getPlatteleteScore(platelets: number): number {
 
 // 产生计算结果的公式
 function genNoticeBar(
+    fio2: number,
     pO2: number,
     platelets: number,
     weight: number,
@@ -686,11 +692,20 @@ function genNoticeBar(
     creatinine: number,
     bilirubin: number
 ): string {
-    if (pO2 === 0 || platelets === 0) {
+    if (
+        pO2 === 0 ||
+        platelets === 0 ||
+        ((useDOPamine || useNorEPINEPHrine || useEPINEPHrine) && weight === 0)
+    ) {
         return '请填写完整';
     }
-    if ((useDOPamine || useNorEPINEPHrine || useEPINEPHrine) && weight === 0) {
-        return '请填写体重';
+
+    if (fio2 < 21 || fio2 > 100) {
+        return 'FiO2填写错误';
+    }
+
+    if (gcs < 3 || gcs > 15) {
+        return 'gcs填写错误';
     }
 
     return `GCS:${getGcsScore(
