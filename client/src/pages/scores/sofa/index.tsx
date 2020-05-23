@@ -358,7 +358,7 @@ export default function Sofa() {
                                     name="dopamineSolute"
                                     title="溶剂剂量:"
                                     type="digit"
-                                    placeholder="水的剂量"
+                                    placeholder="溶液剂量"
                                     value={dopamineSolute ? dopamineSolute.toString() : ''}
                                     onChange={(v: string) =>
                                         setDopamineSolute(v ? parseInt(v, 10) : 0)
@@ -406,7 +406,7 @@ export default function Sofa() {
                                     name="NorEPINEPHrineSolute"
                                     title="溶剂剂量:"
                                     type="digit"
-                                    placeholder="水的剂量"
+                                    placeholder="溶液剂量"
                                     value={
                                         NorEPINEPHrineSolute ? NorEPINEPHrineSolute.toString() : ''
                                     }
@@ -460,7 +460,7 @@ export default function Sofa() {
                                     name="EPINEPHrineSolute"
                                     title="溶剂剂量:"
                                     type="digit"
-                                    placeholder="水的剂量"
+                                    placeholder="溶液剂量"
                                     value={EPINEPHrineSolute ? EPINEPHrineSolute.toString() : ''}
                                     onChange={(v: string) =>
                                         setEPINEPHrineSolute(v ? parseInt(v, 10) : 0)
