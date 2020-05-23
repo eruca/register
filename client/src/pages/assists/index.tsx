@@ -19,7 +19,6 @@ export default function Assists() {
                     { value: 'APACHE Ⅱ' },
                     { value: 'SOFA' },
                     { value: 'qSOFA' },
-                    { value: '体重指数(BMI)' },
                 ]}
             />
             <AtList>
@@ -36,6 +35,18 @@ export default function Assists() {
                         { value: 'AGI' },
                         { value: 'RASS评分' },
                     ]}
+                />
+            </AtList>
+
+            <AtList>
+                <AtListItem
+                    title="计算"
+                    iconInfo={{ size: 25, color: '#79A4FA', value: 'money' }}
+                />
+                <AtGrid
+                    mode="rect"
+                    onClick={onClick3}
+                    data={[{ value: '体重指数(BMI)' }, { value: '营养计算' }]}
                 />
             </AtList>
         </View>
@@ -57,9 +68,9 @@ const onClick = (item: object, index: number) => {
         case 3:
             Taro.navigateTo({ url: '/pages/scores/qsofa/index' });
             break;
-        case 4:
-            Taro.navigateTo({ url: '/pages/scores/bmi/index' });
-            break;
+        // case 4:
+        //     Taro.navigateTo({ url: '/pages/scores/bmi/index' });
+        //     break;
         default:
     }
 };
@@ -79,6 +90,26 @@ const onClick2 = (item: object, index: number) => {
         case 3:
             Taro.navigateTo({ url: '/pages/assess/rass/index' });
             break;
+        default:
+    }
+};
+
+// 计算
+const onClick3 = (item: object, index: number) => {
+    console.log('item', item, 'index', index);
+    switch (index) {
+        case 0:
+            Taro.navigateTo({ url: '/pages/scores/bmi/index' });
+            break;
+        case 1:
+            Taro.navigateTo({ url: '/pages/scores/nutrition/index' });
+            break;
+        // case 2:
+        //     Taro.navigateTo({ url: '/pages/assess/agi/index' });
+        //     break;
+        // case 3:
+        //     Taro.navigateTo({ url: '/pages/assess/rass/index' });
+        //     break;
         default:
     }
 };

@@ -42,7 +42,8 @@ class App extends Component {
             'pages/assess/nrs2002/index',
             'pages/assess/entolerance/index',
             'pages/assess/agi/index',
-            'pages/assess/rass/index'
+            'pages/assess/rass/index',
+            'pages/scores/nutrition/index',
         ],
 
         tabBar: {
