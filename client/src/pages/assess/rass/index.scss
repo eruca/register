@@ -1,0 +1,23 @@
+.gridcontainer {
+    display: grid;
+    grid-template-columns: auto 3fr auto;
+    grid-template-rows: fr fr fr fr fr fr fr fr fr fr;
+    grid-gap: 3rpx;
+    font-size: 0.7em;
+    margin: 5rpx;
+}
+
+.result {
+    font-size: 0.7em;
+
+    .ritem {
+        text-indent: 2em;
+        color:#888888
+    }
+}
+
+.reference {
+    font-size: 0.6em;
+    margin-top: 15rpx;
+    color: #999999;
+}

@@ -30,7 +30,12 @@ export default function Assists() {
                 <AtGrid
                     mode="rect"
                     onClick={onClick2}
-                    data={[{ value: '耐受性评分' }, { value: 'NRS2002' }, { value: 'AGI' }]}
+                    data={[
+                        { value: '耐受性评分' },
+                        { value: 'NRS2002' },
+                        { value: 'AGI' },
+                        { value: 'RASS评分' },
+                    ]}
                 />
             </AtList>
         </View>
@@ -71,9 +76,9 @@ const onClick2 = (item: object, index: number) => {
         case 2:
             Taro.navigateTo({ url: '/pages/assess/agi/index' });
             break;
-        // case 3:
-        //     Taro.navigateTo({ url: '/pages/scores/qsofa/index' });
-        //     break;
+        case 3:
+            Taro.navigateTo({ url: '/pages/assess/rass/index' });
+            break;
         default:
     }
 };
