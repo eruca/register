@@ -44,7 +44,7 @@ export default function ResultSegment() {
                         setPatient(convertToLocal(res.data as IPatient));
                         setFinalPatient(convertToLocal(res.data as IPatient));
                     },
-                    fail:console.error
+                    fail: console.error,
                 });
         }
     }, [patient_id, auth, force_rerender, setPatient, setFinalPatient]);
@@ -117,7 +117,13 @@ export default function ResultSegment() {
                     value={patient.resultIndex}
                     onChange={useCallback(
                         (e) =>
-                            setPatient({ ...patient, resultIndex: parseInt(e.detail.value, 10) }),
+                            setPatient({
+                                ...patient,
+                                resultIndex:
+                                    typeof e.detail.value === 'number'
+                                        ? e.detail.value
+                                        : parseInt(e.detail.value, 10),
+                            }),
                         [patient, setPatient]
                     )}
                     disabled={patient_openid !== user_openid}
