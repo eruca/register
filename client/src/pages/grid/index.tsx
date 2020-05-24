@@ -6,6 +6,7 @@ import { AtSegmentedControl } from 'taro-ui';
 import { IReducers } from '../../reducers';
 import RecordSegment from './RecordSegment';
 import ResultSegment from './ResultSegment';
+import RecordGraph from './RecordGraph';
 import './index.scss';
 
 export default function Grid() {
@@ -23,13 +24,14 @@ export default function Grid() {
         <View>
             <View style="margin-bottom:5px">{`${hospId}-${name}: ${enrolltime}`}</View>
             <AtSegmentedControl
-                values={['记录', '结局']}
+                values={['记录', '图示', '结局']}
                 selectedColor="#FF4949"
-                onClick={v => setSegmentIndex(v)}
+                onClick={(v) => setSegmentIndex(v)}
                 current={segmentIndex}
             />
             {segmentIndex === 0 && <RecordSegment />}
-            {segmentIndex === 1 && <ResultSegment />}
+            {segmentIndex === 1 && <RecordGraph />}
+            {segmentIndex === 2 && <ResultSegment />}
         </View>
     );
 }

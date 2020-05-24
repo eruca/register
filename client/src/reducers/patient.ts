@@ -5,7 +5,7 @@ import { IAction } from '../actions/base';
 
 export interface IPatient {
     _id?: string;
-    _openid?: string;
+    _openid?: string; // 创建者
     hospId: string;
     name: string;
     isMale: boolean;
