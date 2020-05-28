@@ -5,8 +5,8 @@ import { AtList, AtListItem, AtMessage, AtButton } from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 import { IReducers } from 'src/reducers';
 import { ListType } from 'src/reducers/user';
-import Hist from '../../components/F2Graph/hist';
-import Pie from '../../components/F2Graph/pie';
+import Hist, { HistDataType } from '../../components/F2Graph/hist';
+import Pie, { PieDataType } from '../../components/F2Graph/pie';
 import { forceRerender } from '../../actions/user';
 
 type RequestParams = {
@@ -17,11 +17,59 @@ type RequestParams = {
     params: string;
 };
 
-const selectors: string[] = ['性别', '年龄'];
+const selectors: string[] = [
+    '性别',
+    '年龄',
+    'apache2',
+    'agi',
+    '存活出院',
+    '机械通气',
+    '升压药',
+    'nrs2002',
+    'ICU住院时长',
+    '机械通气时间',
 
+    '前白蛋白',
+    '白蛋白',
+    '腹泻',
+    '肠内能量',
+    '肠外能量',
+    '空腹血糖',
+    '胃潴留',
+    '消化道出血',
+    '血红蛋白',
+    '淋巴细胞计数',
+    '误吸',
+    '转铁蛋白',
+    '总蛋白',
+];
+
+// Todo 需要与输入验证相结合
 const map = new Map([
     ['性别', 'isMale:patients:pie:女,男'],
     ['年龄', 'age:patients:hist:0,10,20,30,40,50,60,70,80,90,100,110,120'],
+    ['agi', 'agi:patients:hist:0,1,2,3,4,5'],
+    ['apache2', 'apache2:patients:hist:0,10,20,30,40,50,60,70,80'],
+    ['存活出院', 'isAliveDischarge:patients:pie:死亡,存活'],
+    ['机械通气', 'needVentilation:patients:pie:无,有'],
+    ['升压药', 'needVesopressor:patients:pie:无,有'],
+    ['nrs2002', 'nrs2002:patients:hist:0,3,7,10,15'],
+    ['ICU住院时长', 'stayoficu:patients:hist:0,3,7,10,15,21,30,60'],
+    ['机械通气时间', 'venttime:patients:hist:0,3,7,10,15,21,30,60'],
+
+    ['前白蛋白', 'prealbumin:records:hist:0,170,420,880,1600'],
+    ['白蛋白', 'albumin:records:hist:0,20,30,40,60,80'],
+    ['总蛋白', 'totalProtein:records:hist:0,20,40,60,85,100'],
+    ['腹泻', 'diarrhea:records:pie:无,有'],
+    ['肠内能量', 'enteralCalories:records:hist:0,500,1000,2000,3000'],
+    ['肠外能量', 'parenteralCalories:records:hist:0,500,1000,2000,3000'],
+    ['空腹血糖', 'fastingGlucose:records:hist:0, 4, 11,20,30,50'],
+    ['胃潴留', 'gastricRetention:records:hist:0,500,1000,2000,3000,4000'],
+    ['消化道出血', 'gastrointestinalHemorrhage:records:pie:无,有'],
+    ['血红蛋白', 'hemoglobin:records:hist:0,30,60,90,120,150,180,250'],
+    ['淋巴细胞计数', 'lymphocyteCount:records:hist:0,0.8,3.5,10,20,40,60'],
+    ['误吸', 'misinhalation:records:pie:无,有'],
+    ['转铁蛋白', 'serumTransferrin:records:hist:0,2.2,4,10,14'],
 ]);
 
 // 因为有两个useEffect 返回渲染两次
@@ -35,7 +83,7 @@ export default function RecordGraph() {
     }));
 
     // Picker的value
-    const [currIndex, setCurrIndex] = useState(1);
+    const [currIndex, setCurrIndex] = useState(0);
     const [data, setData] = useState(defaultData);
     const request = getParams(currIndex, listType);
     console.log('request', request);
@@ -68,7 +116,6 @@ export default function RecordGraph() {
 
     return (
         <View className="index">
-            <AtMessage />
             {request['drawstyle'] === 'pie' ? (
                 <Pie
                     data={
@@ -86,6 +133,11 @@ export default function RecordGraph() {
                     }
                 />
             )}
+            <View style={{ margin: '15PX' }}>
+                {request['drawstyle'] === 'pie'
+                    ? printPieData(data[request['query'][0]])
+                    : printHistData(request.params, data[request['query'][0]])}
+            </View>
             <View style={{ margin: '5PX 14PX' }}>
                 <AtButton
                     type="secondary"
@@ -115,6 +167,7 @@ export default function RecordGraph() {
                     </AtList>
                 </Picker>
             </View>
+            <AtMessage />
         </View>
     );
 }
@@ -136,4 +189,27 @@ function getParams(currIndex: number, listType: ListType): RequestParams {
         drawstyle,
         params,
     };
+}
+
+function printPieData(data: PieDataType[]): string {
+    if (!data || data.length < 2) {
+        return '';
+    }
+    return `${data[0].name}:${data[0].count}\n${data[1].name}:${data[1].count}`;
+}
+
+function printHistData(params: string, data: HistDataType[]): string {
+    if (!data || data.length < 2) {
+        return '';
+    }
+    const bins = params.split(',');
+
+    const result: string[] = [];
+    let left = 0;
+    for (let i = 1; i < data.length; i++) {
+        result.push(`${bins[left]}-${bins[i]}:${data[i].value}`);
+        left = i;
+    }
+
+    return result.join(', ');
 }

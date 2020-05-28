@@ -4,7 +4,7 @@ import { F2Canvas } from 'taro-f2';
 import F2 from '@antv/f2/lib/index-all';
 import { CSSProperties } from 'react';
 
-type PieDataType = {
+export type PieDataType = {
     name: string;
     count: number;
     group: string;
