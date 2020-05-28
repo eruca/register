@@ -1,4 +1,4 @@
-import Taro, { useState, useMemo } from '@tarojs/taro';
+import Taro, { useState } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { F2Canvas } from 'taro-f2';
 import F2 from '@antv/f2/lib/index-all';
@@ -11,40 +11,19 @@ type PieDataType = {
 };
 
 type PieProps = {
-    names: string[];
-    input: boolean[];
+    data: PieDataType[];
     radius?: number;
     style?: CSSProperties;
 };
 
-export function formatPieData(names: string[], input: boolean[]): PieDataType[] {
-    const length = input.length;
-    const true_count = input.filter((item) => item).length;
-
-    return [
-        {
-            name: names[1],
-            count: true_count,
-            group: '1',
-        },
-        {
-            name: names[0],
-            count: length - true_count,
-            group: '1',
-        },
-    ];
-}
-
 export default function Pie({
-    names = ['0', '1'],
-    input = [],
+    data = [],
     radius = 0.85,
     style = { width: '100%', height: '450rpx' },
 }: PieProps) {
     const [graph, setGraph] = useState(null);
-    const data = useMemo(() => formatPieData(names, input), [names, input]);
 
-    if (graph && input.length > 0) {
+    if (graph && data.length > 0) {
         console.log('data', data);
         graph.changeData(data);
     }
@@ -82,5 +61,5 @@ export default function Pie({
         return chart;
     };
 
-    return <View style={style}>{input.length && <F2Canvas onInit={initChart}></F2Canvas>}</View>;
+    return <View style={style}>{data.length && <F2Canvas onInit={initChart}></F2Canvas>}</View>;
 }

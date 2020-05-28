@@ -1,6 +1,6 @@
 import Taro, { useEffect, useState } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
-import { AtList, AtListItem } from 'taro-ui';
+import { AtList, AtListItem, AtMessage } from 'taro-ui';
 
 import { useSelector } from '@tarojs/redux';
 import { IReducers } from 'src/reducers';
@@ -12,6 +12,8 @@ type RequestParams = {
     listType: ListType;
     query: string[];
     table: string;
+    drawstyle: string;
+    params: string;
 };
 
 const selectors: string[] = ['性别', '年龄'];
@@ -28,32 +30,31 @@ export default function RecordGraph() {
     }));
 
     // Picker的value
-    const [currIndex, setCurrIndex] = useState(0);
+    const [currIndex, setCurrIndex] = useState(1);
     const [data, setData] = useState([]);
-    const { request, drawstyle, config } = getParams(currIndex, listType);
+    const request = getParams(currIndex, listType);
 
+    console.log('request', request);
     useEffect(() => {
         console.log('getDataForGraph');
-        setData([]);
         Taro.cloud.callFunction({
             name: 'getDataForGraph',
             data: request,
-            success: (res) => {
-                console.log('get DataFor Graph', res, request, drawstyle);
-                const array = res['result']['array'].map((item) => item[request.query[0]]); // false, true, false
-                console.log('success on getDataForGraph', array);
-                setData(array);
+            success: ({ errMsg, result = {} }: Taro.cloud.CallFunctionResult) => {
+                console.log('get DataFor Graph', errMsg, result, request);
+                if (result['err']) {
+                    Taro.atMessage({ message: result['err'], type: 'error' });
+                    return;
+                }
+                setData(result['data']);
             },
         });
     }, [currIndex, force_rerender]);
 
     return (
         <View className="index">
-            {drawstyle === 'pie' ? (
-                <Pie names={config} input={data} />
-            ) : (
-                <Hist values={data} bins={config.map((it) => Number(it))} binsSorted={true} />
-            )}
+            <AtMessage />
+            {request['drawstyle'] === 'pie' ? <Pie data={data} /> : <Hist data={data} />}
             <View>
                 <Picker
                     mode="selector"
@@ -77,25 +78,20 @@ export default function RecordGraph() {
 }
 
 // 获取cloud.callFunction的参数
-function getParams(
-    currIndex: number,
-    listType: ListType
-): { request: RequestParams; drawstyle: string; config: string[] } {
+function getParams(currIndex: number, listType: ListType): RequestParams {
     const selector = selectors[currIndex];
     const value = map.get(selector);
     if (!value) {
         throw new Error('value 不能为空');
     }
 
-    const [query, table, drawstyle, config] = value.split(':');
+    const [query, table, drawstyle, params] = value.split(':');
 
     return {
-        request: {
-            listType,
-            query: [query],
-            table,
-        },
+        listType,
+        query: [query],
+        table,
         drawstyle,
-        config: config.split(','),
+        params,
     };
 }

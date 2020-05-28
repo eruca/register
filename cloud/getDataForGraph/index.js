@@ -13,7 +13,7 @@ const LIMIT = 1000;
 exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext();
     console.log('event', event);
-    const { listType, table, query } = event;
+    const { listType, table, query, drawstyle, params } = event;
 
     const filter = await getFriends(wxContext.OPENID, listType);
 
@@ -21,11 +21,67 @@ exports.main = async (event, context) => {
     const array = await getData(table, filter, query);
 
     console.log('array', array);
+    const result = getResult(array, query, drawstyle, params);
 
-    return {
-        array,
-    };
+    return result;
 };
+
+function getResult(array, query, drawstyle, params) {
+    switch (drawstyle) {
+        case 'pie': {
+            const length = array.length;
+            const true_length = array.filter((item) => item[query[0]]).length;
+            const names = params.split(',');
+            return {
+                data: [
+                    {
+                        name: names[0],
+                        count: length - true_length,
+                        group: '1',
+                    },
+                    { name: names[1], count: true_length, group: '1' },
+                ],
+            };
+        }
+        case 'hist': {
+            if (array.length === 0) {
+                return { data: [], err: '数据为空' };
+            }
+            const bins = params.split(',').map((it) => parseFloat(it));
+            bins.sort((a, b) => a - b);
+
+            let left = bins[0];
+            const result = bins.slice(1).map((bin) => {
+                const res1 = {
+                    bin: (left + bin) / 2,
+                    value: 0,
+                };
+                left = bin;
+                return res1;
+            });
+            console.log('result', result, 'bins', bins, typeof bins[0]);
+
+            const length = bins.length;
+            for (const item of array) {
+                if (item[query[0]] < bins[0] || item[query[0]] > bins[length - 1]) {
+                    console.error('bins 无法容纳所有数据');
+                    return { data: [], err: 'bins 无法容纳所有数据' };
+                }
+
+                for (let i = 0; i < length; i++) {
+                    if (item[query[0]] === bins[i]) {
+                        result[i].value += 1;
+                        break;
+                    } else if (item[query[0]] < bins[i]) {
+                        result[i - 1].value += 1;
+                        break;
+                    }
+                }
+            }
+            return { data: result };
+        }
+    }
+}
 
 // 获取自己还是组内还是所有
 async function getFriends(_openid, listType) {
