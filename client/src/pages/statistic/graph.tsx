@@ -1,12 +1,13 @@
-import Taro, { useEffect, useState } from '@tarojs/taro';
+import Taro, { useEffect, useState, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
-import { AtList, AtListItem, AtMessage } from 'taro-ui';
+import { AtList, AtListItem, AtMessage, AtButton } from 'taro-ui';
 
-import { useSelector } from '@tarojs/redux';
+import { useSelector, useDispatch } from '@tarojs/redux';
 import { IReducers } from 'src/reducers';
 import { ListType } from 'src/reducers/user';
 import Hist from '../../components/F2Graph/hist';
 import Pie from '../../components/F2Graph/pie';
+import { forceRerender } from '../../actions/user';
 
 type RequestParams = {
     listType: ListType;
@@ -23,7 +24,11 @@ const map = new Map([
     ['年龄', 'age:patients:hist:0,10,20,30,40,50,60,70,80,90,100,110,120'],
 ]);
 
+// 因为有两个useEffect 返回渲染两次
+const defaultData = {};
+
 export default function RecordGraph() {
+    const dispatch = useDispatch();
     const { force_rerender, listType } = useSelector((state: IReducers) => ({
         force_rerender: state.user.force_rerender,
         listType: state.user.listType,
@@ -31,12 +36,18 @@ export default function RecordGraph() {
 
     // Picker的value
     const [currIndex, setCurrIndex] = useState(1);
-    const [data, setData] = useState([]);
+    const [data, setData] = useState(defaultData);
     const request = getParams(currIndex, listType);
-
     console.log('request', request);
+
+    useEffect(() => setData(defaultData), [force_rerender]);
+
     useEffect(() => {
-        console.log('getDataForGraph');
+        console.log('getDataForGraph', currIndex, data);
+        if (data[request['query'][0]]) {
+            console.log('data exist', data[request['query'][0]]);
+            return;
+        }
         Taro.cloud.callFunction({
             name: 'getDataForGraph',
             data: request,
@@ -46,15 +57,46 @@ export default function RecordGraph() {
                     Taro.atMessage({ message: result['err'], type: 'error' });
                     return;
                 }
-                setData(result['data']);
+                if (!result['data']) {
+                    Taro.atMessage({ message: '返回数据为空', type: 'error' });
+                    return;
+                }
+                setData({ ...data, [request.query[0]]: result['data'] });
             },
         });
-    }, [currIndex, force_rerender]);
+    }, [currIndex, data]);
 
     return (
         <View className="index">
             <AtMessage />
-            {request['drawstyle'] === 'pie' ? <Pie data={data} /> : <Hist data={data} />}
+            {request['drawstyle'] === 'pie' ? (
+                <Pie
+                    data={
+                        data && request && request.query && request.query[0]
+                            ? data[request['query'][0]]
+                            : []
+                    }
+                />
+            ) : (
+                <Hist
+                    data={
+                        data && request && request.query && request.query[0]
+                            ? data[request['query'][0]]
+                            : []
+                    }
+                />
+            )}
+            <View style={{ margin: '5PX 14PX' }}>
+                <AtButton
+                    type="secondary"
+                    onClick={useCallback(() => {
+                        dispatch(forceRerender());
+                        Taro.atMessage({ message: '已刷新', type: 'success' });
+                    }, [])}
+                >
+                    刷新
+                </AtButton>
+            </View>
             <View>
                 <Picker
                     mode="selector"

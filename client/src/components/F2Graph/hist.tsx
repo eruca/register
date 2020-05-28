@@ -17,7 +17,7 @@ type HistProps = {
 
 export default function Hist({
     data = [],
-    style = { width: '100%', height: '450rpx' },
+    style = { width: '100%', height: '600rpx' },
 }: HistProps) {
     const [graph, setGraph] = useState(null);
 
@@ -44,6 +44,13 @@ export default function Hist({
                 };
             },
         });
+        chart.tooltip({
+            showItemMarker: false,
+            onShow: ({ items }) => {
+                console.log('x, y, item, title', items);
+                items[0].name = items[0].title;
+            },
+        });
 
         chart.interval().position('bin*value');
 
@@ -55,4 +62,3 @@ export default function Hist({
 
     return <View style={style}>{data.length && <F2Canvas onInit={initChart} />}</View>;
 }
-

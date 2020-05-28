@@ -19,7 +19,7 @@ type PieProps = {
 export default function Pie({
     data = [],
     radius = 0.85,
-    style = { width: '100%', height: '450rpx' },
+    style = { width: '100%', height: '600rpx' },
 }: PieProps) {
     const [graph, setGraph] = useState(null);
 
