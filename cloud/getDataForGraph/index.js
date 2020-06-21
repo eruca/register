@@ -26,22 +26,49 @@ exports.main = async (event, context) => {
     return result;
 };
 
+function pie(array, query, names) {
+    if (array.length === 0) {
+        return { data: [] };
+    }
+    // 如果是布尔类型，比如:isMale:true
+    if (typeof array[0][query[0]] === 'boolean') {
+        const true_length = array.filter((item) => item[query[0]]).length;
+        return {
+            data: [
+                {
+                    name: names[0],
+                    count: array.length - true_length,
+                    group: '1',
+                },
+                { name: names[1], count: true_length, group: '1' },
+            ],
+        };
+    }
+
+    if (typeof array[0][query[0]] === 'number') {
+        const length = names.length;
+        const values = [];
+        const result = [];
+        for (let i = 0; i < length; i++) {
+            values.push(0);
+            result.push({ name: `${query[0]} ${names[i]}`, group: '1' });
+        }
+        array.forEach((item) => {
+            values[item[query[0]]] += 1;
+        });
+        console.log('values in pie', values);
+        for (let i = 0; i < length; i++) {
+            result[i]['count'] = values[i];
+        }
+        return { data: result };
+    }
+}
+
 function getResult(array, query, drawstyle, params) {
     switch (drawstyle) {
         case 'pie': {
-            const length = array.length;
-            const true_length = array.filter((item) => item[query[0]]).length;
             const names = params.split(',');
-            return {
-                data: [
-                    {
-                        name: names[0],
-                        count: length - true_length,
-                        group: '1',
-                    },
-                    { name: names[1], count: true_length, group: '1' },
-                ],
-            };
+            return pie(array, query, names);
         }
         case 'hist': {
             if (array.length === 0) {
@@ -53,7 +80,7 @@ function getResult(array, query, drawstyle, params) {
             let left = bins[0];
             const result = bins.slice(1).map((bin) => {
                 const res1 = {
-                    bin: (left + bin) / 2,
+                    bin: [left, bin],
                     value: 0,
                 };
                 left = bin;
@@ -167,7 +194,9 @@ async function getCount(table, filter = {}) {
     return { total, none };
 }
 
+// @query: ['age',...]
 async function getData(table, filter, query) {
+    // none 代表filter是不是{}里有数据
     const { total, none } = await getCount(table, filter);
     const fields = query.reduce((accu, item) => {
         accu[item] = true;

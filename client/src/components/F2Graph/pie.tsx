@@ -46,7 +46,7 @@ export default function Pie({
         chart.tooltip(false);
         chart.pieLabel({
             sidePadding: 40,
-            label1: (data, color) => ({ text: data.name, fill: color }),
+            label1: (data, color) => ({ text: data.name.toUpperCase(), fill: color }),
             label2: (data) => ({
                 text: String(data.count),
                 fill: '#808080',

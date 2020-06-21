@@ -45,10 +45,11 @@ const selectors: string[] = [
 ];
 
 // Todo 需要与输入验证相结合
+// query:table:drawstyle:params => [query]:table:drawstyle:params
 const map = new Map([
     ['性别', 'isMale:patients:pie:女,男'],
     ['年龄', 'age:patients:hist:0,10,20,30,40,50,60,70,80,90,100,110,120'],
-    ['agi', 'agi:patients:hist:0,1,2,3,4,5'],
+    ['agi', 'agi:patients:pie:1,2,3,4'],
     ['apache2', 'apache2:patients:hist:0,10,20,30,40,50,60,70,80'],
     ['存活出院', 'isAliveDischarge:patients:pie:死亡,存活'],
     ['机械通气', 'needVentilation:patients:pie:无,有'],
@@ -114,6 +115,7 @@ export default function RecordGraph() {
         });
     }, [currIndex, data]);
 
+    console.log('current data', data);
     return (
         <View className="index">
             {request['drawstyle'] === 'pie' ? (
@@ -195,7 +197,10 @@ function printPieData(data: PieDataType[]): string {
     if (!data || data.length < 2) {
         return '';
     }
-    return `${data[0].name}:${data[0].count}\n${data[1].name}:${data[1].count}`;
+    let sum = data.reduce((accu, cv) => accu + cv.count, 0);
+    return data
+        .map((item) => `${item.name.toUpperCase()}: ${((item.count / sum) * 100).toFixed(1)}%`)
+        .join(',\t');
 }
 
 function printHistData(params: string, data: HistDataType[]): string {
@@ -211,5 +216,5 @@ function printHistData(params: string, data: HistDataType[]): string {
         left = i;
     }
 
-    return result.join(', ');
+    return result.join(',\t');
 }

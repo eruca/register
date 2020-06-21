@@ -5,7 +5,7 @@ import F2 from '@antv/f2/lib/index-all';
 import { CSSProperties } from 'react';
 
 export type HistDataType = {
-    bin: number;
+    bin: [number, number];
     value: number;
 };
 
@@ -35,22 +35,22 @@ export default function Hist({
         });
 
         chart.source(data);
-        chart.axis('bins', {
-            label: (text, index, total) => {
-                console.log('bins label', text, index, total);
-                return {
-                    textAlign: 'start',
-                    text: text.toString(),
-                };
-            },
-        });
-        chart.tooltip({
-            showItemMarker: false,
-            onShow: ({ items }) => {
-                console.log('x, y, item, title', items);
-                items[0].name = items[0].title;
-            },
-        });
+        // chart.axis('bin', {
+        //     label: (text, index, total) => {
+        //         console.log('bins label', text, index, total);
+        //         return {
+        //             textAlign: 'start',
+        //             text: text.toString(),
+        //         };
+        //     },
+        // });
+        // chart.tooltip({
+        //     showItemMarker: false,
+        //     onShow: ({ items }) => {
+        //         console.log('x, y, item, title', items);
+        //         items[0].name = items[0].title;
+        //     },
+        // });
 
         chart.interval().position('bin*value');
 
