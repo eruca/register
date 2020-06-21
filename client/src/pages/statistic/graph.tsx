@@ -138,7 +138,7 @@ export default function RecordGraph() {
             <View style={{ margin: '15PX' }}>
                 {request['drawstyle'] === 'pie'
                     ? printPieData(data[request['query'][0]])
-                    : printHistData(request.params, data[request['query'][0]])}
+                    : printHistData(data[request['query'][0]])}
             </View>
             <View style={{ margin: '5PX 14PX' }}>
                 <AtButton
@@ -203,18 +203,10 @@ function printPieData(data: PieDataType[]): string {
         .join(',\t');
 }
 
-function printHistData(params: string, data: HistDataType[]): string {
+function printHistData(data: HistDataType[]): string {
     if (!data || data.length < 2) {
         return '';
     }
-    const bins = params.split(',');
 
-    const result: string[] = [];
-    let left = 0;
-    for (let i = 1; i < data.length; i++) {
-        result.push(`${bins[left]}-${bins[i]}:${data[i].value}`);
-        left = i;
-    }
-
-    return result.join(',\t');
+    return data.map((item) => `${item.bin[0]}-${item.bin[1]}: ${item.value}`).join(',\t');
 }
