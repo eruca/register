@@ -25,22 +25,28 @@ export default function Nutrition() {
     const [useEN, setUseEN] = useState(false);
     const [百普力, set百普力] = useState(0);
     const [能全力, set能全力] = useState(0);
+    const [高能能全力, set高能能全力] = useState(0);
     const [康全力, set康全力] = useState(0);
     const [瑞代, set瑞代] = useState(0);
 
     // 肠外制剂
     const [usePN, setUsePN] = useState(false);
     const [卡文, set卡文] = useState(0);
+    const [力保肪宁, set力保肪宁] = useState(0);
 
     const pngsCalories = (0.05 * pngs5 + 0.1 * pngs10 + 0.5 * pngs50) * 4;
     const engsCalories = (0.05 * engs5 + 0.1 * engs10 + 0.5 * engs50) * 4;
 
     const amino = 0.05 * amino5 + 0.085 * amino8_5 + 0.1 * amino10;
-    const enCalories = 百普力 + 能全力 + 0.75 * 康全力 + 0.9 * 瑞代;
+    const enCalories = 百普力 + 能全力 + 1.5 * 高能能全力 + 0.75 * 康全力 + 0.9 * 瑞代;
     const enAmino =
-        (20 / 500) * 百普力 + (30 / 500) * 能全力 + (16 / 500) * 康全力 + (17 / 500) * 瑞代;
+        (20 / 500) * 百普力 +
+        (20 / 500) * 能全力 +
+        (30 / 500) * 高能能全力 +
+        (16 / 500) * 康全力 +
+        (17 / 500) * 瑞代;
 
-    const pnCalories = (卡文 / 1440) * 1000;
+    const pnCalories = (卡文 / 1440) * 1000 + 力保肪宁 * 1.908;
     const pnAmino = (卡文 / 1440) * 34;
 
     return (
@@ -257,6 +263,22 @@ export default function Nutrition() {
                         >
                             <View style={{ marginRight: '10PX' }}>ml</View>
                         </AtInput>
+
+                        <AtInput
+                            name="高能能全力"
+                            title="高能能全力"
+                            type="digit"
+                            placeholder="请输入高能能全力(ml)"
+                            value={高能能全力 ? 高能能全力.toString() : ''}
+                            onChange={(v: string) => set高能能全力(v ? parseFloat(v) : 0)}
+                            onBlur={() =>
+                                高能能全力 > 10000 &&
+                                Taro.atMessage({ message: '输入是否错误', type: 'warning' })
+                            }
+                        >
+                            <View style={{ marginRight: '10PX' }}>ml</View>
+                        </AtInput>
+
                         <AtInput
                             name="康全力"
                             title="康全力"
@@ -306,6 +328,20 @@ export default function Nutrition() {
                             onChange={(v: string) => set卡文(v ? parseFloat(v) : 0)}
                             onBlur={() =>
                                 卡文 > 10000 &&
+                                Taro.atMessage({ message: '输入是否错误', type: 'warning' })
+                            }
+                        >
+                            <View style={{ marginRight: '10PX' }}>ml</View>
+                        </AtInput>
+                        <AtInput
+                            name="力保肪宁"
+                            title="力保肪宁"
+                            type="digit"
+                            placeholder="请输入力保肪宁(ml)"
+                            value={力保肪宁 ? 力保肪宁.toString() : ''}
+                            onChange={(v: string) => set力保肪宁(v ? parseFloat(v) : 0)}
+                            onBlur={() =>
+                                力保肪宁 > 10000 &&
                                 Taro.atMessage({ message: '输入是否错误', type: 'warning' })
                             }
                         >
