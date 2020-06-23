@@ -367,7 +367,7 @@ export default function Apache2() {
                             onClick={() => Taro.navigateTo({ url: '/pages/scores/gcs/index' })}
                             customStyle={{ margin: '5PX' }}
                         >
-                            计算GCS
+                            去计算GCS
                         </AtButton>
                         {admiExplanation && surgicalIndex === 0 && (
                             <View style={{ marginTop: '15PX' }}>
