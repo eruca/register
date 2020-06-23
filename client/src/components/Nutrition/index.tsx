@@ -33,6 +33,9 @@ export default function Nutrition() {
     const [usePN, setUsePN] = useState(false);
     const [卡文, set卡文] = useState(0);
     const [力保肪宁, set力保肪宁] = useState(0);
+    const [丙泊酚, set丙泊酚] = useState(0);
+    const [力文, set力文] = useState(0);
+    const [尤文, set尤文] = useState(0);
 
     const pngsCalories = (0.05 * pngs5 + 0.1 * pngs10 + 0.5 * pngs50) * 4;
     const engsCalories = (0.05 * engs5 + 0.1 * engs10 + 0.5 * engs50) * 4;
@@ -46,7 +49,8 @@ export default function Nutrition() {
         (16 / 500) * 康全力 +
         (17 / 500) * 瑞代;
 
-    const pnCalories = (卡文 / 1440) * 1000 + 力保肪宁 * 1.908;
+    const pnCalories =
+        (卡文 / 1440) * 1000 + 力保肪宁 * 1.908 + 丙泊酚 * 0.9 + 力文 * 1.96 + 尤文 * 1.12;
     const pnAmino = (卡文 / 1440) * 34;
 
     return (
@@ -128,6 +132,7 @@ export default function Nutrition() {
                             title="1. 5%GS"
                             type="digit"
                             placeholder="请输入肠内5%GS(ml)"
+                            clear={true}
                             value={engs5 ? engs5.toString() : ''}
                             onChange={(v: string) => setEnGs5(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -142,6 +147,7 @@ export default function Nutrition() {
                             title="2. 10%GS"
                             type="digit"
                             placeholder="请输入肠内10%GS(ml)"
+                            clear={true}
                             value={engs10 ? engs10.toString() : ''}
                             onChange={(v: string) => setEnGs10(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -156,6 +162,7 @@ export default function Nutrition() {
                             title="3. 50%GS"
                             type="digit"
                             placeholder="请输入肠内50%GS(ml)"
+                            clear={true}
                             value={engs50 ? engs50.toString() : ''}
                             onChange={(v: string) => setEnGs50(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -208,11 +215,11 @@ export default function Nutrition() {
                             <View style={{ marginRight: '10PX' }}>ml</View>
                         </AtInput>
                         <AtInput
-                            clear={true}
                             name="10%amino"
                             title="10%氨基酸"
                             type="digit"
                             placeholder="请输入10%氨基酸(ml)"
+                            clear={true}
                             value={amino10 ? amino10.toString() : ''}
                             onChange={(v: string) => setAmino10(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -239,6 +246,7 @@ export default function Nutrition() {
                             title="百普力"
                             type="digit"
                             placeholder="请输入百普力(ml)"
+                            clear={true}
                             value={百普力 ? 百普力.toString() : ''}
                             onChange={(v: string) => set百普力(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -254,6 +262,7 @@ export default function Nutrition() {
                             title="能全力"
                             type="digit"
                             placeholder="请输入能全力(ml)"
+                            clear={true}
                             value={能全力 ? 能全力.toString() : ''}
                             onChange={(v: string) => set能全力(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -269,6 +278,7 @@ export default function Nutrition() {
                             title="高能能全力"
                             type="digit"
                             placeholder="请输入高能能全力(ml)"
+                            clear={true}
                             value={高能能全力 ? 高能能全力.toString() : ''}
                             onChange={(v: string) => set高能能全力(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -284,6 +294,7 @@ export default function Nutrition() {
                             title="康全力"
                             type="digit"
                             placeholder="请输入康全力(ml)"
+                            clear={true}
                             value={康全力 ? 康全力.toString() : ''}
                             onChange={(v: string) => set康全力(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -298,6 +309,7 @@ export default function Nutrition() {
                             title="瑞代"
                             type="digit"
                             placeholder="请输入瑞代(ml)"
+                            clear={true}
                             value={瑞代 ? 瑞代.toString() : ''}
                             onChange={(v: string) => set瑞代(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -324,6 +336,7 @@ export default function Nutrition() {
                             title="卡文(1440ml)"
                             type="digit"
                             placeholder="请输入卡文(ml)"
+                            clear={true}
                             value={卡文 ? 卡文.toString() : ''}
                             onChange={(v: string) => set卡文(v ? parseFloat(v) : 0)}
                             onBlur={() =>
@@ -338,10 +351,56 @@ export default function Nutrition() {
                             title="力保肪宁"
                             type="digit"
                             placeholder="请输入力保肪宁(ml)"
+                            clear={true}
                             value={力保肪宁 ? 力保肪宁.toString() : ''}
                             onChange={(v: string) => set力保肪宁(v ? parseFloat(v) : 0)}
                             onBlur={() =>
                                 力保肪宁 > 10000 &&
+                                Taro.atMessage({ message: '输入是否错误', type: 'warning' })
+                            }
+                        >
+                            <View style={{ marginRight: '10PX' }}>ml</View>
+                        </AtInput>
+                        <AtInput
+                            name="力文"
+                            title="力文"
+                            type="digit"
+                            placeholder="请输入力文(ml)"
+                            clear={true}
+                            value={力文 ? 力文.toString() : ''}
+                            onChange={(v: string) => set力文(v ? parseFloat(v) : 0)}
+                            onBlur={() =>
+                                力文 > 10000 &&
+                                Taro.atMessage({ message: '输入是否错误', type: 'warning' })
+                            }
+                        >
+                            <View style={{ marginRight: '10PX' }}>ml</View>
+                        </AtInput>
+                        <AtInput
+                            name="尤文"
+                            title="尤文"
+                            type="digit"
+                            placeholder="请输入尤文(ml)"
+                            clear={true}
+                            value={尤文 ? 尤文.toString() : ''}
+                            onChange={(v: string) => set尤文(v ? parseFloat(v) : 0)}
+                            onBlur={() =>
+                                尤文 > 10000 &&
+                                Taro.atMessage({ message: '输入是否错误', type: 'warning' })
+                            }
+                        >
+                            <View style={{ marginRight: '10PX' }}>ml</View>
+                        </AtInput>
+                        <AtInput
+                            name="丙泊酚"
+                            title="丙泊酚"
+                            type="digit"
+                            placeholder="请输入丙泊酚(ml)"
+                            clear={true}
+                            value={丙泊酚 ? 丙泊酚.toString() : ''}
+                            onChange={(v: string) => set丙泊酚(v ? parseFloat(v) : 0)}
+                            onBlur={() =>
+                                丙泊酚 > 10000 &&
                                 Taro.atMessage({ message: '输入是否错误', type: 'warning' })
                             }
                         >
