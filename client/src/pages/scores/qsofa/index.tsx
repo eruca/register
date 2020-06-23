@@ -26,7 +26,7 @@ export default function Qsofa() {
                     onSwitchChange={() => setRespiratoryRate(!respiratory_rate)}
                 />
                 <AtListItem
-                    title="收缩压≤100"
+                    title="收缩压≤100mmHg"
                     isSwitch={true}
                     switchIsCheck={systolicBP}
                     onSwitchChange={() => setSystolicBP(!systolicBP)}
