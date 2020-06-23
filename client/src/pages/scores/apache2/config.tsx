@@ -6,7 +6,7 @@ export function gen_ages(defaultIndex = 0) {
   return {
     index,
     setIndex,
-    items: ["0~44", "45~54", "55~64", "65~75", "75~"],
+    items: ["0~44", "45~54", "55~64", "65~75", "≥75"],
     scores: [0, 2, 3, 5, 6],
     text: "年龄(岁)"
   };
@@ -19,14 +19,14 @@ export function gen_retalTemp(defaultIndex = 4) {
     index,
     setIndex,
     items: [
-      "~29.9",
+      "≤29.9",
       "30~31.9",
       "32~33.9",
       "34~35.9",
       "36~38.4",
       "38.5~38.9",
       "39~40.9",
-      "41~"
+      "≥41"
     ],
     scores: [-4, -3, -2, -1, 0, 1, 3, 4],
     text: "肛温(℃)"
@@ -39,7 +39,7 @@ export function gen_map(defaultIndex = 2) {
   return {
     index,
     setIndex,
-    items: ["~49", "50~69", "70~109", "110~129", "130~159", "160~"],
+    items: ["≤49", "50~69", "70~109", "110~129", "130~159", "≥160"],
     scores: [-4, -2, 0, 2, 3, 4],
     text: "平均动脉压(mmHg)"
   };
@@ -51,7 +51,7 @@ export function gen_heartRate(defaultIndex = 3) {
   return {
     index,
     setIndex,
-    items: ["~39", "40~54", "55~69", "70~109", "110~139", "140~179", "180~"],
+    items: ["≤39", "40~54", "55~69", "70~109", "110~139", "140~179", "≥180"],
     scores: [-4, -3, -2, 0, 2, 3, 4],
     text: "心率(bmp)"
   };
@@ -63,7 +63,7 @@ export function gen_respirateRate(defaultIndex = 3) {
   return {
     index,
     setIndex,
-    items: ["~5", "6~9", "10~11", "12~24", "25~34", "35~49", "50~"],
+    items: ["≤5", "6~9", "10~11", "12~24", "25~34", "35~49", "≥50"],
     scores: [-4, -2, -1, 0, 1, 3, 4],
     text: "呼吸频率(次/分)"
   };
@@ -73,8 +73,8 @@ export function gen_respirateRate(defaultIndex = 3) {
 export function gen_fio2(fio2: boolean) {
   return {
     items: fio2
-      ? ["~200", "200~400", "400~500", "500~"]
-      : ["~55", "55~60", "60~70", "70~"],
+      ? ["<200", "200~400", "400~500", "≥500"]
+      : ["<55", "55~60", "60~70", "≥70"],
     scores: fio2 ? [0, 2, 3, 4] : [-4, -3, -1, 0],
     text: fio2 ? "AaDaO2(mmHg)" : "PaO2(mmHg)"
   };
@@ -84,7 +84,7 @@ export function gen_fio2(fio2: boolean) {
 export function gen_ph(bg: boolean) {
   return {
     items: bg
-      ? ["≤15", "15~17.9", "18~21.9", "22~31.9", "32~40.9", "41~51.9", "≥52"]
+      ? ["<15", "15~17.9", "18~21.9", "22~31.9", "32~40.9", "41~51.9", "≥52"]
       : [
           "≤7.14",
           "7.15~7.24",
@@ -141,7 +141,7 @@ export function gen_cr(defaultIndex = 1) {
   return {
     index,
     setIndex,
-    items: ["<53", "53~123", "124~175", "176~308", "≥309"],
+    items: ["<53", "53~127", "128~171", "172~304", "≥305"],
     scores: [-1, 0, 2, 3, 4],
     text: "血肌酐(mmol/L)"
   };

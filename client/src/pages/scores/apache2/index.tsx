@@ -1,6 +1,6 @@
 import Taro, { useState } from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { AtSwitch, AtInput, AtCard, AtMessage, AtTabs, AtTabsPane } from 'taro-ui';
+import { AtSwitch, AtInput, AtCard, AtMessage, AtTabs, AtTabsPane, AtButton } from 'taro-ui';
 
 import CPicker from '../../../components/CPicker';
 import Chronic from './chronic';
@@ -362,6 +362,13 @@ export default function Apache2() {
                             text="入科原因"
                             abs={false}
                         />
+                        <AtButton
+                            type="secondary"
+                            onClick={() => Taro.navigateTo({ url: '/pages/scores/gcs/index' })}
+                            customStyle={{ margin: '5PX' }}
+                        >
+                            计算GCS
+                        </AtButton>
                         {admiExplanation && surgicalIndex === 0 && (
                             <View style={{ marginTop: '15PX' }}>
                                 <AtCard title="呼吸功能不全或呼吸衰竭:">
