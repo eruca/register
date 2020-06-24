@@ -129,7 +129,7 @@ export default function Nutrition() {
                     <View>
                         <AtInput
                             name="5%gs"
-                            title="1. 5%GS"
+                            title="5%GS"
                             type="digit"
                             placeholder="请输入肠内5%GS(ml)"
                             clear={true}
@@ -144,7 +144,7 @@ export default function Nutrition() {
                         </AtInput>
                         <AtInput
                             name="10%gs"
-                            title="2. 10%GS"
+                            title="10%GS"
                             type="digit"
                             placeholder="请输入肠内10%GS(ml)"
                             clear={true}
@@ -159,7 +159,7 @@ export default function Nutrition() {
                         </AtInput>
                         <AtInput
                             name="50%gs"
-                            title="3. 50%GS"
+                            title="50%GS"
                             type="digit"
                             placeholder="请输入肠内50%GS(ml)"
                             clear={true}
