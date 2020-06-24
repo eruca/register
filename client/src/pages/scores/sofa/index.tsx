@@ -1,6 +1,15 @@
 import Taro, { useState, useMemo } from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { AtListItem, AtList, AtRadio, AtNoticebar, AtInput, AtMessage, AtIcon } from 'taro-ui';
+import {
+    AtListItem,
+    AtList,
+    AtRadio,
+    AtNoticebar,
+    AtInput,
+    AtMessage,
+    AtIcon,
+    AtButton,
+} from 'taro-ui';
 
 const pO2Unit = ['mmHg', 'kPa'];
 const ecof = 7.50062;
@@ -487,6 +496,13 @@ export default function Sofa() {
                     </View>
                 )}
             </AtList>
+            <AtButton
+                type="secondary"
+                customStyle={{ margin: '5PX' }}
+                onClick={() => Taro.navigateTo({ url: '/pages/scores/gcs/index' })}
+            >
+                去计算GCS
+            </AtButton>
         </View>
     );
 }
