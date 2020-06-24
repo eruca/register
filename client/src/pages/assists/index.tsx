@@ -32,8 +32,9 @@ export default function Assists() {
                     data={[
                         { value: '耐受性评分' },
                         { value: 'NRS2002' },
-                        { value: 'AGI' },
+                        { value: 'AGI评分' },
                         { value: 'RASS评分' },
+                        { value: 'NIHSS评分' },
                     ]}
                 />
             </AtList>
@@ -89,6 +90,9 @@ const onClick2 = (item: object, index: number) => {
             break;
         case 3:
             Taro.navigateTo({ url: '/pages/assess/rass/index' });
+            break;
+        case 4:
+            Taro.navigateTo({ url: '/pages/assess/nihss/index' });
             break;
         default:
     }

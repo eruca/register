@@ -44,6 +44,7 @@ class App extends Component {
             'pages/assess/agi/index',
             'pages/assess/rass/index',
             'pages/scores/nutrition/index',
+            'pages/assess/nihss/index',
         ],
 
         tabBar: {

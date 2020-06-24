@@ -59,14 +59,14 @@ export default function RassPage() {
             <View style={{ color: 'red', marginTop: '5PX' }}>结果解读:</View>
             <View className="result">
                 <View>第1步：观察病人</View>
-                <View className='ritem'>病人清醒、不安焦虑、或躁动？——>评分0~+4</View>
+                <View className='ritem'>病人清醒、不安焦虑、或躁动？——&gt;评分0~+4</View>
                 <View>第2步：若病人不清醒，用名字唤醒病人并令其睁眼看着说话人</View>
-                <View className='ritem'>病人可睁眼，有眼神交流，并维持该状态——>评分-1</View>
-                <View className='ritem'>病人可睁眼，有眼神交流，但无法维持——>评分-2</View>
-                <View className='ritem'>病人可睁眼，或有其他有反应，但无眼神交流——>评分-3</View>
+                <View className='ritem'>病人可睁眼，有眼神交流，并维持该状态——&gt;评分-1</View>
+                <View className='ritem'>病人可睁眼，有眼神交流，但无法维持——&gt;评分-2</View>
+                <View className='ritem'>病人可睁眼，或有其他有反应，但无眼神交流——&gt;评分-3</View>
                 <View>第3步：若病人对声音无反应，摇晃肩膀或抚摸胸口唤醒病人</View>
-                <View className='ritem'>病人对物理刺激有反应或睁眼——>评分-4</View>
-                <View className='ritem'>病人对所有刺激均无反应——>评分-5</View>
+                <View className='ritem'>病人对物理刺激有反应或睁眼——&gt;评分-4</View>
+                <View className='ritem'>病人对所有刺激均无反应——&gt;评分-5</View>
             </View>
             <View className="reference">
                 参考来源:Sessler CN, et al. The Richmond Agitation-Sedation Scale: validity and
