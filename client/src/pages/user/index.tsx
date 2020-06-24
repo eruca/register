@@ -1,12 +1,23 @@
-import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
-import { View, Text } from '@tarojs/components';
-import { AtForm, AtInput, AtButton, AtMessage, AtTextarea } from 'taro-ui';
+import Taro, { useState, useEffect, useCallback, Dispatch, SetStateAction } from '@tarojs/taro';
+import { View, Text, Button } from '@tarojs/components';
+import {
+    AtForm,
+    AtInput,
+    AtButton,
+    AtMessage,
+    AtTextarea,
+    AtListItem,
+    AtModal,
+    AtModalHeader,
+    AtModalContent,
+    AtModalAction,
+} from 'taro-ui';
 import { useSelector, useDispatch } from '@tarojs/redux';
 
 import { IReducers } from '../../reducers';
-import { isAdmin, IUserState } from '../../reducers/user';
+import { isAdmin, IUserState, isUnknown } from '../../reducers/user';
 import { syncHospDeptCocodes, userSync, forceRerender } from '../../actions/user';
-import { getContextSuccess } from '../../cloudfunc';
+import { getContextSuccess, onAuthSuccess } from '../../cloudfunc';
 
 type EqualType = {
     name: string;
@@ -31,6 +42,15 @@ function disableUpdate(lhs: EqualType, rhs: EqualType): boolean {
     );
 }
 
+// onChange 统一使用该函数
+const onChange = (fn: Dispatch<SetStateAction<string>>) => (v: number | string) => {
+    if (typeof v === 'number') {
+        fn(v.toString());
+    } else {
+        fn(v);
+    }
+};
+
 export default function User() {
     const dispatch = useDispatch();
     const {
@@ -39,6 +59,7 @@ export default function User() {
         hosp: defaultHosp,
         name: defaultName,
         mail: defaultMail,
+        nickName,
         cocode, // 不可改变，只能从服务器获取
         cocodes: defaultCocodes, // 可编辑
         authority,
@@ -50,6 +71,52 @@ export default function User() {
     const [name, setName] = useState(defaultName);
     const [mail, setMail] = useState(defaultMail);
     const [cocodes, setCocodes] = useState(defaultCocodes);
+
+    const [isOpen, setOpen] = useState(false);
+    const [inviteCodeSender, setInviteCodeSender] = useState('');
+    const [inviteCode, setInviteCode] = useState('');
+
+    const onModalClick = useCallback(() => {
+        Taro.atMessage({ message: '正在申请加入, 请稍等...', type: 'info' });
+
+        Taro.cloud.callFunction({
+            name: 'onAuth',
+            data: { invitor: inviteCodeSender, code: inviteCode, nickname: nickName },
+            success: onAuthSuccess(dispatch, setOpen),
+            fail: console.error,
+        });
+    }, [inviteCode, inviteCodeSender, setOpen]);
+
+    const onModalClose = useCallback(() => {
+        setOpen(false);
+        setInviteCodeSender('');
+        setInviteCode('');
+    }, [setOpen, setInviteCodeSender, setInviteCodeSender]);
+
+    const mailTest = () => {
+        if (!mail_regexp.test(mail)) {
+            Taro.atMessage({
+                message: '邮箱密码格式错误,示例:81233890@qq.com',
+                type: 'error',
+            });
+        }
+    };
+
+    const applyJoin = () => {
+        if (
+            name.trim() === '' ||
+            hosp.trim() === '' ||
+            dept.trim() === '' ||
+            !mail_regexp.test(mail)
+        ) {
+            Taro.atMessage({
+                message: '请完善名字、医院、科室及有效邮箱',
+                type: 'error',
+            });
+            return;
+        }
+        setOpen(true);
+    };
 
     useEffect(() => {
         Taro.cloud.callFunction({
@@ -130,22 +197,22 @@ export default function User() {
                     value={mail}
                     placeholder="你的邮箱，接受数据用"
                     onChange={(e: string) => setMail(e)}
-                    onBlur={(e) => {
-                        if (!mail_regexp.test(mail)) {
-                            Taro.atMessage({
-                                message: '邮箱密码格式错误,示例:81233890@qq.com',
-                                type: 'error',
-                            });
-                        }
-                    }}
+                    onBlur={mailTest}
                 />
-                <AtInput
-                    title="协作码:"
-                    name="cocode"
-                    value={cocode ? cocode : ''}
-                    disabled={true}
-                    onChange={() => {}}
-                />
+                {isUnknown(authority) && (
+                    <View style={{ marginLeft: '5PX' }}>
+                        <AtListItem title="加入RCT" onClick={applyJoin} arrow="right" />
+                    </View>
+                )}
+                {!isUnknown(authority) && (
+                    <AtInput
+                        title="协作码:"
+                        name="cocode"
+                        value={cocode ? cocode : ''}
+                        disabled={true}
+                        onChange={() => {}}
+                    />
+                )}
                 {isAdmin(authority) && (
                     <AtInput
                         title="邀请码:"
@@ -155,24 +222,29 @@ export default function User() {
                         onChange={() => {}}
                     />
                 )}
-                <View className="at-row" style={{ margin: '15PX 0 5PX 16PX' }}>
-                    <View className="at-col">
-                        协作人员:
-                        <Text style={{ fontSize: '0.6em', color: '#CCCCCC' }}>
-                            协作码#备注 以逗号分隔
-                        </Text>
-                    </View>
-                </View>
 
-                <View style={{ margin: '5PX 15PX 10PX 16PX' }}>
-                    <View style="height:100px" className="at-col">
-                        <AtTextarea
-                            value={cocodes}
-                            placeholder="090909#张三,091111#李四"
-                            onChange={(value) => setCocodes(value.replace(/，/, ','))}
-                        />
+                {!isUnknown(authority) && (
+                    <View>
+                        <View className="at-row" style={{ margin: '15PX 0 5PX 16PX' }}>
+                            <View className="at-col">
+                                协作人员:
+                                <Text style={{ fontSize: '0.6em', color: '#CCCCCC' }}>
+                                    协作码#备注 以逗号分隔
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={{ margin: '5PX 15PX 10PX 16PX' }}>
+                            <View style="height:100px" className="at-col">
+                                <AtTextarea
+                                    value={cocodes}
+                                    placeholder="090909#张三,091111#李四"
+                                    onChange={(value) => setCocodes(value.replace(/，/, ','))}
+                                />
+                            </View>
+                        </View>
                     </View>
-                </View>
+                )}
 
                 <View style="margin:5PX 15PX">
                     <AtButton
@@ -207,6 +279,43 @@ export default function User() {
                     </View>
                 )}
             </AtForm>
+
+            {isUnknown(authority) && (
+                <AtModal
+                    isOpened={isOpen}
+                    onCancel={onModalClose}
+                    onClose={onModalClose}
+                    closeOnClickOverlay={true}
+                >
+                    <AtModalHeader>
+                        <Text style="color:skyblue">申请加入</Text>
+                    </AtModalHeader>
+                    <AtModalContent>
+                        <AtInput
+                            name="inviteCodeSender"
+                            title="邀请者:"
+                            placeholder="邀请者协作码"
+                            value={inviteCodeSender}
+                            clear
+                            type="number"
+                            onChange={onChange(setInviteCodeSender)}
+                        />
+                        <AtInput
+                            name="inviteCode"
+                            type="number"
+                            title="邀请码:"
+                            placeholder="邀请者邀请码"
+                            clear
+                            value={inviteCode}
+                            onChange={onChange(setInviteCode)}
+                        />
+                    </AtModalContent>
+                    <AtModalAction>
+                        <Button onClick={onModalClose}>取消</Button>{' '}
+                        <Button onClick={onModalClick}>确定</Button>
+                    </AtModalAction>
+                </AtModal>
+            )}
         </View>
     );
 }
