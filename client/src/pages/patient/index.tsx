@@ -100,6 +100,7 @@ export default function Patient() {
                     name="hospId"
                     title="病案号:"
                     type="number"
+                    placeholder="请输入病案号或住院号"
                     value={patient.hospId}
                     onChange={useCallback((v: string) => setPatient({ ...patient, hospId: v }), [
                         patient,
@@ -110,6 +111,7 @@ export default function Patient() {
                     name="name"
                     title="姓名:"
                     type="text"
+                    placeholder="请输入姓名"
                     value={patient.name}
                     onChange={useCallback((v: string) => setPatient({ ...patient, name: v }), [
                         patient,
@@ -179,7 +181,7 @@ export default function Patient() {
                 />
                 <AtInput
                     name="weight"
-                    title="体重(Kg):"
+                    title="体重(kg):"
                     type="number"
                     placeholder="30-300"
                     value={patient.weight === '0' && patient_id === '' ? '' : patient.weight}
