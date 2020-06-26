@@ -1,9 +1,8 @@
-import Taro, { useEffect, useState, useCallback } from '@tarojs/taro';
+import Taro, { useEffect, useState } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { AtList, AtListItem } from 'taro-ui';
-import { F2Canvas } from 'taro-f2';
-import F2 from '@antv/f2';
 
+import Line, { LineValueType } from '../../components/F2Graph/line';
 import { useSelector } from '@tarojs/redux';
 import { IReducers } from 'src/reducers';
 import { IRecord } from '../../reducers/records';
@@ -60,49 +59,14 @@ export default function RecordGraph() {
     // Picker的value
     const [currIndex, setCurrIndex] = useState(0);
 
-    const [graph, setGraph] = useState(null);
-
-    if (graph && patientRecords.length > 0) {
-        graph.changeData(
-            patientRecords.map((record) => ({
-                time: record['recordtime'],
-                value: record[map.get(selectors[currIndex]) || 'enteralCalories'],
-            }))
-        );
-    }
-
-    const initChart = useCallback(
-        (canvas: any, width: number, height: number) => {
-            console.log('initChart', width, height);
-            const chart = new F2.Chart({
-                el: canvas,
-                width,
-                height,
-            });
-
-            chart.source([], {
-                time: { type: 'timeCat' },
-                value: { tickCount: 4 },
-            });
-            chart.tooltip({
-                showItemMarker: true,
-                onShow({ items }) {
-                    items[0].name = items[0].title;
-                    items[0].value = items[0].value;
-                },
-            });
-            chart.interval().position('time*value');
-            chart.render();
-            setGraph(chart);
-        },
-        [patient_id, patientRecords, currIndex]
-    );
+    const data: LineValueType[] = patientRecords.map((record: IRecord) => ({
+        date: record['recordtime'],
+        value: record[map.get(selectors[currIndex]) || 'enteralCalories'],
+    }));
 
     return (
         <View className="index">
-            <View style="width:100%;height:450px">
-                <F2Canvas onInit={initChart}></F2Canvas>
-            </View>
+            <Line data={data} />
             <View>
                 <Picker
                     mode="selector"
