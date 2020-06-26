@@ -182,7 +182,7 @@ export default function Patient() {
                 <AtInput
                     name="weight"
                     title="体重(kg):"
-                    type="number"
+                    type="digit"
                     placeholder="30-300"
                     value={patient.weight === '0' && patient_id === '' ? '' : patient.weight}
                     onChange={useCallback(

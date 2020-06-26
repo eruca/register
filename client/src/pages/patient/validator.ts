@@ -1,4 +1,4 @@
-import { validateNotEmpty, validateInt, ConfigType } from '../../utils/validator';
+import { validateNotEmpty, validateInt, ConfigType, validateNumber } from '../../utils/validator';
 import { LocalPatient } from './config';
 
 const validators: Map<string, ConfigType> = [
@@ -25,7 +25,7 @@ const validators: Map<string, ConfigType> = [
     {
         key: 'weight',
         message: '体重在20-299',
-        validator: validateInt(v => v >= 20 && v < 300),
+        validator: validateNumber(v => v >= 20 && v < 300),
     },
     {
         key: 'apache2',
