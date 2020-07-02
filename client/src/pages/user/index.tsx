@@ -28,7 +28,7 @@ type EqualType = {
 };
 
 // email正则
-const mail_regexp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+const mail_regexp = /^([a-zA-Z0-9_\-\.])+@([a-zA-Z0-9_\-\.])+(\.[a-zA-Z0-9_-]+)+$/;
 
 // 禁止更新
 function disableUpdate(lhs: EqualType, rhs: EqualType): boolean {
