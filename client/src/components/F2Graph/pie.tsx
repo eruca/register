@@ -1,5 +1,6 @@
 import Taro, { useState } from '@tarojs/taro';
 import { View } from '@tarojs/components';
+import { AtActivityIndicator } from 'taro-ui';
 import { F2Canvas } from 'taro-f2';
 import F2 from '@antv/f2/lib/index-all';
 import { CSSProperties } from 'react';
@@ -19,7 +20,7 @@ type PieProps = {
 export default function Pie({
     data = [],
     radius = 0.85,
-    style = { width: '100%', height: '600rpx' },
+    style = { width: '100%', height: '600rpx', position: 'relative' },
 }: PieProps) {
     const [graph, setGraph] = useState(null);
 
@@ -61,5 +62,13 @@ export default function Pie({
         return chart;
     };
 
-    return <View style={style}>{data.length && <F2Canvas onInit={initChart}></F2Canvas>}</View>;
+    return (
+        <View style={style}>
+            {data.length ? (
+                <F2Canvas onInit={initChart} />
+            ) : (
+                <AtActivityIndicator mode="center" size={32} content="加载中..." />
+            )}
+        </View>
+    );
 }

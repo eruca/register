@@ -1,5 +1,6 @@
 import Taro, { useState } from '@tarojs/taro';
 import { View } from '@tarojs/components';
+import { AtActivityIndicator } from 'taro-ui';
 import { F2Canvas } from 'taro-f2';
 import F2 from '@antv/f2/lib/index-all';
 import { CSSProperties } from 'react';
@@ -17,7 +18,7 @@ type HistProps = {
 
 export default function Hist({
     data = [],
-    style = { width: '100%', height: '600rpx' },
+    style = { width: '100%', height: '600rpx', position: 'relative' },
 }: HistProps) {
     const [graph, setGraph] = useState(null);
 
@@ -60,5 +61,13 @@ export default function Hist({
     };
     console.log('values.length', data);
 
-    return <View style={style}>{data.length && <F2Canvas onInit={initChart} />}</View>;
+    return (
+        <View style={style}>
+            {data.length ? (
+                <F2Canvas onInit={initChart} />
+            ) : (
+                <AtActivityIndicator mode="center" size={32} content="加载中..." />
+            )}
+        </View>
+    );
 }
