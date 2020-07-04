@@ -1,13 +1,15 @@
 import Taro, { useEffect } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { AtList, AtListItem, AtMessage } from 'taro-ui';
-import { useSelector } from '@tarojs/redux';
+import { useSelector, useDispatch } from '@tarojs/redux';
 
 import Head from '../../components/Head';
 import { IReducers } from '../../reducers';
 import { version } from '../../version';
+import { getProjects } from '../../actions/projects';
 
 export default function Index() {
+    const dispatch = useDispatch();
     const { user } = useSelector((state: IReducers) => ({
         user: state.user,
     }));
@@ -20,6 +22,20 @@ export default function Index() {
             });
         }
     }, []);
+
+    useEffect(() => {
+        Taro.cloud.callFunction({
+            name: 'getProjects',
+            success: ({ errMsg, result = {} }: Taro.cloud.CallFunctionResult) => {
+                console.log('getProjects', errMsg, result);
+                if (typeof result === 'string') {
+                    console.log('获取是字符串，应该是{}');
+                    return;
+                }
+                dispatch(getProjects(result.list[0].projects as string[]));
+            },
+        });
+    }, [user.force_rerender]);
 
     return (
         <View>

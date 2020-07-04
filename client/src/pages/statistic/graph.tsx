@@ -1,6 +1,6 @@
-import Taro, { useEffect, useState, useCallback } from '@tarojs/taro';
+import Taro, { useEffect, useState, useCallback, useMemo } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
-import { AtList, AtListItem, AtMessage, AtButton } from 'taro-ui';
+import { AtList, AtListItem, AtButton, AtMessage } from 'taro-ui';
 
 import { useSelector, useDispatch } from '@tarojs/redux';
 import { IReducers } from 'src/reducers';
@@ -76,100 +76,138 @@ const map = new Map([
 // 因为有两个useEffect 返回渲染两次
 const defaultData = {};
 
+function getKey(request: RequestParams, currProjectIndex: number): string {
+    return `${request.query[0]}:${currProjectIndex}`;
+}
+
 export default function RecordGraph() {
     const dispatch = useDispatch();
-    const { force_rerender, listType } = useSelector((state: IReducers) => ({
+    const { force_rerender, listType, projects } = useSelector((state: IReducers) => ({
         force_rerender: state.user.force_rerender,
         listType: state.user.listType,
+        projects: state.projects,
     }));
+
+    // const [modal, setModal] = useState({ open: false, content: '' });
+    // const modalClose = () => setModal({ open: false, content: '' });
 
     // Picker的value
     const [currIndex, setCurrIndex] = useState(0);
     const [data, setData] = useState(defaultData);
     const request = getParams(currIndex, listType);
+
+    // projects index
+    const projects4Selectors = useMemo(() => ['全部', ...projects], [projects]);
+    const [currProjectIndex, setCurrProjectIndex] = useState(0);
     console.log('request', request);
 
+    // 将缓存重置
     useEffect(() => setData(defaultData), [force_rerender]);
 
     useEffect(() => {
-        console.log('getDataForGraph', currIndex, data);
-        if (data[request['query'][0]]) {
-            console.log('data exist', data[request['query'][0]]);
+        console.log('getDataForGraph', currIndex, currProjectIndex);
+        if (data[getKey(request, currProjectIndex)]) {
+            console.log('data exist', data[getKey(request, currProjectIndex)]);
             return;
         }
         Taro.cloud.callFunction({
             name: 'getDataForGraph',
-            data: request,
+            data: { ...request, project: projects4Selectors[currProjectIndex] },
             success: ({ errMsg, result = {} }: Taro.cloud.CallFunctionResult) => {
                 console.log('get DataFor Graph', errMsg, result, request);
                 if (result['err']) {
                     Taro.atMessage({ message: result['err'], type: 'error' });
+                    // setModal({ open: true, content: result['err'] });
                     return;
                 }
                 if (!result['data']) {
                     Taro.atMessage({ message: '返回数据为空', type: 'error' });
+                    // setModal({ open: true, content: '返回数据为空' });
                     return;
                 }
-                setData({ ...data, [request.query[0]]: result['data'] });
+                setData({ ...data, [getKey(request, currProjectIndex)]: result['data'] });
             },
         });
-    }, [currIndex, data]);
+    }, [currIndex, currProjectIndex]);
 
     console.log('current data', data);
     return (
-        <View className="index">
-            {request['drawstyle'] === 'pie' ? (
-                <Pie
-                    data={
-                        data && request && request.query && request.query[0]
-                            ? data[request['query'][0]]
-                            : []
-                    }
-                />
-            ) : (
-                <Hist
-                    data={
-                        data && request && request.query && request.query[0]
-                            ? data[request['query'][0]]
-                            : []
-                    }
-                />
-            )}
-            <View style={{ margin: '15PX' }}>
-                {request['drawstyle'] === 'pie'
-                    ? printPieData(data[request['query'][0]])
-                    : printHistData(data[request['query'][0]])}
-            </View>
-            <View style={{ margin: '5PX 14PX' }}>
-                <AtButton
-                    type="secondary"
-                    onClick={useCallback(() => {
-                        dispatch(forceRerender());
-                        Taro.atMessage({ message: '已刷新', type: 'success' });
-                    }, [])}
-                >
-                    刷新
-                </AtButton>
-            </View>
-            <View>
-                <Picker
-                    mode="selector"
-                    range={selectors}
-                    value={currIndex}
-                    onChange={(e) =>
-                        setCurrIndex(
-                            typeof e.detail.value === 'number'
-                                ? e.detail.value
-                                : parseInt(e.detail.value, 10)
-                        )
-                    }
-                >
-                    <AtList>
-                        <AtListItem title="请选择展示内容" extraText={selectors[currIndex]} />
-                    </AtList>
-                </Picker>
-            </View>
+        <View>
             <AtMessage />
+            <View className="index">
+                {request['drawstyle'] === 'pie' ? (
+                    <Pie
+                        data={
+                            data && request && request.query && request.query[0]
+                                ? data[getKey(request, currProjectIndex)]
+                                : []
+                        }
+                    />
+                ) : (
+                    <Hist
+                        data={
+                            data && request && request.query && request.query[0]
+                                ? data[getKey(request, currProjectIndex)]
+                                : []
+                        }
+                    />
+                )}
+                <View style={{ margin: '15PX' }}>
+                    {request['drawstyle'] === 'pie'
+                        ? printPieData(data[getKey(request, currProjectIndex)])
+                        : printHistData(data[getKey(request, currProjectIndex)])}
+                </View>
+                <View style={{ margin: '5PX 14PX' }}>
+                    <AtButton
+                        type="secondary"
+                        onClick={useCallback(() => {
+                            dispatch(forceRerender());
+                            Taro.atMessage({ message: '已刷新', type: 'success' });
+                        }, [])}
+                    >
+                        刷新
+                    </AtButton>
+                </View>
+                <View>
+                    <Picker
+                        mode="selector"
+                        range={selectors}
+                        value={currIndex}
+                        onChange={(e) =>
+                            setCurrIndex(
+                                typeof e.detail.value === 'number'
+                                    ? e.detail.value
+                                    : parseInt(e.detail.value, 10)
+                            )
+                        }
+                    >
+                        <AtList>
+                            <AtListItem title="请选择展示内容" extraText={selectors[currIndex]} />
+                        </AtList>
+                    </Picker>
+                </View>
+                <View>
+                    <Picker
+                        mode="selector"
+                        range={projects4Selectors}
+                        value={currProjectIndex}
+                        onChange={(e) =>
+                            setCurrProjectIndex(
+                                typeof e.detail.value === 'number'
+                                    ? e.detail.value
+                                    : parseInt(e.detail.value, 10)
+                            )
+                        }
+                    >
+                        <AtList>
+                            <AtListItem
+                                title="请选择展示项目"
+                                extraText={projects4Selectors[currProjectIndex]}
+                            />
+                        </AtList>
+                    </Picker>
+                </View>
+            </View>
         </View>
     );
 }

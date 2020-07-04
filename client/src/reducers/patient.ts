@@ -16,6 +16,8 @@ export interface IPatient {
     height: number;
     weight: number;
     diagnoseIndex: number;
+    diagnose: string;
+    projectName: string;
     needVesopressor: boolean;
     needVentilation: boolean;
     useSmallPeptide: boolean;
@@ -41,6 +43,8 @@ export function zeroPatient(): IPatient {
         height: 0,
         weight: 0,
         diagnoseIndex: 0,
+        diagnose: '',
+        projectName: '',
         needVesopressor: false,
         needVentilation: false,
         useSmallPeptide: false,

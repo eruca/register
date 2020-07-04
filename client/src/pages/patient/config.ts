@@ -13,6 +13,8 @@ export interface LocalPatient {
     height: string;
     weight: string;
     diagnoseIndex: number;
+    diagnose: string;
+    projectName: string;
     needVesopressor: boolean;
     needVentilation: boolean;
     useSmallPeptide: boolean;
@@ -39,6 +41,8 @@ export function equal(lhs: LocalPatient, rhs: LocalPatient): boolean {
         lhs.height === rhs.height &&
         lhs.weight === rhs.weight &&
         lhs.diagnoseIndex === rhs.diagnoseIndex &&
+        lhs.diagnose === rhs.diagnose &&
+        lhs.projectName === rhs.projectName &&
         lhs.needVesopressor === rhs.needVesopressor &&
         lhs.needVentilation === rhs.needVentilation &&
         lhs.useSmallPeptide === rhs.useSmallPeptide &&
@@ -59,6 +63,8 @@ export function convertToLocal(patient: IPatient): LocalPatient {
         admittime: patient.admittime,
         enrolltime: patient.enrolltime,
         diagnoseIndex: patient.diagnoseIndex,
+        diagnose: patient.diagnose,
+        projectName: patient.projectName,
         needVentilation: patient.needVentilation,
         needVesopressor: patient.needVesopressor,
         useSmallPeptide: patient.useSmallPeptide,
@@ -86,6 +92,8 @@ export function convertToPatient(patient: LocalPatient, withID: boolean = true):
         admittime: patient.admittime,
         enrolltime: patient.enrolltime,
         diagnoseIndex: patient.diagnoseIndex,
+        diagnose: patient.diagnose,
+        projectName: patient.projectName,
         needVentilation: patient.needVentilation,
         needVesopressor: patient.needVesopressor,
         useSmallPeptide: patient.useSmallPeptide,

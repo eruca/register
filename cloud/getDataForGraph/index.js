@@ -5,7 +5,7 @@ cloud.init();
 
 const db = cloud.database();
 const _ = cloud.database().command;
-// const $ = cloud.database().command.aggregate;
+const $ = cloud.database().command.aggregate;
 
 const LIMIT = 1000;
 
@@ -13,18 +13,36 @@ const LIMIT = 1000;
 exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext();
     console.log('event', event);
-    const { listType, table, query, drawstyle, params } = event;
+    const { listType, table, query, drawstyle, params, project } = event;
 
     const filter = await getFriends(wxContext.OPENID, listType);
-
     console.log('filter', filter);
-    const array = await getData(table, filter, query);
+    const filter2 = await getProjectfilter(table, project);
+    console.log('filter2', filter2);
+
+    const array = await getData(table, { ...filter, ...filter2 }, query);
 
     console.log('array', array);
     const result = getResult(array, query, drawstyle, params);
 
     return result;
 };
+
+async function getProjectfilter(table, project) {
+    if (project === '全部') {
+        return {};
+    }
+    if (table === 'patients') {
+        return { projectName: project };
+    }
+
+    const { data: ids } = await db
+        .collection('patients')
+        .where({ projectName: project })
+        .field({ _id: 1 })
+        .get();
+    return { patientid: _.in(ids.map((x) => x._id)) };
+}
 
 function pie(array, query, names) {
     if (array.length === 0) {

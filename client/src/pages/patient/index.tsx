@@ -1,7 +1,16 @@
 import Taro, { useState, useEffect, useCallback } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { useSelector, useDispatch } from '@tarojs/redux';
-import { AtForm, AtInput, AtButton, AtSwitch, AtMessage, AtIcon, AtFloatLayout } from 'taro-ui';
+import {
+    AtForm,
+    AtInput,
+    AtButton,
+    AtSwitch,
+    AtMessage,
+    AtIcon,
+    AtFloatLayout,
+    AtListItem,
+} from 'taro-ui';
 
 import { zeroPatient, IPatient } from '../../reducers/patient';
 import FormField from '../../components/FormField';
@@ -17,18 +26,28 @@ import './index.scss';
 
 export default function Patient() {
     const dispatch = useDispatch();
-    const { patient_id, _openid, auth, force_rerender } = useSelector((state: IReducers) => ({
-        ...state.patients,
-        _openid: state.user._openid,
-        force_rerender: state.user.force_rerender,
-        auth: state.user.authority,
-    }));
+    const { patient_id, _openid, auth, force_rerender, projects } = useSelector(
+        (state: IReducers) => ({
+            ...state.patients,
+            _openid: state.user._openid,
+            force_rerender: state.user.force_rerender,
+            auth: state.user.authority,
+            projects: state.projects,
+        })
+    );
 
     // 作为从数据库下载下来的数据
     const [finalPatient, setFinalPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
     const [patient, setPatient] = useState<LocalPatient>(convertToLocal(zeroPatient()));
     // 现在有2个浮层，用0 => 关闭， 1 => NRS2002, 2 => EnteralNutritionTolenance
     const [floatLay, setFloatLay] = useState(0);
+
+    const [projectSwitch, setProjectSwitch] = useState(true);
+    const currIndex = projects.indexOf(patient.projectName);
+    console.log('currIndex', currIndex);
+    const [projectCurrIndex, setProjectCurrIndex] = useState(currIndex);
+
+    useEffect(() => setProjectCurrIndex(currIndex), [currIndex]);
 
     // 如果patient_id已被选择，就从数据库获取该patient数据
     useEffect(() => {
@@ -107,6 +126,58 @@ export default function Patient() {
                         setPatient,
                     ])}
                 />
+                <View style={{ display: 'flex', flexDirection: 'row', marginLeft: '2PX' }}>
+                    {projectSwitch ? (
+                        <View style={{ flexGrow: 1 }}>
+                            <Picker
+                                mode="selector"
+                                range={projects || []}
+                                value={projectCurrIndex}
+                                onChange={(e) => {
+                                    const index =
+                                        typeof e.detail.value === 'number'
+                                            ? e.detail.value
+                                            : parseInt(e.detail.value, 10);
+                                    setProjectCurrIndex(index);
+                                    setPatient({ ...patient, projectName: projects[index] });
+                                }}
+                            >
+                                <AtListItem
+                                    title="请选择项目"
+                                    extraText={projects[projectCurrIndex]}
+                                />
+                            </Picker>
+                        </View>
+                    ) : (
+                        <View style={{ flexGrow: 1 }}>
+                            <AtInput
+                                name="projectName"
+                                title="项目名称:"
+                                type="text"
+                                placeholder="新增项目"
+                                value={patient.projectName}
+                                onChange={useCallback(
+                                    (v: string) => setPatient({ ...patient, projectName: v }),
+                                    [patient, setPatient]
+                                )}
+                            />
+                        </View>
+                    )}
+                    <View
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            margin: 'auto 20PX',
+                        }}
+                    >
+                        <AtIcon
+                            value={projectSwitch ? 'edit' : 'check'}
+                            color="#79A4FA"
+                            onClick={() => setProjectSwitch(!projectSwitch)}
+                        />
+                    </View>
+                </View>
                 <AtInput
                     name="name"
                     title="姓名:"
@@ -208,6 +279,17 @@ export default function Patient() {
                 >
                     <FormField name="主要诊断" value={selector[patient.diagnoseIndex]} />
                 </Picker>
+                <AtInput
+                    name="diagnose"
+                    title="诊断:"
+                    type="text"
+                    placeholder="请输入诊断"
+                    value={patient.diagnose}
+                    onChange={useCallback((v: string) => setPatient({ ...patient, diagnose: v }), [
+                        patient,
+                        setPatient,
+                    ])}
+                />
                 <AtSwitch
                     title="需要升压药"
                     checked={patient.needVesopressor}
