@@ -13,7 +13,7 @@ export default function Statistic() {
         <View>
             <AtTabs
                 current={segmentIndex}
-                tabList={[{ title: '统计' }, { title: '图表' }]}
+                tabList={[{ title: '图表' }, { title: '统计' }]}
                 onClick={(v) => setSegmentIndex(v)}
             >
                 <AtTabsPane current={segmentIndex} index={0}>

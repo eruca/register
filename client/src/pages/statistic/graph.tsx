@@ -1,13 +1,12 @@
-import Taro, { useEffect, useState, useCallback, useMemo } from '@tarojs/taro';
+import Taro, { useEffect, useState, useMemo } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
-import { AtList, AtListItem, AtButton, AtMessage } from 'taro-ui';
+import { AtList, AtListItem, AtMessage } from 'taro-ui';
 
-import { useSelector, useDispatch } from '@tarojs/redux';
+import { useSelector } from '@tarojs/redux';
 import { IReducers } from 'src/reducers';
 import { ListType } from 'src/reducers/user';
 import Hist, { HistDataType } from '../../components/F2Graph/hist';
 import Pie, { PieDataType } from '../../components/F2Graph/pie';
-import { forceRerender } from '../../actions/user';
 
 type RequestParams = {
     listType: ListType;
@@ -64,7 +63,7 @@ const map = new Map([
     ['腹泻', 'diarrhea:records:pie:无,有'],
     ['肠内能量', 'enteralCalories:records:hist:0,500,1000,2000,3000'],
     ['肠外能量', 'parenteralCalories:records:hist:0,500,1000,2000,3000'],
-    ['空腹血糖', 'fastingGlucose:records:hist:0, 4, 11,20,30,50'],
+    ['空腹血糖', 'fastingGlucose:records:hist:0,4,11,20,30,50'],
     ['胃潴留', 'gastricRetention:records:hist:0,500,1000,2000,3000,4000'],
     ['消化道出血', 'gastrointestinalHemorrhage:records:pie:无,有'],
     ['血红蛋白', 'hemoglobin:records:hist:0,30,60,90,120,150,180,250'],
@@ -81,7 +80,7 @@ function getKey(request: RequestParams, currProjectIndex: number): string {
 }
 
 export default function RecordGraph() {
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const { force_rerender, listType, projects } = useSelector((state: IReducers) => ({
         force_rerender: state.user.force_rerender,
         listType: state.user.listType,
@@ -117,12 +116,10 @@ export default function RecordGraph() {
                 console.log('get DataFor Graph', errMsg, result, request);
                 if (result['err']) {
                     Taro.atMessage({ message: result['err'], type: 'error' });
-                    // setModal({ open: true, content: result['err'] });
                     return;
                 }
                 if (!result['data']) {
                     Taro.atMessage({ message: '返回数据为空', type: 'error' });
-                    // setModal({ open: true, content: '返回数据为空' });
                     return;
                 }
                 setData({ ...data, [getKey(request, currProjectIndex)]: result['data'] });
@@ -156,17 +153,6 @@ export default function RecordGraph() {
                     {request['drawstyle'] === 'pie'
                         ? printPieData(data[getKey(request, currProjectIndex)])
                         : printHistData(data[getKey(request, currProjectIndex)])}
-                </View>
-                <View style={{ margin: '5PX 14PX' }}>
-                    <AtButton
-                        type="secondary"
-                        onClick={useCallback(() => {
-                            dispatch(forceRerender());
-                            Taro.atMessage({ message: '已刷新', type: 'success' });
-                        }, [])}
-                    >
-                        刷新
-                    </AtButton>
                 </View>
                 <View>
                     <Picker
