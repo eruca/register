@@ -17,10 +17,10 @@ export default function Statistic() {
                 onClick={(v) => setSegmentIndex(v)}
             >
                 <AtTabsPane current={segmentIndex} index={0}>
-                    <Stats />
+                    <Graph />
                 </AtTabsPane>
                 <AtTabsPane current={segmentIndex} index={1}>
-                    <Graph />
+                    <Stats />
                 </AtTabsPane>
             </AtTabs>
         </View>
