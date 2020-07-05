@@ -93,7 +93,7 @@ class App extends Component {
         if (!Taro.cloud) {
             console.error('请使用2.2.3或以上的基础库以使用云能力');
         } else {
-            Taro.cloud.init({ traceUser: true });
+            Taro.cloud.init({ env: 'nutriant-t53no', traceUser: true });
             Taro.cloud.callFunction({
                 name: 'getContext',
                 success: getContextSuccess(store.dispatch),

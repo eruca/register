@@ -1,7 +1,7 @@
 // 云函数入口文件
 const cloud = require('wx-server-sdk');
 
-cloud.init();
+cloud.init({ env: 'nutriant-t53no', traceUser: true });
 
 const db = cloud.database();
 const col = cloud.database().collection('patients');
@@ -65,7 +65,7 @@ exports.main = async (event, context) => {
 
         // 获取组内数据
         case 1:
-            // 获取登录用户信息
+            // 获取登录用户组内朋友的cocodes
             const { data } =
                 (await db
                     .collection('users')
@@ -75,6 +75,7 @@ exports.main = async (event, context) => {
                     .get()) || {};
             const { cocodes } = data[0];
 
+            // 获取自己的cocode
             const { data: data1 } = await db
                 .collection('cocodes')
                 .where({ _openid: wxContext.OPENID })
@@ -82,7 +83,14 @@ exports.main = async (event, context) => {
             const { cocode } = data1[0];
 
             // 获取所有的cocodes
-            const groupCocodes = [cocode, ...cocodes.split(',').map((v) => v.trim().split('#')[0])];
+            const groupCocodes1 = [
+                cocode,
+                ...cocodes.split(',').map((v) => v.trim().split('#')[0]),
+            ];
+            const data11 = await getAllcocodes(groupCocodes1);
+            const groupCocodes = [...groupCocodes1, ...data11];
+
+            console.log('最后的cocodes', groupCocodes);
             const group_openid = [];
 
             let skip = 0;
@@ -150,6 +158,34 @@ exports.main = async (event, context) => {
         openid_nicknames,
     };
 };
+
+// 获取本人及组内朋友及他们邀请的人员的cocodes
+async function getAllcocodes(cocodes) {
+    console.log('邀请者', cocodes);
+    // 增加该输入的参数
+    // aggregate_cocodes.push(...cocodes);
+    const result = await db
+        .collection('cocodes')
+        .where({ invitor: _.in(cocodes) })
+        .get();
+    if (result.data.length === 0) {
+        return [];
+    }
+    const cocodes2 = result.data.map((it) => it.cocode);
+    console.log('被邀请者们', cocodes2);
+    const data = await getAllcocodes(drop_duplicate(cocodes2, cocodes));
+    return [...cocodes2, ...data];
+}
+
+function drop_duplicate(sons, fathers) {
+    let set = new Set(sons);
+    for (const one of fathers) {
+        if (set.has(one)) {
+            set.delete(one);
+        }
+    }
+    return [...set];
+}
 
 async function getSupervisorInfo(found, OPENID) {
     // 监督功能，所有查询到文档的作者Set
