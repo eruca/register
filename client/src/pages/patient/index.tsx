@@ -47,6 +47,9 @@ export default function Patient() {
     console.log('currIndex', currIndex);
     const [projectCurrIndex, setProjectCurrIndex] = useState(currIndex);
 
+    // 控制submit 开关的按键
+    const [submitDisable, setSubmitDisable] = useState(false);
+
     useEffect(() => setProjectCurrIndex(currIndex), [currIndex]);
 
     // 如果patient_id已被选择，就从数据库获取该patient数据
@@ -67,13 +70,15 @@ export default function Patient() {
     }, [patient_id, auth, force_rerender, setPatient, setFinalPatient]);
     console.log('patient =>', patient, 'patient_id', patient_id);
 
-    const onSubmit = () => {
+    const onSubmit = useCallback(() => {
         const message = validate(patient);
         if (message !== '') {
             Taro.atMessage({ message, type: 'error' });
             return;
         }
 
+        // disable 重复点击
+        setSubmitDisable(true);
         if (isCrew(auth)) {
             if (patient_id === '') {
                 Taro.cloud
@@ -106,7 +111,7 @@ export default function Patient() {
                     });
             }
         }
-    };
+    }, [patient, auth, patient_id]);
 
     // 如果是已经有patient_id, 但是这个时候网络断了，那么就会出现这种情况
     return patient_id !== '' && !patient._id ? (
@@ -451,8 +456,9 @@ export default function Patient() {
                     type="primary"
                     formType="submit"
                     disabled={
-                        (_openid !== patient._openid || equal(patient, finalPatient)) && // 不是本人的或者没有更改的
-                        patient_id !== '' // 新增的
+                        submitDisable ||
+                        ((_openid !== patient._openid || equal(patient, finalPatient)) && // 不是本人的或者没有更改的
+                            patient_id !== '') // 新增的
                     }
                 >
                     {patient_id === '' ? '提交' : '修改'}

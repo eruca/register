@@ -51,7 +51,8 @@ export default function ResultSegment() {
 
     console.log('patient_id', patient_id);
     console.table(patient);
-    const onSubmit = () => {
+    const [disableSubmit, setDisableSubmit] = useState(false);
+    const onSubmit = useCallback(() => {
         if (patient_id === '') {
             throw new Error('不可能为空');
         }
@@ -66,6 +67,7 @@ export default function ResultSegment() {
             return;
         }
 
+        setDisableSubmit(true);
         if (isCrew(auth)) {
             Taro.cloud
                 .database()
@@ -81,7 +83,7 @@ export default function ResultSegment() {
                     fail: console.error,
                 });
         }
-    };
+    }, [patient_id, patient, auth, setDisableSubmit]);
 
     return (
         <View>
@@ -142,7 +144,11 @@ export default function ResultSegment() {
                 <AtButton
                     type="primary"
                     formType="submit"
-                    disabled={patient_openid !== user_openid || equal(patient, finalPatient)}
+                    disabled={
+                        disableSubmit ||
+                        patient_openid !== user_openid ||
+                        equal(patient, finalPatient)
+                    }
                 >
                     提交
                 </AtButton>

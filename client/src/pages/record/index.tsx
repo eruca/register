@@ -15,13 +15,14 @@ import EnteralNutritionTolerance from '../../components/EnteralNutritionToleranc
 
 export default function Form() {
     const dispatch = useDispatch();
-    const { record_id, patient_id, _openid, auth, enrolltime, force_rerender } = useSelector(
+    const { record_id, force_rerender, auth, _openid, patient_id, enrolltime } = useSelector(
         (state: IReducers) => ({
             record_id: state.records.record_id,
             force_rerender: state.user.force_rerender,
             auth: state.user.authority,
             _openid: state.user._openid,
-            ...state.patients,
+            patient_id: state.patients.patient_id,
+            enrolltime: state.patients.enrolltime,
         })
     );
 
@@ -49,13 +50,17 @@ export default function Form() {
     }, [record_id, auth, setRecord, force_rerender]);
     console.log(`${patient_id}. record`, record);
 
-    const onSubmit = () => {
+    // disable submit
+    const [disableSubmit, setDisableSubmit] = useState(false);
+
+    const onSubmit = useCallback(() => {
         const message = validate(record);
         if (message !== '') {
             Taro.atMessage({ message, type: 'error' });
             return;
         }
 
+        setDisableSubmit(true);
         if (isCrew(auth)) {
             if (record_id === '') {
                 Taro.cloud
@@ -85,7 +90,7 @@ export default function Form() {
                     });
             }
         }
-    };
+    }, [record, auth, record_id, setDisableSubmit]);
 
     return (
         <View>
@@ -397,8 +402,9 @@ export default function Form() {
                     type="primary"
                     formType="submit"
                     disabled={
-                        (_openid !== record._openid || equal(record, finalRecord)) &&
-                        record_id !== ''
+                        disableSubmit ||
+                        ((_openid !== record._openid || equal(record, finalRecord)) &&
+                            record_id !== '')
                     }
                 >
                     {record_id === '' ? '提交' : '修改'}
