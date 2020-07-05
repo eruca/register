@@ -39,12 +39,12 @@ class App extends Component {
             'pages/scores/qsofa/index',
             'pages/scores/sofa/index',
             'pages/scores/bmi/index',
+            'pages/scores/nutrition/index',
+            'pages/scores/nihss/index',
             'pages/assess/nrs2002/index',
             'pages/assess/entolerance/index',
             'pages/assess/agi/index',
             'pages/assess/rass/index',
-            'pages/scores/nutrition/index',
-            'pages/assess/nihss/index',
         ],
 
         tabBar: {

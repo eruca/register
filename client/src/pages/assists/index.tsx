@@ -19,6 +19,7 @@ export default function Assists() {
                     { value: 'APACHE Ⅱ' },
                     { value: 'SOFA' },
                     { value: 'qSOFA' },
+                    { value: 'NIHSS评分' },
                 ]}
             />
             <AtList>
@@ -34,7 +35,6 @@ export default function Assists() {
                         { value: 'NRS2002' },
                         { value: 'AGI评分' },
                         { value: 'RASS评分' },
-                        { value: 'NIHSS评分' },
                     ]}
                 />
             </AtList>
@@ -69,9 +69,9 @@ const onClick = (item: object, index: number) => {
         case 3:
             Taro.navigateTo({ url: '/pages/scores/qsofa/index' });
             break;
-        // case 4:
-        //     Taro.navigateTo({ url: '/pages/scores/bmi/index' });
-        //     break;
+        case 4:
+            Taro.navigateTo({ url: '/pages/scores/nihss/index' });
+            break;
         default:
     }
 };
@@ -90,9 +90,6 @@ const onClick2 = (item: object, index: number) => {
             break;
         case 3:
             Taro.navigateTo({ url: '/pages/assess/rass/index' });
-            break;
-        case 4:
-            Taro.navigateTo({ url: '/pages/assess/nihss/index' });
             break;
         default:
     }
