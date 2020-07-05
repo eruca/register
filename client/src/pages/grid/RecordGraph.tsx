@@ -66,7 +66,20 @@ export default function RecordGraph() {
 
     return (
         <View className="index">
-            <Line data={data} />
+            {Array.isArray(data) && data.length > 0 ? (
+                <Line data={data} />
+            ) : (
+                <View
+                    style={{
+                        height: '600rpx',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    暂无数据
+                </View>
+            )}
             <View>
                 <Picker
                     mode="selector"
