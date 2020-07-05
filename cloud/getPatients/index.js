@@ -134,9 +134,15 @@ exports.main = async (event, context) => {
             break;
     }
 
+    // result.found存储data
     const result = await getData(col, final_filter, offset, size);
 
-    const openid_nicknames = await getSupervisorInfo(result.found, wxContext.OPENID);
+    // 如果是全部的话，看作者，而不是监督员
+    const openid_nicknames =
+        listType === 2
+            ? await getAuthorInfo(result.found, wxContext.OPENID)
+            : await getSupervisorInfo(result.found, wxContext.OPENID);
+
     // 开始收集record数量
     const patient_ids = result.found.map((it) => it._id);
     console.log('patient_ids', patient_ids);
@@ -187,6 +193,33 @@ function drop_duplicate(sons, fathers) {
     return [...set];
 }
 
+async function getAuthorInfo(found, OPENID) {
+    const set = new Set(found.map((it) => it._openid));
+    // 将监视者的_openid => user
+    const { data: supervisors } = await db
+        .collection('users')
+        .where({
+            _openid: _.in([...set]),
+        })
+        .get();
+
+    const supervisor_openid_name = supervisors.reduce((accu, curr) => {
+        accu.set(curr._openid, (curr.name || '') + '-' + curr.nickName + ',' + (curr.hosp || ''));
+        return accu;
+    }, new Map());
+
+    console.log('supervisor_openid_name', supervisor_openid_name);
+
+    const openid_nicknames = {};
+    for (const key of set) {
+        openid_nicknames[key] = supervisor_openid_name.get(key);
+    }
+
+    console.log('openid_nicknames', openid_nicknames);
+
+    return openid_nicknames;
+}
+
 async function getSupervisorInfo(found, OPENID) {
     // 监督功能，所有查询到文档的作者Set
     const set = new Set(found.map((it) => it._openid));
@@ -216,6 +249,7 @@ async function getSupervisorInfo(found, OPENID) {
         }
     });
 
+    // 文档记录者_openid => 与查询者最近的被邀请者_openid
     const openid_openid = new Map();
     // 查询者的cocode
     const queryer_cocode = map.get(OPENID);
