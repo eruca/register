@@ -22,6 +22,7 @@ import { deselect, select } from '../../actions/patient';
 import { isCrew } from '../../reducers/user';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
+import { splitter } from '../../utils/regexp';
 
 import './index.scss';
 
@@ -280,9 +281,9 @@ function decorate_extratext(line: string | undefined): string {
         return '';
     }
     const [names, hosps] = line.split(',');
-    const [name1, name2] = names.split('-');
+    const [name1, name2] = names.split(splitter);
     const name = name1 ? name1 : name2;
-    const parts = hosps.split('-');
+    const parts = hosps.split(splitter);
     if (parts.length === 1) {
         if (hosps) {
             return name + ':' + hosps;
