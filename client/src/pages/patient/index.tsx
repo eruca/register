@@ -76,40 +76,48 @@ export default function Patient() {
             Taro.atMessage({ message, type: 'error' });
             return;
         }
+        if (!isCrew(auth)) {
+            return;
+        }
 
         // disable 重复点击
         setSubmitDisable(true);
-        if (isCrew(auth)) {
-            if (patient_id === '') {
-                Taro.cloud
-                    .database()
-                    .collection('patients')
-                    .add({
-                        data: convertToPatient(patient),
-                        success: function () {
-                            Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                            // 添加成功，则再次从数据库获取统计信息
-                            dispatch(forceRerender());
-                            setTimeout(() => Taro.navigateBack(), 1000);
-                        },
-                        fail: console.error,
-                    });
-            } else {
-                Taro.cloud
-                    .database()
-                    .collection('patients')
-                    .doc(patient_id)
-                    .set({
-                        data: convertToPatient(patient, false),
-                        success: function () {
-                            Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                            // 修改成功，则再次从数据库获取统计信息
-                            dispatch(forceRerender());
-                            setTimeout(() => Taro.navigateBack(), 1000);
-                        },
-                        fail: console.error,
-                    });
-            }
+
+        if (patient_id === '') {
+            Taro.cloud
+                .database()
+                .collection('patients')
+                .add({
+                    data: convertToPatient(patient),
+                    success: function () {
+                        Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                        setSubmitDisable(false);
+                        // 添加成功，则再次从数据库获取统计信息
+                        dispatch(forceRerender());
+                    },
+                    fail: function () {
+                        console.error(arguments);
+                        setSubmitDisable(false);
+                    },
+                });
+        } else {
+            Taro.cloud
+                .database()
+                .collection('patients')
+                .doc(patient_id)
+                .set({
+                    data: convertToPatient(patient, false),
+                    success: function () {
+                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                        setSubmitDisable(false);
+                        // 修改成功，则再次从数据库获取统计信息
+                        dispatch(forceRerender());
+                    },
+                    fail: function () {
+                        console.log(arguments);
+                        setSubmitDisable(false);
+                    },
+                });
         }
     }, [patient, auth, patient_id]);
 

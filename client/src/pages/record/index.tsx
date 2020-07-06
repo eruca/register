@@ -29,8 +29,10 @@ export default function Form() {
     // 控制浮动层
     const [floatLay, setfloatLay] = useState(false);
 
-    const [finalRecord, setFinalRecord] = useState(convertToLocal(zeroRecord(patient_id)));
-    const [record, setRecord] = useState(convertToLocal(zeroRecord(patient_id)));
+    // 为了比较是否发生了改动，将finalRecord当做未变的数据，而record则一直在更新
+    const rd = convertToLocal(zeroRecord(patient_id));
+    const [finalRecord, setFinalRecord] = useState(rd);
+    const [record, setRecord] = useState(rd);
 
     useEffect(() => {
         console.log('ask for database: record_id:', record_id);
@@ -59,36 +61,46 @@ export default function Form() {
             Taro.atMessage({ message, type: 'error' });
             return;
         }
+        if (!isCrew(auth)) {
+            return;
+        }
 
         setDisableSubmit(true);
-        if (isCrew(auth)) {
-            if (record_id === '') {
-                Taro.cloud
-                    .database()
-                    .collection('records')
-                    .add({
-                        data: convertToIRecord(record),
-                        success: function () {
-                            Taro.atMessage({ message: '添加记录成功', type: 'success' });
-                            dispatch(forceRerender());
-                        },
-                        fail: console.error,
-                    });
-            } else {
-                console.log('modify');
-                Taro.cloud
-                    .database()
-                    .collection('records')
-                    .doc(record_id)
-                    .set({
-                        data: convertToIRecord(record, false),
-                        success: function () {
-                            Taro.atMessage({ message: '修改记录成功', type: 'success' });
-                            dispatch(forceRerender());
-                        },
-                        fail: console.error,
-                    });
-            }
+        if (record_id === '') {
+            Taro.cloud
+                .database()
+                .collection('records')
+                .add({
+                    data: convertToIRecord(record),
+                    success: function () {
+                        Taro.atMessage({ message: '添加记录成功', type: 'success' });
+                        setDisableSubmit(false);
+                        Taro.navigateTo({ url: '/pages/grid/index' });
+                        dispatch(forceRerender());
+                    },
+                    fail: function () {
+                        console.error(arguments);
+                        setDisableSubmit(false);
+                    },
+                });
+        } else {
+            console.log('modify');
+            Taro.cloud
+                .database()
+                .collection('records')
+                .doc(record_id)
+                .set({
+                    data: convertToIRecord(record, false),
+                    success: function () {
+                        Taro.atMessage({ message: '修改记录成功', type: 'success' });
+                        Taro.navigateTo({ url: '/pages/grid/index' });
+                        dispatch(forceRerender());
+                    },
+                    fail: function () {
+                        console.error(arguments);
+                        setDisableSubmit(false);
+                    },
+                });
         }
     }, [record, auth, record_id, setDisableSubmit]);
 

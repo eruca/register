@@ -66,23 +66,28 @@ export default function ResultSegment() {
             Taro.atMessage({ message, type: 'error' });
             return;
         }
+        if (!isCrew(auth)) {
+            return;
+        }
 
         setDisableSubmit(true);
-        if (isCrew(auth)) {
-            Taro.cloud
-                .database()
-                .collection('patients')
-                .doc(patient_id)
-                .set({
-                    data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
-                    success: function (res) {
-                        console.log('result after change', res);
-                        dispatch(forceRerender());
-                        Taro.atMessage({ message: '更新结局成功', type: 'success' });
-                    },
-                    fail: console.error,
-                });
-        }
+        Taro.cloud
+            .database()
+            .collection('patients')
+            .doc(patient_id)
+            .set({
+                data: { ...convertToPatient(patient), _id: undefined, _openid: undefined },
+                success: function (res) {
+                    console.log('result after change', res);
+                    Taro.atMessage({ message: '更新结局成功', type: 'success' });
+                    setDisableSubmit(false);
+                    dispatch(forceRerender());
+                },
+                fail: function () {
+                    console.error(arguments);
+                    setDisableSubmit(false);
+                },
+            });
     }, [patient_id, patient, auth, setDisableSubmit]);
 
     return (
