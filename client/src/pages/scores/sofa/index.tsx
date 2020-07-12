@@ -316,7 +316,7 @@ export default function Sofa() {
                             { label: '➋ 1.2-1.9(110-170)', value: 1 },
                             { label: '➌ 2.0-3.4(171-299)', value: 2 },
                             { label: '➍ 3.5-4.9(300-440) 或 24小时尿量<500ml', value: 3 },
-                            { label: '➎ ≥12.0(>204) 或 24小时尿量<200ml', value: 4 },
+                            { label: '➎ ≥5.0(>440) 或 24小时尿量<200ml', value: 4 },
                         ]}
                         value={creatinine}
                         onClick={(v) => setCreatinine(v)}
