@@ -15,7 +15,7 @@ const validators: Map<string, ConfigType> = [
     {
         key: 'bed',
         message: '床号在1-120之间',
-        validator: validateInt(v => v >= 1 && v < 120),
+        validator: validateInt(v => v >= 0 && v < 120),
     },
     {
         key: 'height',
@@ -25,7 +25,7 @@ const validators: Map<string, ConfigType> = [
     {
         key: 'weight',
         message: '体重在20-299',
-        validator: validateNumber(v => v >= 20 && v < 300),
+        validator: validateNumber(v => v >= 0 && v < 300),
     },
     {
         key: 'apache2',

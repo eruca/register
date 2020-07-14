@@ -164,39 +164,84 @@ export default function Form() {
                         value={nasalFeedTubeTypes[record.nasalFeedTubeType]}
                     />
                 </Picker>
-                <AtInput
-                    name="enteralCalories"
-                    title="肠内热卡(kcal):"
-                    placeholder="0-5000kcal"
-                    type="number"
-                    value={
-                        record.enteralCalories === '0' && record_id === ''
-                            ? ''
-                            : record.enteralCalories
-                    }
-                    onChange={useCallback(
-                        (v: string) => setRecord({ ...record, enteralCalories: v }),
-                        [record, setRecord]
-                    )}
-                />
-                <AtInput
-                    name="parenteralCalories"
-                    title="肠外热卡(kcal):"
-                    type="number"
-                    placeholder="0-5000kcal"
-                    value={
-                        record.parenteralCalories === '0' && record_id === ''
-                            ? ''
-                            : record.parenteralCalories
-                    }
-                    onChange={useCallback(
-                        (v: string) => setRecord({ ...record, parenteralCalories: v }),
-                        [record, setRecord]
-                    )}
-                />
+
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
+                        <AtInput
+                            name="enteralCalories"
+                            title="肠内热卡(kcal):"
+                            type="number"
+                            placeholder="请输入肠内热卡"
+                            value={
+                                record.enteralCalories === '0' && record_id === ''
+                                    ? ''
+                                    : record.enteralCalories
+                            }
+                            onChange={useCallback(
+                                (v: string) => setRecord({ ...record, enteralCalories: v }),
+                                [record, setRecord]
+                            )}
+                        />
+                    </View>
+                    <View style={{ marginRight: '18PX' }}>
+                        <AtIcon
+                            value="external-link"
+                            size="30"
+                            color="#79A4FA"
+                            onClick={() =>
+                                Taro.navigateTo({ url: '/pages/scores/nutrition/index' })
+                            }
+                        />
+                    </View>
+                </View>
+
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{ flexGrow: 1 }}>
+                        <AtInput
+                            name="parenteralCalories"
+                            title="肠外热卡(kcal):"
+                            type="number"
+                            placeholder="请输入肠外热卡"
+                            value={
+                                record.parenteralCalories === '0' && record_id === ''
+                                    ? ''
+                                    : record.parenteralCalories
+                            }
+                            onChange={useCallback(
+                                (v: string) => setRecord({ ...record, parenteralCalories: v }),
+                                [record, setRecord]
+                            )}
+                        />
+                    </View>
+                    <View style={{ marginRight: '18PX' }}>
+                        <AtIcon
+                            value="external-link"
+                            size="30"
+                            color="#79A4FA"
+                            onClick={() =>
+                                Taro.navigateTo({ url: '/pages/scores/nutrition/index' })
+                            }
+                        />
+                    </View>
+                </View>
                 <AtInput
                     name="totalProtein"
                     title="总蛋白(g):"
+                    clear={true}
                     type="digit"
                     placeholder="50-80"
                     value={
@@ -210,6 +255,7 @@ export default function Form() {
                 <AtInput
                     name="prealbumin"
                     title="前白蛋白(mg/L):"
+                    clear={true}
                     placeholder="170-420"
                     type="digit"
                     value={record.prealbumin === '0' && record_id === '' ? '' : record.prealbumin}
@@ -221,6 +267,7 @@ export default function Form() {
                 <AtInput
                     name="albumin"
                     title="白蛋白(g):"
+                    clear={true}
                     placeholder="30-50"
                     type="digit"
                     value={record.albumin === '0' && record_id === '' ? '' : record.albumin}
@@ -231,8 +278,9 @@ export default function Form() {
                 />
                 <AtInput
                     name="serumTransfferin"
-                    title="转铁蛋白(g):"
+                    title="转铁蛋白(g/L):"
                     placeholder="1-10"
+                    clear={true}
                     type="digit"
                     value={
                         record.serumTransferrin === '0' && record_id === ''
@@ -247,6 +295,7 @@ export default function Form() {
                 <AtInput
                     name="lymphocyteCount"
                     title="淋巴细胞计数(10^9/L):"
+                    clear={true}
                     placeholder="0.8-4"
                     type="digit"
                     value={
@@ -262,6 +311,7 @@ export default function Form() {
                 <AtInput
                     name="hemoglobin"
                     title="血红蛋白(g/l):"
+                    clear={true}
                     placeholder="90-160"
                     type="number"
                     value={record.hemoglobin === '0' && record_id === '' ? '' : record.hemoglobin}
@@ -273,6 +323,7 @@ export default function Form() {
                 <AtInput
                     name="fastingGlucose"
                     title="空腹血糖(mmol/L):"
+                    clear={true}
                     type="digit"
                     placeholder="3.9-11.1"
                     value={
@@ -288,6 +339,7 @@ export default function Form() {
                 <AtInput
                     name="gastricRetention"
                     title="胃潴留(ml):"
+                    clear={true}
                     placeholder="0-1000"
                     type="number"
                     value={
@@ -303,6 +355,7 @@ export default function Form() {
                 <AtInput
                     name="injectionOfAlbumin"
                     title="输白蛋白(g):"
+                    clear={true}
                     placeholder="0-60"
                     type="number"
                     value={

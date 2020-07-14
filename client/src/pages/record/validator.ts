@@ -15,17 +15,17 @@ const config: Map<string, ConfigType> = [
     {
         key: 'totalProtein',
         message: '总蛋白20-299',
-        validator: validateNumber(v => v > 20 && v < 300),
+        validator: validateNumber(v => v >= 0 && v < 300),
     },
     {
         key: 'prealbumin',
         message: '前蛋白20-999',
-        validator: validateNumber(v => v > 20 && v < 1000),
+        validator: validateNumber(v => v >= 0 && v < 1000),
     },
     {
         key: 'albumin',
         message: '白蛋白1-99',
-        validator: validateNumber(v => v > 0 && v < 100),
+        validator: validateNumber(v => v >= 0 && v < 100),
     },
     {
         key: 'serumTransferrin',
@@ -35,17 +35,17 @@ const config: Map<string, ConfigType> = [
     {
         key: 'lymphocyteCount',
         message: '淋巴细胞计数0-200',
-        validator: validateNumber(v => v > 0 && v < 200),
+        validator: validateNumber(v => v >= 0 && v < 200),
     },
     {
         key: 'hemoglobin',
         message: '血红蛋白20-300',
-        validator: validateNumber(v => v > 20 && v < 300),
+        validator: validateNumber(v => v >= 0 && v < 300),
     },
     {
         key: 'fastingGlucose',
         message: '空腹血糖0-200',
-        validator: validateNumber(v => v > 0 && v < 200),
+        validator: validateNumber(v => v >= 0 && v < 200),
     },
     {
         key: 'gastricRetention',
