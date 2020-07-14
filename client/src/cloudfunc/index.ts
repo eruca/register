@@ -5,6 +5,10 @@ import { ButtonProps } from '@tarojs/components/types/Button';
 import { userSync, syncConnectResult } from '../actions/user';
 import { IUserState } from '../reducers/user';
 
+export const removeRecords = ({ result, errMsg }: Taro.cloud.CallFunctionResult) => {
+    console.log('result', result, 'errMsg', errMsg);
+};
+
 // 云函数成功的处理
 export const getContextSuccess = (dispatch: Dispatch<any>) => ({
     result,
@@ -70,5 +74,4 @@ export const onAuthSuccess = (
     }
 };
 
-
-// export const getPatientsSuccess = 
+// export const getPatientsSuccess =

@@ -145,19 +145,29 @@ export default function List() {
     console.log('openIndex', openIndex);
     const onDelete = () => {
         if (isCrew(auth)) {
-            Taro.cloud
-                .database()
-                .collection('patients')
-                .doc(patients[openIndex]._id || '')
-                .remove({
-                    success: ({ stats }) => {
-                        console.log('e', stats);
-                        dispatch(forceRerender());
-                        onClosed();
-                        setModelOpened(false);
-                    },
-                    fail: console.error,
-                });
+            Taro.cloud.callFunction({
+                name: 'removePatient',
+                data: { patientid: patients[openIndex]._id },
+                success: ({ result, errMsg }: Taro.cloud.CallFunctionResult) => {
+                    console.log('removePatient', result, 'errMsg', errMsg);
+                    if (!result) {
+                        console.warn('removePatient 没有获取数据');
+                        return;
+                    }
+                    Taro.atMessage({
+                        message: `删除成功，同时删除${result['records']}记录`,
+                        type: 'success',
+                    });
+                    dispatch(forceRerender());
+                    onClosed();
+                    setModelOpened(false);
+                },
+                fail: () => {
+                    console.error(arguments);
+                    Taro.atMessage({ message: '删除失败', type: 'error' });
+                    setModelOpened(false);
+                },
+            });
         }
     };
 
@@ -250,7 +260,7 @@ export default function List() {
                 <AtModalHeader>
                     <Text style="color:red">删除病人</Text>
                 </AtModalHeader>
-                <AtModalContent>将会从数据库删除病人信息</AtModalContent>
+                <AtModalContent>将会从数据库删除病人信息及记录</AtModalContent>
                 <AtModalAction>
                     <Button
                         onClick={() => {
