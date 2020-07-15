@@ -39,8 +39,8 @@ const validators: Map<string, ConfigType> = [
     },
     {
         key: 'nrs2002',
-        message: 'NRS2002评分0~23',
-        validator: validateInt(v => v >= 0 && v <= 23),
+        message: 'NRS2002评分0~7',
+        validator: validateInt(v => v >= 0 && v <= 7),
     },
     {
         key: 'enteralNutritionToleranceScore',

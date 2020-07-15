@@ -402,7 +402,7 @@ export default function Patient() {
                             name="nrs2002"
                             title="NRS2002:"
                             type="number"
-                            placeholder="0-23"
+                            placeholder="0-7"
                             value={
                                 patient.nrs2002 === '0' && patient_id === '' ? '' : patient.nrs2002
                             }
