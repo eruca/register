@@ -45,6 +45,7 @@ class App extends Component {
             'pages/assess/entolerance/index',
             'pages/assess/agi/index',
             'pages/assess/rass/index',
+            'pages/assess/cpot/index',
         ],
 
         tabBar: {

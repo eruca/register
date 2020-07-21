@@ -35,6 +35,7 @@ export default function Assists() {
                         { value: 'NRS2002' },
                         { value: 'AGI评分' },
                         { value: 'RASS评分' },
+                        { value: 'CPOT评分' },
                     ]}
                 />
             </AtList>
@@ -90,6 +91,9 @@ const onClick2 = (item: object, index: number) => {
             break;
         case 3:
             Taro.navigateTo({ url: '/pages/assess/rass/index' });
+            break;
+        case 4:
+            Taro.navigateTo({ url: '/pages/assess/cpot/index' });
             break;
         default:
     }

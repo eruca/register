@@ -1,0 +1,6 @@
+.gridcontainer {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr auto;
+    grid-gap: 2rpx;
+    font-size: 0.7em;
+}
