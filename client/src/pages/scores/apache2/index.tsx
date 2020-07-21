@@ -18,7 +18,6 @@ import {
     rbc_compress_volume,
     wbc_count,
 } from './config';
-import Title from '../../../components/Title';
 import './style.css';
 
 const tabs = [{ title: '急性生理评分' }, { title: '年龄评分+GCS' }, { title: '慢性病评分' }];
@@ -29,7 +28,7 @@ const isDigit = /^\d+$/;
 
 const diseaseArray: Array<[string, number]> = [
     ['哮喘/过敏', -2.108],
-    ['COPY', -0.367],
+    ['COPD', -0.367],
     ['非心源性肺水肿', -0.251],
     ['呼吸骤停后', -0.168],
     ['误吸/中毒', -0.142],
@@ -131,15 +130,17 @@ export default function Apache2() {
         setIsMap(true);
         const parts = bp.split('/').map((p) => parseInt(p, 10));
         const _map = (parts[0] + 2 * parts[1]) / 3;
+        console.log('map', _map);
+
         if (_map < 49) {
             maps.setIndex(0);
-        } else if (_map >= 50 && _map <= 69) {
+        } else if (_map >= 50 && _map < 70) {
             maps.setIndex(1);
-        } else if (_map >= 70 && _map <= 109) {
+        } else if (_map >= 70 && _map < 110) {
             maps.setIndex(2);
-        } else if (_map >= 110 && _map <= 129) {
+        } else if (_map >= 110 && _map < 130) {
             maps.setIndex(3);
-        } else if (_map >= 130 && _map <= 159) {
+        } else if (_map >= 130 && _map < 160) {
             maps.setIndex(4);
         } else {
             maps.setIndex(5);
@@ -191,10 +192,11 @@ export default function Apache2() {
         Math.abs(k.scores[k.index]) +
         Math.abs(acuteRenalFailure ? 2 * cr.scores[cr.index] : cr.scores[cr.index]) +
         Math.abs(compress_volume.scores[compress_volume.index]) +
-        Math.abs(wbc.scores[wbc.index]) +
-        Math.abs(15 - gcs);
+        Math.abs(wbc.scores[wbc.index]);
+    const score2 = Math.abs(15 - gcs);
 
-    const allScore = score1 + Math.abs(ages.scores[ages.index]) + chronicScores[chronicIndex];
+    const allScore =
+        score1 + score2 + Math.abs(ages.scores[ages.index]) + chronicScores[chronicIndex];
 
     const x =
         -3.517 +
@@ -202,31 +204,19 @@ export default function Apache2() {
         (surgicalIndex === 1 ? 0.603 : 0) +
         admissionScores[admiDiseaseIndex];
     const R = (Math.exp(x) / (1 + Math.exp(x))) * 100;
-    console.log(
-        'allscore',
-        allScore,
-        admissionScores[admiDiseaseIndex],
-        'x',
-        x,
-        'R',
-        R,
-        typeof admiDiseaseIndex,
-        admiDiseaseIndex
-    );
+    // console.log('allscore',allScore,admissionScores[admiDiseaseIndex],'x',x,'R',R,typeof admiDiseaseIndex,admiDiseaseIndex);
 
     return (
         <View style={{ paddingTop: '3PX' }}>
             <AtMessage />
             <View className="fix_view">
-                分值:
-                {`${score1} + ${Math.abs(ages.scores[ages.index])} + ${
+                {`A:${Math.abs(ages.scores[ages.index])} + B:${
                     chronicScores[chronicIndex]
-                } = ${allScore} 死亡率: ${R.toFixed(3)}%`}
+                } + C:${score2} + D:${score1} = ${allScore} 死亡率: ${R.toFixed(3)}%`}
             </View>
             <View style={{ marginTop: '20PX' }}>
                 <AtTabs tabList={tabs} current={currentTab} onClick={(v) => setCurrentTab(v)}>
                     <AtTabsPane current={currentTab} index={0}>
-                        <Title title="生命体征" />
                         <CPicker {...retalTemps} />
                         <View style={{ margin: 'auto -5PX -10PX -5PX' }}>
                             <AtSwitch
@@ -244,9 +234,10 @@ export default function Apache2() {
                                     name="bp"
                                     title="血压"
                                     value={bp}
+                                    type="digit"
                                     placeholder="输入血压"
                                     onChange={bpChange}
-                                    clear
+                                    clear={true}
                                     onBlur={onBlur}
                                 >
                                     mmHg
@@ -256,7 +247,6 @@ export default function Apache2() {
                         <CPicker {...respirateRate} />
                         <CPicker {...heartRate} />
 
-                        <Title title="氧合" />
                         <View style={{ margin: 'auto -5PX -10PX -5PX' }}>
                             <AtSwitch
                                 title={`吸氧浓度${fio2 ? '≥' : '<'}50%`}
@@ -282,8 +272,6 @@ export default function Apache2() {
                             />
                         </View>
                         <CPicker index={phIndex} setIndex={setPhIndex} {...phConfig} />
-
-                        <Title title="血清化学物质" />
                         <CPicker {...na} />
                         <CPicker {...k} />
 
@@ -299,7 +287,6 @@ export default function Apache2() {
                         </View>
                         <CPicker {...cr} />
 
-                        <Title title="血液" />
                         <CPicker {...compress_volume} />
                         <CPicker {...wbc} />
                     </AtTabsPane>
@@ -309,14 +296,27 @@ export default function Apache2() {
                                 name="gcs"
                                 title="GCS评分"
                                 type="number"
-                                value={gcs.toString()}
-                                onChange={(v) => {
+                                value={gcs ? gcs.toString() : ''}
+                                clear={true}
+                                onChange={(v) =>
+                                    v ? setGcs(parseInt(v as string, 10)) : setGcs(0)
+                                }
+                                onBlur={(v) => {
                                     const v1 = parseInt(v as string, 10);
-                                    if (v1 < 3 || v > 15) {
-                                        Taro.atMessage({ message: 'GCS在3~15之间', type: 'error' });
+                                    if (Number.isNaN(v1)) {
+                                        Taro.atMessage({
+                                            message: '请输入数字3~15',
+                                            type: 'error',
+                                        });
                                         return;
                                     }
-                                    setGcs(parseInt(v as string, 10));
+                                    if (v1 < 3 || v1 > 15) {
+                                        Taro.atMessage({
+                                            message: 'GCS必须在3~15之间, 将重置为15',
+                                            type: 'error',
+                                        });
+                                        setGcs(15);
+                                    }
                                 }}
                             />
                         </View>

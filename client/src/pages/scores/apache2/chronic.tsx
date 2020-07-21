@@ -71,7 +71,7 @@ export default function Chronic({
                   的慢性低氧、CO2潴留、继发性真红细胞增多症、
                 </View>
                 <View className="at-col at-col-12">
-                  重度肺动脉高压(> 40mmHg)或呼吸肌依赖
+                  重度肺动脉高压(&gt; 40mmHg)或呼吸肌依赖
                 </View>
               </View>
             </View>
