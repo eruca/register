@@ -106,6 +106,7 @@ export default function CpotPage() {
                 )}
                 <View style={even}>2</View>
             </View>
+            <View style={{ fontSize: '0.7em', color: 'red' }}>注: CPOT 评分≥3分提示明显疼痛</View>
             <AtSwitch title="插管状态" checked={isTube} onChange={() => setIsTube(!isTube)} />
         </View>
     );
