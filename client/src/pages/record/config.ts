@@ -68,11 +68,11 @@ export function convertToIRecord(record: LocalRecord, withID: boolean = true): I
         parenteralCalories: parseInt(record.parenteralCalories, 10),
         totalProtein: parseInt(record.totalProtein, 10),
         prealbumin: parseInt(record.prealbumin, 10),
-        albumin: parseInt(record.albumin, 10),
-        serumTransferrin: parseInt(record.serumTransferrin, 10), // 血清转铁蛋白
-        lymphocyteCount: parseInt(record.lymphocyteCount, 10), // 淋巴细胞计数
+        albumin: parseFloat(record.albumin),
+        serumTransferrin: parseFloat(record.serumTransferrin), // 血清转铁蛋白
+        lymphocyteCount: parseFloat(record.lymphocyteCount), // 淋巴细胞计数
         hemoglobin: parseInt(record.hemoglobin, 10),
-        fastingGlucose: parseInt(record.fastingGlucose, 10), // 空腹血糖
+        fastingGlucose: parseFloat(record.fastingGlucose), // 空腹血糖
         gastricRetention: parseInt(record.gastricRetention, 10), // 胃潴留量
         injectionOfAlbumin: parseInt(record.injectionOfAlbumin, 10), // 注射白蛋白量
         enteralNutritionToleranceScore: parseInt(record.enteralNutritionToleranceScore),
