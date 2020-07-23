@@ -11,6 +11,8 @@ export interface IRecord {
     nasalFeedTubeType: number;
     enteralCalories: number;
     parenteralCalories: number;
+    enteralProtein: number; // 肠内营养性氨基酸
+    parenteralProtein: number; // 肠外营养性氨基酸
     totalProtein: number;
     prealbumin: number;
     albumin: number;
@@ -34,6 +36,8 @@ export function zeroRecord(patient_id: string): IRecord {
         nasalFeedTubeType: 0,
         enteralCalories: 0,
         parenteralCalories: 0,
+        enteralProtein: 0,
+        parenteralProtein: 0,
         totalProtein: 0,
         prealbumin: 0,
         albumin: 0,
@@ -49,6 +53,30 @@ export function zeroRecord(patient_id: string): IRecord {
         agiIndex: 0,
         enteralNutritionToleranceScore: 0,
     };
+}
+
+export function equalRecords(lhs: IRecord, rhs: IRecord): boolean {
+    return (
+        lhs.recordtime === rhs.recordtime &&
+        lhs.nasalFeedTubeType === rhs.nasalFeedTubeType &&
+        lhs.misinhalation === rhs.misinhalation &&
+        lhs.diarrhea === rhs.diarrhea &&
+        lhs.gastrointestinalHemorrhage === rhs.gastrointestinalHemorrhage &&
+        lhs.agiIndex === rhs.agiIndex &&
+        lhs.enteralCalories === rhs.enteralCalories &&
+        lhs.parenteralCalories === rhs.parenteralCalories &&
+        lhs.enteralProtein === rhs.enteralProtein &&
+        lhs.parenteralProtein === rhs.parenteralProtein &&
+        lhs.totalProtein === rhs.totalProtein &&
+        lhs.prealbumin === rhs.prealbumin &&
+        lhs.serumTransferrin === rhs.serumTransferrin &&
+        lhs.lymphocyteCount === rhs.lymphocyteCount &&
+        lhs.hemoglobin === rhs.hemoglobin &&
+        lhs.fastingGlucose === rhs.fastingGlucose &&
+        lhs.gastricRetention === rhs.gastricRetention &&
+        lhs.injectionOfAlbumin === rhs.injectionOfAlbumin &&
+        lhs.enteralNutritionToleranceScore === rhs.enteralNutritionToleranceScore
+    );
 }
 
 export interface IRecordState {

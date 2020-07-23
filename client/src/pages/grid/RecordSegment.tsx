@@ -60,7 +60,7 @@ export default function RecordSegment() {
     const newRecord = useCallback(() => {
         dispatch(deselectRecord());
         Taro.navigateTo({
-            url: '/pages/record/index',
+            url: '/pages/record/index?new=true',
         });
     }, []);
 

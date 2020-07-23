@@ -80,6 +80,9 @@ export default function Patient() {
             return;
         }
 
+        if (submitDisable === true) {
+            return;
+        }
         // disable 重复点击
         setSubmitDisable(true);
 
@@ -119,7 +122,7 @@ export default function Patient() {
                     },
                 });
         }
-    }, [patient, auth, patient_id]);
+    }, [patient, auth, patient_id, setSubmitDisable, submitDisable]);
 
     // 如果是已经有patient_id, 但是这个时候网络断了，那么就会出现这种情况
     return patient_id !== '' && !patient._id ? (
