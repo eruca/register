@@ -97,7 +97,7 @@ export default function Form() {
                     success: function () {
                         Taro.atMessage({ message: '添加记录成功', type: 'success' });
                         setDisableSubmit(false);
-                        Taro.navigateTo({ url: '/pages/grid/index' });
+                        Taro.redirectTo({ url: '/pages/grid/index' });
                         dispatch(forceRerender());
                     },
                     fail: function () {
@@ -106,20 +106,22 @@ export default function Form() {
                     },
                 });
         } else {
-            console.log('modify');
+            console.log('modify', record);
+            // 修正需要删除_id, _openid
+            const { _openid, _id, ...data } = record;
             Taro.cloud
                 .database()
                 .collection('records')
                 .doc(record_id)
                 .set({
-                    data: record,
+                    data,
                     success: function () {
                         Taro.atMessage({ message: '修改记录成功', type: 'success' });
                         Taro.redirectTo({ url: '/pages/grid/index' });
                         dispatch(forceRerender());
                     },
-                    fail: function () {
-                        console.error(arguments);
+                    fail: function (e) {
+                        console.error(e);
                         setDisableSubmit(false);
                     },
                 });

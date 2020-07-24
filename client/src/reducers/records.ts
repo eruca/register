@@ -67,6 +67,7 @@ export function equalRecords(lhs: IRecord, rhs: IRecord): boolean {
         lhs.parenteralCalories === rhs.parenteralCalories &&
         lhs.enteralProtein === rhs.enteralProtein &&
         lhs.parenteralProtein === rhs.parenteralProtein &&
+        lhs.albumin === rhs.albumin &&
         lhs.totalProtein === rhs.totalProtein &&
         lhs.prealbumin === rhs.prealbumin &&
         lhs.serumTransferrin === rhs.serumTransferrin &&
