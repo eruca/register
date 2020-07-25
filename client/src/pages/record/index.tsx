@@ -42,7 +42,9 @@ export default function Form() {
         })
     );
     // 是不是是新页，目的在于如果新建的话，不要显示0，而是空，从而显示placeholder
-    const newOne = useRouter().params.new ? true : false;
+    const routerParams = useRouter().params;
+    console.log('routerParmas', routerParams);
+    const newOne = routerParams.new ? true : false;
 
     // 控制浮动层
     const [floatLay, setfloatLay] = useState(false);
@@ -51,6 +53,31 @@ export default function Form() {
     const rd = zeroRecord(patient_id);
     const [finalRecord, setFinalRecord] = useState(rd);
     const [record, setRecord] = useState(rd);
+
+    // 数据从营养计算页面返回来的数据
+    useEffect(() => {
+        setRecord((rd1) => ({
+            ...rd1,
+            enteralCalories: routerParams.enCalories
+                ? parseInt(routerParams.enCalories, 10)
+                : rd1.enteralCalories,
+            enteralProtein: routerParams.enAmino
+                ? parseInt(routerParams.enAmino, 10)
+                : rd1.enteralProtein,
+            parenteralCalories: routerParams.pnCalories
+                ? parseInt(routerParams.pnCalories, 10)
+                : rd1.parenteralCalories,
+            parenteralProtein: routerParams.pnAmino
+                ? parseInt(routerParams.pnAmino, 10)
+                : rd1.parenteralProtein,
+        }));
+    }, [
+        routerParams.enCalories,
+        routerParams.enAmino,
+        routerParams.pnCalories,
+        routerParams.pnAmino,
+        setRecord,
+    ]);
 
     useEffect(() => {
         console.log('ask for database: record_id:', record_id);
@@ -225,104 +252,39 @@ export default function Form() {
                             size="30"
                             color="#79A4FA"
                             onClick={() =>
-                                Taro.navigateTo({ url: '/pages/scores/nutrition/index' })
+                                Taro.navigateTo({ url: '/pages/scores/nutrition/index?back=true' })
                             }
                         />
                     </View>
                 </View>
 
-                <View
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <View style={{ flexGrow: 1 }}>
-                        <AtInput
-                            name="parenteralCalories"
-                            title="肠外热卡(kcal):"
-                            type="number"
-                            clear={true}
-                            placeholder="请输入肠外热卡"
-                            value={newOne ? '' : record.parenteralCalories.toString()}
-                            onChange={onChange(setRecord, 'parenteralCalories', parseInt)}
-                        />
-                    </View>
-                    <View style={{ marginRight: '18PX' }}>
-                        <AtIcon
-                            value="external-link"
-                            size="30"
-                            color="#79A4FA"
-                            onClick={() =>
-                                Taro.navigateTo({ url: '/pages/scores/nutrition/index' })
-                            }
-                        />
-                    </View>
-                </View>
-
-                <View
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <View style={{ flexGrow: 1 }}>
-                        <AtInput
-                            name="enteralProtein"
-                            title="肠内蛋白(g):"
-                            type="number"
-                            placeholder="请输入肠内营养性蛋白"
-                            clear={true}
-                            value={newOne ? '' : record.enteralProtein.toString()}
-                            onChange={onChange(setRecord, 'enteralProtein', parseInt)}
-                        />
-                    </View>
-                    <View style={{ marginRight: '18PX' }}>
-                        <AtIcon
-                            value="external-link"
-                            size="30"
-                            color="#79A4FA"
-                            onClick={() =>
-                                Taro.navigateTo({ url: '/pages/scores/nutrition/index' })
-                            }
-                        />
-                    </View>
-                </View>
-
-                <View
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <View style={{ flexGrow: 1 }}>
-                        <AtInput
-                            name="parenteralProtein"
-                            title="肠外氨基酸(g):"
-                            type="number"
-                            placeholder="请输入肠外营养性氨基酸(g)"
-                            clear={true}
-                            value={newOne ? '' : record.parenteralProtein.toString()}
-                            onChange={onChange(setRecord, 'parenteralProtein', parseInt)}
-                        />
-                    </View>
-                    <View style={{ marginRight: '18PX' }}>
-                        <AtIcon
-                            value="external-link"
-                            size="30"
-                            color="#79A4FA"
-                            onClick={() =>
-                                Taro.navigateTo({ url: '/pages/scores/nutrition/index' })
-                            }
-                        />
-                    </View>
-                </View>
+                <AtInput
+                    name="parenteralCalories"
+                    title="肠外热卡(kcal):"
+                    type="number"
+                    clear={true}
+                    placeholder="请输入肠外热卡"
+                    value={newOne ? '' : record.parenteralCalories.toString()}
+                    onChange={onChange(setRecord, 'parenteralCalories', parseInt)}
+                />
+                <AtInput
+                    name="enteralProtein"
+                    title="肠内蛋白(g):"
+                    type="number"
+                    placeholder="请输入肠内营养性蛋白"
+                    clear={true}
+                    value={newOne ? '' : record.enteralProtein.toString()}
+                    onChange={onChange(setRecord, 'enteralProtein', parseInt)}
+                />
+                <AtInput
+                    name="parenteralProtein"
+                    title="肠外氨基酸(g):"
+                    type="number"
+                    placeholder="请输入肠外营养性氨基酸(g)"
+                    clear={true}
+                    value={newOne ? '' : record.parenteralProtein.toString()}
+                    onChange={onChange(setRecord, 'parenteralProtein', parseInt)}
+                />
 
                 <AtInput
                     name="totalProtein"
