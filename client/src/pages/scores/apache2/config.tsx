@@ -142,7 +142,7 @@ export function gen_cr(defaultIndex = 1) {
         index,
         setIndex,
         items: ['x<53', '53≤x<128', '128≤x<172', '172≤x<305', '≥305'],
-        scores: [-1, 0, 2, 3, 4],
+        scores: [-2, 0, 2, 3, 4],
         text: '血肌酐(mmol/L)',
     };
 }

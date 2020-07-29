@@ -75,9 +75,20 @@ export default function Nutrition() {
     return (
         <View>
             <AtMessage />
-            <AtNoticebar>{`热卡:${(pngsCalories + engsCalories + enCalories + pnCalories).toFixed(
+            <View
+                style={{
+                    display: 'flex',
+                    position: 'sticky',
+                    top: 0,
+                    left: 0,
+                    zIndex: 9,
+                    fontSize: '1.5em',
+                    justifyContent: 'center',
+                    backgroundColor: '#FFCCFF',
+                }}
+            >{`热卡:${(pngsCalories + engsCalories + enCalories + pnCalories).toFixed(
                 2
-            )}kcal,蛋白:${(amino + enAmino + pnAmino).toFixed(2)}g`}</AtNoticebar>
+            )}kcal,蛋白:${(amino + enAmino + pnAmino).toFixed(2)}g`}</View>
             <AtList>
                 <AtListItem
                     title={`肠外葡萄糖: ${pngsCalories.toFixed(2)}kcal `}
