@@ -13,7 +13,8 @@ const config = {
 };
 
 // email正则
-const mail_regexp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+// const mail_regexp = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+const mail_regexp = /^([a-zA-Z0-9_\-\.])+@([a-zA-Z0-9_\-\.])+(\.[a-zA-Z0-9_-]+)+$/;
 
 const transporter = nodemailer.createTransport(config);
 
