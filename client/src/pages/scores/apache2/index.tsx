@@ -101,37 +101,16 @@ export default function Apache2() {
     const maps = gen_map();
     const [isMap, setIsMap] = useState(true);
     const [bp, setBp] = useState<string>('');
-    const [bpCharCnt, setBpCharCnt] = useState<number>(0);
-    const bpChange = (e) => {
-        // 如果是删除键，保持原样
-        if (e.length < bpCharCnt) {
-            setBpCharCnt(e.length);
-            setBp(e);
+    const onBlur = () => {
+        const parts = bp.split('.').map((p) => parseInt(p, 10));
+        if (parts.length !== 2) {
+            Taro.atMessage({ message: '请输入血压以 140.90', type: 'error' });
             return;
         }
-
-        const parts = (e as string).split('/');
-        if (parts.length === 1) {
-            if (!isDigit.test(parts[0])) {
-                Taro.atMessage({ message: '请输入血压值', type: 'error' });
-            } else if (parseInt(parts[0], 10) > 30) {
-                setBp(e + '/');
-                setBpCharCnt(e.length + 1);
-                return;
-            }
-        } else if (!isDigit.test(parts[0]) || !isDigit.test(parts[1])) {
-            Taro.atMessage({ message: '请输入血压值2', type: 'error' });
-        }
-
-        setBpCharCnt(e.length);
-        setBp(e);
-    };
-    const onBlur = () => {
-        setIsMap(true);
-        const parts = bp.split('/').map((p) => parseInt(p, 10));
         const _map = (parts[0] + 2 * parts[1]) / 3;
         console.log('map', _map);
 
+        setIsMap(true);
         if (_map < 49) {
             maps.setIndex(0);
         } else if (_map >= 50 && _map < 70) {
@@ -235,8 +214,8 @@ export default function Apache2() {
                                     title="血压"
                                     value={bp}
                                     type="digit"
-                                    placeholder="输入血压"
-                                    onChange={bpChange}
+                                    placeholder="输入170.65"
+                                    onChange={(e) => setBp(e as string)}
                                     clear={true}
                                     onBlur={onBlur}
                                 >
