@@ -24,8 +24,6 @@ const tabs = [{ title: '急性生理评分' }, { title: '年龄评分+GCS' }, { 
 
 const chronicScores = [0, 2, 5];
 
-const isDigit = /^\d+$/;
-
 const diseaseArray: Array<[string, number]> = [
     ['哮喘/过敏', -2.108],
     ['COPD', -0.367],
