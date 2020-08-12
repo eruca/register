@@ -15,7 +15,7 @@ import { IReducers } from '../../reducers';
 import { syncViewSet } from '../../actions/user';
 import FormField from '../../components/FormField';
 
-const listTypes = ['我的', '本组', '所有'];
+const listTypes = ['我的', '本组', '本组(显示作者)', '所有'];
 const timeOptions = ['所有', '未满1周', '已到1周'];
 const resultOptions = ['所有', '无结果', '有结果'];
 
@@ -63,7 +63,7 @@ export default function Viewset() {
                         mode="selector"
                         range={listTypes.slice(
                             0,
-                            isUnknown(user.authority) ? 1 : isRoot(user.authority) ? 3 : 2
+                            isUnknown(user.authority) ? 1 : isRoot(user.authority) ? 4 : 3
                         )}
                         value={user.listType}
                         onChange={(e) => {

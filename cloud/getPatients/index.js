@@ -49,7 +49,7 @@ exports.main = async (event, context) => {
             };
             break;
         // 获取全部数据
-        case 2:
+        case 3:
             final_filter = {
                 ...filter,
                 enrolltime:
@@ -63,8 +63,9 @@ exports.main = async (event, context) => {
 
             break;
 
-        // 获取组内数据
+        // 获取组内数据，包括显示最近的人，或者作者
         case 1:
+        case 2:
             // 获取登录用户组内朋友的cocodes
             const { data } =
                 (await db
@@ -139,7 +140,7 @@ exports.main = async (event, context) => {
 
     // 如果是全部的话，看作者，而不是监督员
     const openid_nicknames =
-        listType === 2
+        listType === 2 || listType === 3
             ? await getAuthorInfo(result.found, wxContext.OPENID)
             : await getSupervisorInfo(result.found, wxContext.OPENID);
 
