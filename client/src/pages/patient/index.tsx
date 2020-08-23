@@ -22,6 +22,7 @@ import { isCrew } from '../../reducers/user';
 import { forceRerender } from '../../actions/user';
 import { selector, LocalPatient, convertToLocal, convertToPatient, equal } from './config';
 import { validate } from './validator';
+// import { AGIs } from '../../constants/record';
 import './index.scss';
 
 export default function Patient() {
@@ -392,6 +393,40 @@ export default function Patient() {
                         />
                     </View>
                 </View>
+                {/* <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Picker
+                        mode="selector"
+                        range={AGIs}
+                        style={{ flexGrow: 1 }}
+                        value={patient.agi}
+                        onChange={(v) =>
+                            setPatient({
+                                ...patient,
+                                agi:
+                                    typeof v.detail.value === 'number'
+                                        ? v.detail.value
+                                        : parseInt(v.detail.value, 10),
+                            })
+                        }
+                    >
+                        <FormField name="AGI 评级" value={AGIs[record.agiIndex]} />
+                    </Picker>
+                    <View style={{ marginRight: '18PX' }}>
+                        <AtIcon
+                            value="external-link"
+                            size="25"
+                            color="#79A4FA"
+                            onClick={() => Taro.navigateTo({ url: '/pages/assess/agi/index' })}
+                        />
+                    </View>
+                </View> */}
                 <View
                     style={{
                         display: 'flex',
