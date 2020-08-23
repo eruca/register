@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 import Loading from '../../components/Loading';
 import { IPatient } from '../../reducers/patient';
 import { deselect, select } from '../../actions/patient';
-import { isCrew } from '../../reducers/user';
+import { isCrew, isUnknown } from '../../reducers/user';
 import { IReducers } from '../../reducers';
 import { forceRerender } from '../../actions/user';
 import { splitter } from '../../utils/regexp';
@@ -249,11 +249,11 @@ export default function List() {
                     onClick={useCallback(() => {
                         dispatch(deselect());
                         Taro.navigateTo({
-                            url: '/pages/patient/index',
+                            url: isUnknown(auth) ? '/pages/user/index' : '/pages/patient/index',
                         });
                     }, [dispatch])}
                 >
-                    新增
+                    {isUnknown(auth) ? '加入RCT' : '新增'}
                 </AtButton>
             </View>
             <AtModal isOpened={isModalOpened}>
