@@ -12,18 +12,22 @@ export type LineValueType = {
 
 type LineType = {
     data: LineValueType[];
+    showZero: boolean;
     style?: CSSProperties;
 };
 
 export default function Line({
     data = [],
+    showZero,
     style = { width: '100%', height: '600rpx', position: 'relative' },
 }: LineType) {
     const [graph, setGraph] = useState(null);
 
+    const data2 = data.filter((item) => item.value > 0);
+
     if (graph && data.length > 0) {
-        console.log('data', data);
-        graph.changeData(data);
+        console.log('data', data2);
+        graph.changeData(showZero ? data : data2);
     }
 
     const initChart = (canvas: any, width: number, height: number) => {
@@ -34,7 +38,7 @@ export default function Line({
             height,
         });
 
-        chart.source(data, {
+        chart.source(data2, {
             date: {
                 type: 'timeCat',
                 range: [0, 1],

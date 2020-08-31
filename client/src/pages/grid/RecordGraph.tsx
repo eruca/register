@@ -1,4 +1,4 @@
-import Taro, { useEffect, useState } from '@tarojs/taro';
+import Taro, { useEffect, useState, base64ToArrayBuffer } from '@tarojs/taro';
 import { View, Picker } from '@tarojs/components';
 import { AtList, AtListItem } from 'taro-ui';
 
@@ -22,17 +22,17 @@ const selectors: string[] = [
 ];
 
 const map = new Map([
-    ['肠内热卡', 'enteralCalories'],
-    ['肠外热卡', 'parenteralCalories'],
-    ['总蛋白', 'totalProtein'],
-    ['前白蛋白', 'prealbumin'],
-    ['白蛋白', 'albumin'],
-    ['转铁蛋白', 'serumTransferrin'],
-    ['淋巴细胞计数', 'lymphocyteCount'],
-    ['血红蛋白', 'hemoglobin'],
-    ['空腹血糖', 'fastingGlucose'],
-    ['AGI', 'agiIndex'],
-    ['耐受性评分', 'enteralNutritionToleranceScore'],
+    ['肠内热卡', { name: 'enteralCalories', showZero: false }],
+    ['肠外热卡', { name: 'parenteralCalories', showZero: false }],
+    ['总蛋白', { name: 'totalProtein', showZero: false }],
+    ['前白蛋白', { name: 'prealbumin', showZero: false }],
+    ['白蛋白', { name: 'albumin', showZero: false }],
+    ['转铁蛋白', { name: 'serumTransferrin', showZero: false }],
+    ['淋巴细胞计数', { name: 'lymphocyteCount', showZero: false }],
+    ['血红蛋白', { name: 'hemoglobin', showZero: false }],
+    ['空腹血糖', { name: 'fastingGlucose', showZero: false }],
+    ['AGI', { name: 'agiIndex', showZero: true }],
+    ['耐受性评分', { name: 'enteralNutritionToleranceScore', showZero: true }],
 ]);
 
 export default function RecordGraph() {
@@ -59,15 +59,22 @@ export default function RecordGraph() {
     // Picker的value
     const [currIndex, setCurrIndex] = useState(0);
 
-    const data: LineValueType[] = patientRecords.map((record: IRecord) => ({
-        date: record['recordtime'],
-        value: record[map.get(selectors[currIndex]) || 'enteralCalories'],
-    }));
+    const data: LineValueType[] = patientRecords.map((record: IRecord) => {
+        const mapValue = map.get(selectors[currIndex]);
+        const name = mapValue ? mapValue.name : 'enteralCalories';
+        return {
+            date: record['recordtime'],
+            value: record[name],
+        };
+    });
+
+    const mapValue = map.get(selectors[currIndex]);
+    const showZero = mapValue ? mapValue.showZero : false;
 
     return (
         <View className="index">
             {Array.isArray(data) && data.length > 0 ? (
-                <Line data={data} />
+                <Line data={data} showZero={showZero} />
             ) : (
                 <View
                     style={{
