@@ -22,6 +22,7 @@ import { isCrew } from '../../reducers/user';
 import { forceRerender } from '../../actions/user';
 import { selector, LocalPatient, convertToLocal, convertToPatient, equal } from './config';
 import { validate } from './validator';
+import { AGIs } from '../../constants/patient';
 import './index.scss';
 
 export default function Patient() {
@@ -370,19 +371,23 @@ export default function Patient() {
                         alignItems: 'center',
                     }}
                 >
-                    <View style={{ flexGrow: 1 }}>
-                        <AtInput
-                            name="agi"
-                            title="AGI:"
-                            type="number"
-                            placeholder="0-4"
-                            value={patient.agi === '0' && patient_id === '' ? '' : patient.agi}
-                            onChange={useCallback(
-                                (v: string) => setPatient({ ...patient, agi: v ? v : '0' }),
-                                [patient, setPatient]
-                            )}
-                        />
-                    </View>
+                    <Picker
+                        mode="selector"
+                        range={AGIs}
+                        style={{ flexGrow: 1 }}
+                        value={parseInt(patient.agi, 10)}
+                        onChange={(v) =>
+                            setPatient({
+                                ...patient,
+                                agi:
+                                    typeof v.detail.value === 'number'
+                                        ? v.detail.value.toString()
+                                        : v.detail.value,
+                            })
+                        }
+                    >
+                        <FormField name="AGI 评级" value={AGIs[patient.agi]} />
+                    </Picker>
                     <View style={{ marginRight: '18PX' }}>
                         <AtIcon
                             value="external-link"
