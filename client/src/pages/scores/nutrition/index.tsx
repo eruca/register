@@ -1,10 +1,13 @@
 import Taro, { useState, useRouter } from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { AtList, AtMessage, AtNoticebar, AtInput, AtListItem, AtButton } from 'taro-ui';
+import { AtList, AtMessage, AtInput, AtListItem, AtButton } from 'taro-ui';
 
 export default function Nutrition() {
     // 返回数据给调用方
-    const backValues = useRouter().params['back'];
+    const params = useRouter().params;
+    const backValues = params['back'];
+    const nasalFeedTubeType = params['nasalFeedTubeType'];
+    const recordtime = params['recordtime'];
 
     // 肠外葡萄糖
     const [pnGs, setPnGs] = useState(false);
@@ -69,7 +72,7 @@ export default function Nutrition() {
                 enCalories + engsCalories
             }&enAmino=${enAmino}&pnCalories=${pnCalories + pngsCalories}&pnAmino=${
                 pnAmino + amino
-            }`,
+            }&nasalFeedTubeType=${nasalFeedTubeType}&recordtime=${recordtime}`,
         });
 
     return (

@@ -18,11 +18,10 @@ import { zeroRecord, IRecord, equalRecords } from '../../reducers/records';
 import FormField from '../../components/FormField';
 import { IReducers } from '../../reducers';
 import { isCrew } from '../../reducers/user';
-import { AGIs } from '../../constants/patient';
-import { nasalFeedTubeTypes } from './config';
 import { validate } from './validator';
 import { forceRerender } from '../../actions/user';
 import EnteralNutritionTolerance from '../../components/EnteralNutritionTolerance';
+import { AGIs, nasalFeedTubeTypes } from '../../constants/record';
 
 // onChange: 如果输入时不规范，比如....，也可以强制改为0
 const onChange = (setRecord, key, parse: (v3: string) => number) => (v: string) => {
@@ -57,26 +56,37 @@ export default function Form() {
 
     // 数据从营养计算页面返回来的数据
     useEffect(() => {
-        setRecord((rd1) => ({
-            ...rd1,
-            enteralCalories: routerParams.enCalories
-                ? parseInt(routerParams.enCalories, 10)
-                : rd1.enteralCalories,
-            enteralProtein: routerParams.enAmino
-                ? parseInt(routerParams.enAmino, 10)
-                : rd1.enteralProtein,
-            parenteralCalories: routerParams.pnCalories
-                ? parseInt(routerParams.pnCalories, 10)
-                : rd1.parenteralCalories,
-            parenteralProtein: routerParams.pnAmino
-                ? parseInt(routerParams.pnAmino, 10)
-                : rd1.parenteralProtein,
-        }));
+        setRecord((rd1) => {
+            console.log(`${rd1.recordtime} in useEffect`);
+            return {
+                ...rd1,
+                enteralCalories: routerParams.enCalories
+                    ? parseInt(routerParams.enCalories, 10)
+                    : rd1.enteralCalories,
+                enteralProtein: routerParams.enAmino
+                    ? parseInt(routerParams.enAmino, 10)
+                    : rd1.enteralProtein,
+                parenteralCalories: routerParams.pnCalories
+                    ? parseInt(routerParams.pnCalories, 10)
+                    : rd1.parenteralCalories,
+                parenteralProtein: routerParams.pnAmino
+                    ? parseInt(routerParams.pnAmino, 10)
+                    : rd1.parenteralProtein,
+                nasalFeedTubeType: routerParams.nasalFeedTubeType
+                    ? parseInt(routerParams.nasalFeedTubeType)
+                    : rd1.nasalFeedTubeType,
+                recordtime: routerParams.recordtime
+                    ? routerParams.recordtime
+                    : dayjs().format('YYYY-MM-DD'),
+            };
+        });
     }, [
         routerParams.enCalories,
         routerParams.enAmino,
         routerParams.pnCalories,
         routerParams.pnAmino,
+        routerParams.nasalFeedTubeType,
+        routerParams.recordtime,
         setRecord,
     ]);
 
@@ -253,7 +263,9 @@ export default function Form() {
                             size="30"
                             color="#79A4FA"
                             onClick={() =>
-                                Taro.navigateTo({ url: '/pages/scores/nutrition/index?back=true' })
+                                Taro.navigateTo({
+                                    url: `/pages/scores/nutrition/index?back=true&nasalFeedTubeType=${record.nasalFeedTubeType}&recordtime=${record.recordtime}`,
+                                })
                             }
                         />
                     </View>
@@ -291,7 +303,7 @@ export default function Form() {
                     name="totalProtein"
                     title="总蛋白(g):"
                     clear={true}
-                    type="digit"
+                    type="number"
                     placeholder="50-80"
                     value={newOne ? '' : record.totalProtein.toString()}
                     onChange={onChange(setRecord, 'totalProtein', parseInt)}
@@ -301,7 +313,7 @@ export default function Form() {
                     title="前白蛋白(mg/L):"
                     clear={true}
                     placeholder="170-420"
-                    type="digit"
+                    type="number"
                     value={newOne ? '' : record.prealbumin.toString()}
                     onChange={onChange(setRecord, 'prealbumin', parseInt)}
                 />
