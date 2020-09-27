@@ -361,7 +361,7 @@ export default function Sofa() {
                                     value={dopamine ? dopamine.toString() : ''}
                                     onChange={(v: string) => setDopamine(v ? parseInt(v, 10) : 0)}
                                 >
-                                    <View style={{ marginRight: '10PX' }}>微克(mcg)</View>
+                                    <View style={{ marginRight: '10PX' }}>毫克(mg)</View>
                                 </AtInput>
                                 <AtInput
                                     name="dopamineSolute"
@@ -409,7 +409,7 @@ export default function Sofa() {
                                         setNorEPINEPHrine(v ? parseInt(v, 10) : 0)
                                     }
                                 >
-                                    <View style={{ marginRight: '10PX' }}>微克μg(mcg)</View>
+                                    <View style={{ marginRight: '10PX' }}>毫克(mg)</View>
                                 </AtInput>
                                 <AtInput
                                     name="NorEPINEPHrineSolute"
@@ -463,7 +463,7 @@ export default function Sofa() {
                                         setEPINEPHrine(v ? parseInt(v, 10) : 0)
                                     }
                                 >
-                                    <View style={{ marginRight: '10PX' }}>微克(mcg)</View>
+                                    <View style={{ marginRight: '10PX' }}>毫克(mg)</View>
                                 </AtInput>
                                 <AtInput
                                     name="EPINEPHrineSolute"
@@ -553,7 +553,7 @@ function getDopamineScore(
         if (dopamine === 0 || dopamineSolute === 0 || dopamineVelocity === 0) {
             return [3, 0];
         }
-        dopamineLevel = dopamine / weight / ((dopamineSolute / dopamineVelocity) * 60);
+        dopamineLevel = dopamine * 1000 / weight / ((dopamineSolute / dopamineVelocity) * 60);
         dopamineScore = dopamineLevel <= 5 ? 2 : dopamineLevel > 15 ? 4 : 3;
     }
     return [dopamineScore, dopamineLevel];
@@ -573,7 +573,7 @@ function getEpinephrineScore(
         if (EPINEPHrine === 0 || EPINEPHrineSolute === 0 || EPINEPHrineVelocity === 0) {
             return [3, 0];
         }
-        epinephrineLevel = EPINEPHrine / weight / ((EPINEPHrineSolute / EPINEPHrineVelocity) * 60);
+        epinephrineLevel = EPINEPHrine * 1000 / weight / ((EPINEPHrineSolute / EPINEPHrineVelocity) * 60);
         epinephrineScore = epinephrineLevel <= 0.1 ? 3 : 4;
     }
     return [epinephrineScore, epinephrineLevel];
@@ -594,7 +594,7 @@ function getNorepinephrineScore(
             return [3, 0];
         }
         norepinephrineLevel =
-            NorEPINEPHrine / weight / ((NorEPINEPHrineSolute / NorEPINEPHrineVelocity) * 60);
+            NorEPINEPHrine * 1000 / weight / ((NorEPINEPHrineSolute / NorEPINEPHrineVelocity) * 60);
         norepinephrineScore = norepinephrineLevel <= 0.1 ? 3 : 4;
     }
     return [norepinephrineScore, norepinephrineLevel];
